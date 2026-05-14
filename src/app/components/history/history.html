@@ -8,8 +8,8 @@
   <div class="bg-bg-surface p-4 rounded-3xl shadow-sm border border-gray-100 space-y-4">
     <div class="flex flex-wrap gap-2">
       <!-- Type Filter -->
-      <select 
-        [ngModel]="filterType()" 
+      <select
+        [ngModel]="filterType()"
         (ngModelChange)="filterType.set($event)"
         class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
       >
@@ -19,8 +19,8 @@
       </select>
 
       <!-- Sort By -->
-      <select 
-        [ngModel]="sortBy()" 
+      <select
+        [ngModel]="sortBy()"
         (ngModelChange)="sortBy.set($event)"
         class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
       >
@@ -32,7 +32,7 @@
       </select>
 
       <!-- Sort Order Toggle -->
-      <button 
+      <button
         (click)="toggleSortOrder()"
         class="bg-bg-base p-2 rounded-xl hover:bg-gray-100 transition-colors"
         title="Toggle Sort Order"
@@ -63,7 +63,7 @@
       </div>
       <p class="text-text-heading font-black uppercase tracking-tight">No results found</p>
       <p class="text-text-primary text-sm font-semibold mb-6">Try adjusting your filters.</p>
-      <button 
+      <button
         (click)="clearFilters()"
         class="bg-accent text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform"
       >
@@ -83,13 +83,13 @@
 
           <div class="grid gap-4">
             @for (activity of group.activities; track activity.id) {
-              <div 
-                class="bg-bg-surface rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer relative border border-gray-100 group select-none touch-pan-y active:bg-gray-50" 
+              <div
+                class="bg-bg-surface rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer relative border border-gray-100 group select-none touch-pan-y active:bg-gray-50"
                 style="-webkit-touch-callout: none;"
                 (click)="navigateToActivity(activity.id)"
                 (contextmenu)="onLongPress($event, activity.id)"
               >
-                <div class="p-5 flex justify-between items-center">
+                <div class="p-4 flex justify-between items-center">
                   <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-bg-base rounded-xl flex items-center justify-center group-hover:bg-accent/10 transition-colors">
                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,14 +101,30 @@
                       <p class="text-text-primary text-xs font-semibold">{{ activity.date | date:'shortTime' }}</p>
                     </div>
                   </div>
-                  <div class="text-right">
-                    <p class="font-black text-2xl text-text-heading tracking-tighter">{{ (activity.totalDistance / 1000) | number:'1.2-2' }} <span class="text-xs text-text-primary uppercase font-bold">km</span></p>
-                    <p class="text-text-primary text-xs font-bold uppercase tracking-widest">{{ formatTime(activity.totalTime) }}</p>
+                  <div class="text-right flex flex-col items-end">
+                    <p class="font-black text-2xl text-text-heading tracking-tighter leading-none mb-1">
+                      {{ (activity.totalDistance / 1000) | number:'1.2-2' }} <span class="text-xs text-text-primary uppercase font-bold">km</span>
+                    </p>
+                    <div class="flex items-center space-x-3 text-[10px] font-bold uppercase tracking-wider text-text-primary">
+                      <span>{{ formatTime(activity.totalTime) }}</span>
+                      <span class="flex items-center text-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {{ activity.totalClimb | number:'1.0-0' }}m
+                      </span>
+                      <span class="flex items-center text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 112 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {{ activity.totalDescent | number:'1.0-0' }}m
+                      </span>
+                    </div>
                   </div>
                 </div>
-                
+
                 <!-- Delete Button -->
-                <button 
+                <button
                   (click)="deleteActivity(activity.id, $event)"
                   class="delete-btn absolute top-1/2 -translate-y-1/2 right-4 text-white bg-red-600 transition-all duration-200 p-3 rounded-2xl shadow-xl z-30 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 active:scale-95"
                   [class.scale-100]="activeDeleteId() === activity.id"

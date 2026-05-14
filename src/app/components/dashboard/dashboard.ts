@@ -12,8 +12,8 @@ import { UIService } from '../../services/ui';
 })
 export class DashboardComponent {
   showConfirmModal = signal(false);
-  selectedType = signal('Running');
-  activityTypes = ['Running', 'Walking', 'Cycling', 'Hiking', 'Other'];
+  selectedType = signal('Cycling');
+  activityTypes = ['Cycling', 'Running', 'Walking'];
 
   constructor(
     public trackingService: TrackingService,
