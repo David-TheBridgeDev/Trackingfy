@@ -13,9 +13,26 @@ export interface ConfirmOptions {
 })
 export class UIService {
   isFullScreen = signal<boolean>(false);
+  showOnboarding = signal<boolean>(false);
   
   private confirmResolver?: (value: boolean) => void;
   confirmation = signal<ConfirmOptions | null>(null);
+
+  constructor() {
+    this.checkOnboarding();
+  }
+
+  private checkOnboarding() {
+    const hasSeen = localStorage.getItem('trackingfy_onboarding');
+    if (!hasSeen) {
+      this.showOnboarding.set(true);
+    }
+  }
+
+  completeOnboarding() {
+    localStorage.setItem('trackingfy_onboarding', 'true');
+    this.showOnboarding.set(false);
+  }
 
   toggleFullScreen() {
     this.isFullScreen.update(v => !v);

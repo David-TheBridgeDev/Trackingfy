@@ -2,6 +2,7 @@ import { Component, signal, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UIService } from './services/ui';
+import { TrackingService } from './services/tracking';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +11,25 @@ import { UIService } from './services/ui';
   styleUrl: './app.css',
 })
 export class App {
-  constructor(public uiService: UIService) {}
+  constructor(
+    public uiService: UIService,
+    public trackingService: TrackingService
+  ) {
+    // If user has already seen onboarding but permissions are missing, try to get them
+    if (!this.uiService.showOnboarding()) {
+      this.trackingService.requestPermission();
+    }
+  }
 
   protected readonly title = signal('trackingfy');
+
+  async handleStart() {
+    const success = await this.trackingService.requestPermission();
+    if (success) {
+      this.uiService.completeOnboarding();
+    }
+  }
+
   isOnline = signal(navigator.onLine);
   deferredPrompt = signal<any>(null);
 

@@ -19,35 +19,44 @@ export class TrackingService {
   lastCoordinate = signal<Coordinate | null>(null);
 
   isTracking = signal(false); // Legacy support for simple checks
+  permissionDenied = signal(false);
 
   private timerInterval: any;
 
-  constructor(private db: DatabaseService) {
-    this.getInitialLocation();
-  }
+  constructor(private db: DatabaseService) {}
 
-  private getInitialLocation() {
-    if ('geolocation' in navigator) {
+  async requestPermission(): Promise<boolean> {
+    if (!('geolocation' in navigator)) {
+      console.error('Geolocation not supported');
+      return false;
+    }
+
+    return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // If we are not tracking yet, just set the last coordinate to center the map
-          if (this.state() === 'idle') {
-            const { latitude, longitude, altitude, speed } = position.coords;
-            const { timestamp } = position;
-            this.lastCoordinate.set({
-              activityId: 0, // Dummy ID
-              lat: latitude,
-              lng: longitude,
-              timestamp,
-              altitude: altitude ?? null,
-              speed: speed ?? null
-            });
-          }
+          this.permissionDenied.set(false);
+          const { latitude, longitude, altitude, speed } = position.coords;
+          const { timestamp } = position;
+          this.lastCoordinate.set({
+            activityId: 0,
+            lat: latitude,
+            lng: longitude,
+            timestamp,
+            altitude: altitude ?? null,
+            speed: speed ?? null
+          });
+          resolve(true);
         },
-        (error) => console.error('Initial geolocation error:', error),
+        (error) => {
+          console.error('Geolocation error:', error);
+          if (error.code === error.PERMISSION_DENIED) {
+            this.permissionDenied.set(true);
+          }
+          resolve(false);
+        },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
-    }
+    });
   }
 
   async startTracking(type: string = 'Activity') {
