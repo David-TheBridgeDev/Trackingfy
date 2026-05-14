@@ -1,7 +1,7 @@
 {
   "name": "Trackingfy",
   "short_name": "Trackingfy",
-  "theme_color": "#2563eb",
+  "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone",
   "scope": "./",
