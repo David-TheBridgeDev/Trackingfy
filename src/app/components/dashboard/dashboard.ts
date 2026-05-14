@@ -13,6 +13,7 @@ import { UIService } from '../../services/ui';
 export class DashboardComponent {
   selectedType = signal('Cycling');
   activityTypes = ['Cycling', 'Running', 'Walking'];
+  showTypeModal = signal(false);
 
   constructor(
     public trackingService: TrackingService,

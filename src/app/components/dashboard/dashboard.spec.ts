@@ -12,6 +12,8 @@ describe('DashboardComponent', () => {
     currentDistance: signal(0),
     currentTime: signal(0),
     currentSpeed: signal(0),
+    currentClimb: signal(0),
+    currentDescent: signal(0),
     lastCoordinate: signal(null),
     startTracking: vi.fn(),
     stopTracking: vi.fn(),

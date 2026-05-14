@@ -151,7 +151,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    this.polyline = L.polyline([], { color: '#efbc21', weight: 6, opacity: 0.8 }).addTo(this.map);
+    this.polyline = L.polyline([], { color: 'red', weight: 6, opacity: 0.8 }).addTo(this.map);
     this.marker = L.marker([0, 0], { opacity: 0 }).addTo(this.map);
 
     // Detect user interaction with guard
