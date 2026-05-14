@@ -79,6 +79,45 @@ export class TrackingService {
         await Notification.requestPermission();
       }
     }
+
+    if ('periodicSync' in (navigator as any)) {
+      try {
+        await (navigator as any).permissions.query({
+          name: 'periodic-background-sync' as any,
+        });
+      } catch (e) {}
+    }
+  }
+
+  private async registerSyncs() {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      
+      if ('sync' in registration) {
+        try {
+          await (registration as any).sync.register('sync-activities');
+        } catch (err) {}
+      }
+
+      if ('periodicSync' in registration) {
+        try {
+          await (registration as any).periodicSync.register('tracking-keep-alive', {
+            minInterval: 15 * 60 * 1000,
+          });
+        } catch (err) {}
+      }
+    }
+  }
+
+  private async unregisterPeriodicSync() {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      if ('periodicSync' in registration) {
+        try {
+          await (registration as any).periodicSync.unregister('tracking-keep-alive');
+        } catch (err) {}
+      }
+    }
   }
 
   private async showTrackingNotification() {
@@ -165,6 +204,7 @@ export class TrackingService {
     await this.requestWakeLock();
     this.initAudioHack();
     await this.showTrackingNotification();
+    await this.registerSyncs();
     this.startTimer();
     this.startGeolocation();
   }
@@ -272,6 +312,7 @@ export class TrackingService {
     await this.releaseWakeLock();
     this.stopAudioHack();
     await this.closeTrackingNotification();
+    await this.unregisterPeriodicSync();
 
     const totalDistance = this.currentDistance();
     const totalTime = this.currentTime();
