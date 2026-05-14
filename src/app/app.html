@@ -31,5 +31,44 @@
     </div>
   </main>
 
+  <!-- Global Confirmation Modal -->
+  @if (uiService.confirmation(); as config) {
+    <div class="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div 
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        (click)="uiService.resolveConfirm(false)"
+      ></div>
+      
+      <!-- Modal Content -->
+      <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100">
+        <div class="p-6">
+          <h3 class="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">
+            {{ config.title }}
+          </h3>
+          <p class="text-gray-600 leading-relaxed">
+            {{ config.message }}
+          </p>
+        </div>
+        
+        <div class="flex p-4 gap-3 bg-gray-50">
+          <button 
+            (click)="uiService.resolveConfirm(false)"
+            class="flex-1 px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors uppercase text-sm"
+          >
+            {{ config.cancelText }}
+          </button>
+          <button 
+            (click)="uiService.resolveConfirm(true)"
+            [class]="config.type === 'danger' ? 
+              'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm' : 
+              'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm'"
+          >
+            {{ config.confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
 </div>

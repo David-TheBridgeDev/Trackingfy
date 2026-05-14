@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatabaseService, Activity } from '../../services/database';
+import { UIService } from '../../services/ui';
 
 interface DayGroup {
   date: string;
@@ -11,7 +12,7 @@ interface DayGroup {
 
 @Component({
   selector: 'app-history',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './history.html',
 })
 export class HistoryComponent implements OnInit {
@@ -83,7 +84,11 @@ export class HistoryComponent implements OnInit {
     }
   }
 
-  constructor(private db: DatabaseService, private router: Router) {}
+  constructor(
+    private db: DatabaseService,
+    private router: Router,
+    private uiService: UIService
+  ) {}
 
   async ngOnInit() {
     await this.loadActivities();
@@ -105,12 +110,12 @@ export class HistoryComponent implements OnInit {
 
   navigateToActivity(id: number | undefined) {
     if (!id) return;
-    
+
     if (this.activeDeleteId() === id) {
       this.activeDeleteId.set(null);
       return;
     }
-    
+
     this.router.navigate(['/activity', id]);
   }
 
@@ -134,7 +139,15 @@ export class HistoryComponent implements OnInit {
     if (!id) return;
     event.stopPropagation();
     event.preventDefault();
-    if (confirm('Are you sure you want to delete this activity?')) {
+
+    const confirmed = await this.uiService.confirm({
+      title: 'Delete Activity',
+      message: 'Are you sure you want to delete this activity? This action cannot be undone.',
+      confirmText: 'Delete',
+      type: 'danger'
+    });
+
+    if (confirmed) {
       await this.db.deleteActivity(id);
       await this.loadActivities();
       this.activeDeleteId.set(null);

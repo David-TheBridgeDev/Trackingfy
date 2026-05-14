@@ -11,7 +11,6 @@ import { UIService } from '../../services/ui';
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent {
-  showConfirmModal = signal(false);
   selectedType = signal('Cycling');
   activityTypes = ['Cycling', 'Running', 'Walking'];
 
@@ -59,16 +58,17 @@ export class DashboardComponent {
     }
   }
 
-  requestStopTracking() {
-    this.showConfirmModal.set(true);
-  }
+  async requestStopTracking() {
+    const confirmed = await this.uiService.confirm({
+      title: 'Stop Activity?',
+      message: 'Are you sure you want to end and save this session?',
+      confirmText: 'Stop and Save',
+      cancelText: 'Resume',
+      type: 'danger'
+    });
 
-  confirmStop() {
-    this.trackingService.stopTracking();
-    this.showConfirmModal.set(false);
-  }
-
-  cancelStop() {
-    this.showConfirmModal.set(false);
+    if (confirmed) {
+      this.trackingService.stopTracking();
+    }
   }
 }
