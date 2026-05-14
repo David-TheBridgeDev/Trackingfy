@@ -1,0 +1,35 @@
+<div class="h-[100dvh] w-full bg-bg-base flex flex-col overflow-hidden">
+  <!-- Header (Hidden in Full Screen) -->
+  @if (!uiService.isFullScreen()) {
+    <header class="bg-bg-surface text-text-heading shadow-sm p-4 flex justify-between items-center border-b border-gray-200 shrink-0">
+      <div class="flex items-center space-x-2">
+        <a routerLink="/" class="hover:opacity-80 transition-opacity">
+          <h1 class="text-xl font-black tracking-tight uppercase">Trackingfy</h1>
+        </a>
+        @if (!isOnline()) {
+          <span class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">Offline</span>
+        }
+      </div>
+      <div class="flex items-center space-x-6 font-semibold">
+        @if (deferredPrompt()) {
+          <button (click)="installPwa()" class="text-accent text-xs uppercase font-black hover:underline">Install App</button>
+        }
+        <a routerLink="/history" routerLinkActive="text-accent" class="hover:text-accent transition-colors">History</a>
+      </div>
+    </header>
+  }
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-hidden relative">
+    <div class="h-full w-full overflow-y-auto">
+      <div 
+        class="h-full w-full mx-auto"
+        [ngClass]="uiService.isFullScreen() ? 'max-w-none p-0' : 'max-w-4xl p-4 md:p-6'"
+      >
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+
+
+</div>

@@ -1,0 +1,162 @@
+<div class="flex flex-col h-full w-full space-y-4 relative">
+  <!-- Stats Card (Hidden in Full Screen) -->
+  @if (!uiService.isFullScreen()) {
+    <div class="bg-bg-surface rounded-2xl shadow-sm p-4 grid grid-cols-2 md:grid-cols-5 gap-2 border border-gray-100 shrink-0 transition-all duration-300">
+      <div class="text-center">
+        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Duration</p>
+        <p class="text-xl font-black text-text-heading">{{ formattedTime() }}</p>
+      </div>
+      <div class="text-center border-x border-gray-100">
+        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Distance</p>
+        <p class="text-xl font-black text-text-heading">{{ formattedDistance() }}</p>
+      </div>
+      <div class="text-center md:border-r border-gray-100">
+        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Avg Speed</p>
+        <p class="text-xl font-black text-text-heading">{{ formattedSpeed() }}</p>
+      </div>
+      <div class="text-center border-r border-gray-100">
+        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Climb</p>
+        <p class="text-xl font-black text-text-heading text-green-600">{{ formattedClimb() }}</p>
+      </div>
+      <div class="text-center">
+        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Descent</p>
+        <p class="text-xl font-black text-text-heading text-red-600">{{ formattedDescent() }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Map Container -->
+  <div
+    [ngClass]="uiService.isFullScreen() ? 'fixed inset-0 z-[9999] bg-bg-base' : 'flex-1 bg-bg-surface rounded-2xl border border-gray-100 overflow-hidden relative shadow-sm'"
+    class="transition-all duration-300"
+  >
+    <app-map class="w-full h-full" [currentPoint]="trackingService.lastCoordinate()"></app-map>
+
+    <!-- Full Screen Toggle Button -->
+    <button
+      (click)="uiService.toggleFullScreen()"
+      class="absolute bottom-6 right-6 bg-white p-3 rounded-2xl shadow-2xl text-text-heading z-[10000] active:scale-95 transition-all border border-gray-200"
+    >
+      @if (uiService.isFullScreen()) {
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      }
+    </button>
+
+    <!-- Tracking Indicator -->
+    @if (trackingService.state() === 'tracking') {
+      <div class="absolute top-6 right-6 bg-red-600 text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest animate-pulse shadow-md uppercase z-[10000]">
+        Rec
+      </div>
+    } @else if (trackingService.state() === 'paused') {
+      <div class="absolute top-6 right-6 bg-accent text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest shadow-md uppercase z-[10000]">
+        Paused
+      </div>
+    }
+
+    <!-- Mini Stats Overlay (Only in Full Screen) - MOVED TO BOTTOM LEFT -->
+    @if (uiService.isFullScreen()) {
+      <div class="absolute bottom-6 left-6 flex flex-col space-y-2 z-[10000]">
+        <div class="flex space-x-2">
+          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
+             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Climb</p>
+             <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
+          </div>
+          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
+             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Descent</p>
+             <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
+          </div>
+        </div>
+        <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
+           <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Distance</p>
+           <p class="text-lg font-black text-text-heading">{{ formattedDistance() }}</p>
+        </div>
+        <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
+           <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Duration</p>
+           <p class="text-lg font-black text-text-heading">{{ formattedTime() }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Controls (Hidden in Full Screen) -->
+  @if (!uiService.isFullScreen()) {
+    <div class="flex justify-center items-center shrink-0 pt-2 pb-2 space-x-6">
+
+      <!-- Secondary Controls -->
+      @if (trackingService.state() !== 'idle') {
+        <button
+          (click)="requestStopTracking()"
+          class="w-14 h-14 rounded-full bg-white border-2 border-red-600 text-red-600 shadow-md flex items-center justify-center active:scale-90 transition-transform"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <rect x="6" y="6" width="12" height="12" rx="2" />
+          </svg>
+        </button>
+      }
+
+      <!-- Main Play/Pause Button -->
+      <button
+        (click)="toggleTracking()"
+        class="w-20 h-20 rounded-full bg-accent text-white shadow-xl flex items-center justify-center transition-all active:scale-90 focus:outline-none focus:ring-8 focus:ring-accent/20 shadow-accent/20"
+      >
+        @if (trackingService.state() === 'idle') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        } @else if (trackingService.state() === 'tracking') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        } @else if (trackingService.state() === 'paused') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          </svg>
+        }
+      </button>
+
+      <!-- Placeholder for symmetry -->
+      @if (trackingService.state() !== 'idle') {
+        <div class="w-14 h-14"></div>
+      }
+    </div>
+  }
+
+  <!-- Confirmation Modal -->
+  @if (showConfirmModal()) {
+    <div class="fixed inset-0 z-[20000] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="cancelStop()"></div>
+      <div class="bg-white rounded-3xl p-6 shadow-2xl relative w-full max-w-xs animate-in zoom-in duration-200">
+        <div class="text-center">
+          <div class="bg-red-100 text-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-black text-text-heading uppercase tracking-tight mb-2">Stop Activity?</h3>
+          <p class="text-text-primary text-sm mb-6 font-medium">Are you sure you want to end and save this session?</p>
+          <div class="flex flex-col space-y-3">
+            <button 
+              (click)="confirmStop()"
+              class="w-full bg-red-600 text-white font-black uppercase py-3 rounded-2xl shadow-lg active:scale-95 transition-all tracking-widest text-xs"
+            >
+              Stop and Save
+            </button>
+            <button 
+              (click)="cancelStop()"
+              class="w-full bg-gray-100 text-text-heading font-black uppercase py-3 rounded-2xl active:scale-95 transition-all tracking-widest text-xs"
+            >
+              Resume
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

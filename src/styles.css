@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-accent: #efbc21;
+  --color-accent-hover: #d4a71d;
+  --color-bg-base: #eeeeee;
+  --color-bg-surface: #ffffff;
+  --color-text-primary: #777777;
+  --color-text-heading: #444444;
+}
+
+@layer base {
+  html, body {
+    @apply bg-bg-base text-text-primary overflow-hidden h-full w-full;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text-heading font-bold;
+  }
+}
+
+.leaflet-container {
+    font-family: inherit !important;
+}
+
+/* Ensure Angular app root also fills screen */
+app-root {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
