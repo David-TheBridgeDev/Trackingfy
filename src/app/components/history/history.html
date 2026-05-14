@@ -1,7 +1,47 @@
-<div class="space-y-6">
+<div class="space-y-6 pb-20">
   <div class="flex items-center justify-between">
     <h2 class="text-3xl font-black text-text-heading tracking-tight uppercase">Activities</h2>
     <span class="bg-accent text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">{{ activities().length }} total</span>
+  </div>
+
+  <!-- Toolbar: Filters -->
+  <div class="bg-bg-surface p-4 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+    <div class="flex flex-wrap gap-2">
+      <!-- Type Filter -->
+      <select 
+        [ngModel]="filterType()" 
+        (ngModelChange)="filterType.set($event)"
+        class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
+      >
+        @for (type of availableTypes(); track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+
+      <!-- Sort By -->
+      <select 
+        [ngModel]="sortBy()" 
+        (ngModelChange)="sortBy.set($event)"
+        class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
+      >
+        <option value="date">Date</option>
+        <option value="distance">Distance</option>
+        <option value="duration">Duration</option>
+        <option value="climb">Climb</option>
+        <option value="descent">Descent</option>
+      </select>
+
+      <!-- Sort Order Toggle -->
+      <button 
+        (click)="toggleSortOrder()"
+        class="bg-bg-base p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        title="Toggle Sort Order"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-text-heading transition-transform" [class.rotate-180]="sortOrder() === 'asc'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+        </svg>
+      </button>
+    </div>
   </div>
 
   @if (activities().length === 0) {
@@ -14,44 +54,73 @@
       <p class="text-text-primary font-medium">No activities recorded yet.</p>
       <button routerLink="/dashboard" class="mt-4 text-accent font-bold uppercase text-sm hover:underline">Start your first track</button>
     </div>
+  } @else if (groupedActivities().length === 0) {
+    <div class="py-12 text-center bg-bg-surface rounded-3xl border border-gray-100 shadow-sm">
+      <div class="w-16 h-16 bg-bg-base rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+      <p class="text-text-heading font-black uppercase tracking-tight">No results found</p>
+      <p class="text-text-primary text-sm font-semibold mb-6">Try adjusting your filters.</p>
+      <button 
+        (click)="clearFilters()"
+        class="bg-accent text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform"
+      >
+        Clear all filters
+      </button>
+    </div>
   } @else {
-    <div class="grid gap-4">
-      @for (activity of activities(); track activity.id) {
-        <div 
-          class="bg-bg-surface rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer relative border border-gray-100 group select-none touch-pan-y active:bg-gray-50" 
-          style="-webkit-touch-callout: none;"
-          (click)="navigateToActivity(activity.id)"
-          (contextmenu)="onLongPress($event, activity.id)"
-        >
-          <div class="p-5 flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-bg-base rounded-xl flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                 </svg>
-              </div>
-              <div>
-                <h3 class="font-black text-lg text-text-heading uppercase tracking-tight">{{ activity.type }}</h3>
-                <p class="text-text-primary text-xs font-semibold">{{ activity.date | date:'mediumDate' }} • {{ activity.date | date:'shortTime' }}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="font-black text-2xl text-text-heading tracking-tighter">{{ (activity.totalDistance / 1000) | number:'1.2-2' }} <span class="text-xs text-text-primary uppercase font-bold">km</span></p>
-              <p class="text-text-primary text-xs font-bold uppercase tracking-widest">{{ formatTime(activity.totalTime) }}</p>
-            </div>
+    <div class="space-y-8">
+      @for (group of groupedActivities(); track group.date) {
+        <div class="space-y-4">
+          <!-- Telegram Style Date Separator -->
+          <div class="flex items-center justify-center">
+            <span class="bg-bg-surface px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-text-primary shadow-sm border border-gray-100 sticky top-4 z-10">
+              {{ group.date | date:'longDate' }}
+            </span>
           </div>
-          
-          <!-- Delete Button -->
-          <button 
-            (click)="deleteActivity(activity.id, $event)"
-            class="delete-btn absolute top-1/2 -translate-y-1/2 right-4 text-white bg-red-600 transition-all duration-200 p-3 rounded-2xl shadow-xl z-30 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 active:scale-95"
-            [class.scale-100]="activeDeleteId() === activity.id"
-            [class.opacity-100]="activeDeleteId() === activity.id"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 010-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
+
+          <div class="grid gap-4">
+            @for (activity of group.activities; track activity.id) {
+              <div 
+                class="bg-bg-surface rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer relative border border-gray-100 group select-none touch-pan-y active:bg-gray-50" 
+                style="-webkit-touch-callout: none;"
+                (click)="navigateToActivity(activity.id)"
+                (contextmenu)="onLongPress($event, activity.id)"
+              >
+                <div class="p-5 flex justify-between items-center">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-bg-base rounded-xl flex items-center justify-center group-hover:bg-accent/10 transition-colors">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                       </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-black text-lg text-text-heading uppercase tracking-tight">{{ activity.type }}</h3>
+                      <p class="text-text-primary text-xs font-semibold">{{ activity.date | date:'shortTime' }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-black text-2xl text-text-heading tracking-tighter">{{ (activity.totalDistance / 1000) | number:'1.2-2' }} <span class="text-xs text-text-primary uppercase font-bold">km</span></p>
+                    <p class="text-text-primary text-xs font-bold uppercase tracking-widest">{{ formatTime(activity.totalTime) }}</p>
+                  </div>
+                </div>
+                
+                <!-- Delete Button -->
+                <button 
+                  (click)="deleteActivity(activity.id, $event)"
+                  class="delete-btn absolute top-1/2 -translate-y-1/2 right-4 text-white bg-red-600 transition-all duration-200 p-3 rounded-2xl shadow-xl z-30 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 active:scale-95"
+                  [class.scale-100]="activeDeleteId() === activity.id"
+                  [class.opacity-100]="activeDeleteId() === activity.id"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 010-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
         </div>
       }
     </div>

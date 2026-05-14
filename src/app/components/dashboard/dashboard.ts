@@ -1,16 +1,19 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TrackingService } from '../../services/tracking';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, MapComponent],
+  imports: [CommonModule, MapComponent, FormsModule],
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent {
   showConfirmModal = signal(false);
+  selectedType = signal('Running');
+  activityTypes = ['Running', 'Walking', 'Cycling', 'Hiking', 'Other'];
 
   constructor(
     public trackingService: TrackingService,
@@ -48,7 +51,7 @@ export class DashboardComponent {
   toggleTracking() {
     const state = this.trackingService.state();
     if (state === 'idle') {
-      this.trackingService.startTracking();
+      this.trackingService.startTracking(this.selectedType());
     } else if (state === 'tracking') {
       this.trackingService.pauseTracking();
     } else if (state === 'paused') {

@@ -50,12 +50,12 @@ export class TrackingService {
     }
   }
 
-  async startTracking() {
+  async startTracking(type: string = 'Activity') {
     if (this.state() !== 'idle') return;
 
     const activity: Activity = {
       date: new Date(),
-      type: 'Activity',
+      type: type,
       totalDistance: 0,
       totalTime: 0,
       avgSpeed: 0,

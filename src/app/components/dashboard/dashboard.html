@@ -86,45 +86,67 @@
 
   <!-- Controls (Hidden in Full Screen) -->
   @if (!uiService.isFullScreen()) {
-    <div class="flex justify-center items-center shrink-0 pt-2 pb-2 space-x-6">
-
-      <!-- Secondary Controls -->
-      @if (trackingService.state() !== 'idle') {
-        <button
-          (click)="requestStopTracking()"
-          class="w-14 h-14 rounded-full bg-white border-2 border-red-600 text-red-600 shadow-md flex items-center justify-center active:scale-90 transition-transform"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <rect x="6" y="6" width="12" height="12" rx="2" />
-          </svg>
-        </button>
+    <div class="flex flex-col items-center shrink-0 pt-2 pb-6 space-y-4">
+      
+      <!-- Type Selector (Only in Idle) -->
+      @if (trackingService.state() === 'idle') {
+        <div class="flex flex-wrap justify-center gap-2 max-w-sm px-4">
+          @for (type of activityTypes; track type) {
+            <button 
+              (click)="selectedType.set(type)"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border-2"
+              [class.bg-accent]="selectedType() === type"
+              [class.text-white]="selectedType() === type"
+              [class.border-accent]="selectedType() === type"
+              [class.bg-white]="selectedType() !== type"
+              [class.text-text-primary]="selectedType() !== type"
+              [class.border-gray-100]="selectedType() !== type"
+            >
+              {{ type }}
+            </button>
+          }
+        </div>
       }
 
-      <!-- Main Play/Pause Button -->
-      <button
-        (click)="toggleTracking()"
-        class="w-20 h-20 rounded-full bg-accent text-white shadow-xl flex items-center justify-center transition-all active:scale-90 focus:outline-none focus:ring-8 focus:ring-accent/20 shadow-accent/20"
-      >
-        @if (trackingService.state() === 'idle') {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        } @else if (trackingService.state() === 'tracking') {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        } @else if (trackingService.state() === 'paused') {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-          </svg>
+      <div class="flex justify-center items-center space-x-6 w-full">
+        <!-- Secondary Controls -->
+        @if (trackingService.state() !== 'idle') {
+          <button
+            (click)="requestStopTracking()"
+            class="w-14 h-14 rounded-full bg-white border-2 border-red-600 text-red-600 shadow-md flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="2" />
+            </svg>
+          </button>
         }
-      </button>
 
-      <!-- Placeholder for symmetry -->
-      @if (trackingService.state() !== 'idle') {
-        <div class="w-14 h-14"></div>
-      }
+        <!-- Main Play/Pause Button -->
+        <button
+          (click)="toggleTracking()"
+          class="w-20 h-20 rounded-full bg-accent text-white shadow-xl flex items-center justify-center transition-all active:scale-90 focus:outline-none focus:ring-8 focus:ring-accent/20 shadow-accent/20"
+        >
+          @if (trackingService.state() === 'idle') {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          } @else if (trackingService.state() === 'tracking') {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          } @else if (trackingService.state() === 'paused') {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            </svg>
+          }
+        </button>
+
+        <!-- Placeholder for symmetry -->
+        @if (trackingService.state() !== 'idle') {
+          <div class="w-14 h-14"></div>
+        }
+      </div>
     </div>
   }
 
