@@ -1,16 +1,80 @@
-import { Component, OnInit, signal, HostListener } from '@angular/core';
+import { Component, OnInit, signal, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { DatabaseService, Activity } from '../../services/database';
+
+interface DayGroup {
+  date: string;
+  activities: Activity[];
+}
 
 @Component({
   selector: 'app-history',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './history.html',
 })
 export class HistoryComponent implements OnInit {
   activities = signal<Activity[]>([]);
   activeDeleteId = signal<number | null>(null);
+
+  // Filters & Sorting
+  filterType = signal('All');
+  sortBy = signal<'date' | 'distance' | 'duration' | 'climb' | 'descent'>('date');
+  sortOrder = signal<'asc' | 'desc'>('desc');
+  availableTypes = computed(() => {
+    const types = new Set(this.activities().map(a => a.type));
+    return ['All', ...Array.from(types).sort()];
+  });
+  filteredActivities = computed(() => {
+    let result = [...this.activities()];
+
+    // Type Filter
+    const type = this.filterType();
+    if (type !== 'All') {
+      result = result.filter(a => a.type === type);
+    }
+
+    // Sorting
+    const order = this.sortOrder() === 'asc' ? 1 : -1;
+    result.sort((a, b) => {
+      if (this.sortBy() === 'date') {
+        return (new Date(a.date).getTime() - new Date(b.date).getTime()) * order;
+      }
+      if (this.sortBy() === 'distance') {
+        return (a.totalDistance - b.totalDistance) * order;
+      }
+      if (this.sortBy() === 'duration') {
+        return (a.totalTime - b.totalTime) * order;
+      }
+      if (this.sortBy() === 'climb') {
+        return (a.totalClimb - b.totalClimb) * order;
+      }
+      if (this.sortBy() === 'descent') {
+        return (a.totalDescent - b.totalDescent) * order;
+      }
+      return 0;
+    });
+
+    return result;
+  });
+
+  groupedActivities = computed(() => {
+    const groups: DayGroup[] = [];
+    const activities = this.filteredActivities();
+
+    activities.forEach(activity => {
+      const dateStr = new Date(activity.date).toDateString();
+      let group = groups.find(g => g.date === dateStr);
+      if (!group) {
+        group = { date: dateStr, activities: [] };
+        groups.push(group);
+      }
+      group.activities.push(activity);
+    });
+
+    return groups;
+  });
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
@@ -29,16 +93,24 @@ export class HistoryComponent implements OnInit {
     this.activities.set(await this.db.getActivities());
   }
 
+  clearFilters() {
+    this.filterType.set('All');
+    this.sortBy.set('date');
+    this.sortOrder.set('desc');
+  }
+
+  toggleSortOrder() {
+    this.sortOrder.update(o => o === 'asc' ? 'desc' : 'asc');
+  }
+
   navigateToActivity(id: number | undefined) {
     if (!id) return;
     
-    // If we are in "delete mode" for this card, clicking it just closes the mode
     if (this.activeDeleteId() === id) {
       this.activeDeleteId.set(null);
       return;
     }
     
-    // Otherwise navigate
     this.router.navigate(['/activity', id]);
   }
 
@@ -51,7 +123,6 @@ export class HistoryComponent implements OnInit {
 
   onLongPress(event: Event, id: number | undefined) {
     if (!id) return;
-    // On touch devices, contextmenu is triggered by long press
     if (window.matchMedia('(hover: none)').matches) {
       event.preventDefault();
       this.activeDeleteId.set(this.activeDeleteId() === id ? null : id);
