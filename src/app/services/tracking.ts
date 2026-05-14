@@ -9,8 +9,6 @@ export type TrackingState = 'idle' | 'tracking' | 'paused';
 export class TrackingService {
   private watchId: number | null = null;
   private currentActivityId: number | null = null;
-  private wakeLock: any = null;
-  private audioHack: HTMLAudioElement | null = null;
 
   state = signal<TrackingState>('idle');
   currentDistance = signal(0); // in meters
@@ -26,104 +24,18 @@ export class TrackingService {
 
   constructor(private db: DatabaseService) {
     this.getInitialLocation();
-    this.setupVisibilityListener();
-    this.requestNotificationPermission();
-  }
-
-  private setupVisibilityListener() {
-    document.addEventListener('visibilitychange', async () => {
-      if (this.wakeLock !== null && document.visibilityState === 'visible') {
-        await this.requestWakeLock();
-      }
-    });
-  }
-
-  private async requestWakeLock() {
-    if ('wakeLock' in navigator) {
-      try {
-        this.wakeLock = await (navigator as any).wakeLock.request('screen');
-        console.log('Wake Lock is active');
-      } catch (err: any) {
-        console.error(`${err.name}, ${err.message}`);
-      }
-    }
-  }
-
-  private async releaseWakeLock() {
-    if (this.wakeLock) {
-      await this.wakeLock.release();
-      this.wakeLock = null;
-      console.log('Wake Lock released');
-    }
-  }
-
-  private initAudioHack() {
-    if (!this.audioHack) {
-      this.audioHack = new Audio();
-      // 1 second silent wav
-      this.audioHack.src = 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhBAAAAAAA';
-      this.audioHack.loop = true;
-    }
-    this.audioHack.play().catch(e => console.error('Audio hack failed:', e));
-  }
-
-  private stopAudioHack() {
-    if (this.audioHack) {
-      this.audioHack.pause();
-    }
-  }
-
-  private async requestNotificationPermission() {
-    if ('Notification' in window) {
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-    }
-  }
-
-  private async showTrackingNotification() {
-    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification('Trackingfy: Grabación activa', {
-        body: 'Tu actividad se está grabando en segundo plano.',
-        icon: '/icons/favicon-96x96.png',
-        badge: '/icons/favicon-96x96.png',
-        tag: 'tracking-active',
-        silent: true,
-        requireInteraction: true
-      });
-    }
-  }
-
-  private async updateNotification(status: string) {
-    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification('Trackingfy: ' + status, {
-        body: 'La grabación está ' + status.toLowerCase(),
-        icon: '/icons/favicon-96x96.png',
-        tag: 'tracking-active',
-        silent: true
-      });
-    }
-  }
-
-  private async closeTrackingNotification() {
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      const notifications = await registration.getNotifications({ tag: 'tracking-active' });
-      notifications.forEach(n => n.close());
-    }
   }
 
   private getInitialLocation() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          // If we are not tracking yet, just set the last coordinate to center the map
           if (this.state() === 'idle') {
             const { latitude, longitude, altitude, speed } = position.coords;
             const { timestamp } = position;
             this.lastCoordinate.set({
-              activityId: 0,
+              activityId: 0, // Dummy ID
               lat: latitude,
               lng: longitude,
               timestamp,
@@ -162,9 +74,6 @@ export class TrackingService {
     this.currentDescent.set(0);
     this.lastCoordinate.set(null);
 
-    await this.requestWakeLock();
-    this.initAudioHack();
-    await this.showTrackingNotification();
     this.startTimer();
     this.startGeolocation();
   }
@@ -174,15 +83,11 @@ export class TrackingService {
     this.state.set('paused');
     this.stopTimer();
     this.currentSpeed.set(0);
-    this.stopAudioHack();
-    this.updateNotification('Pausada');
   }
 
   resumeTracking() {
     if (this.state() !== 'paused') return;
     this.state.set('tracking');
-    this.initAudioHack();
-    this.showTrackingNotification();
     this.startTimer();
   }
 
@@ -217,6 +122,8 @@ export class TrackingService {
   }
 
   private handlePosition(position: GeolocationPosition) {
+    // If paused, we still want to keep the "current position" updated for the map, 
+    // but we don't record the point in the DB or add to distance.
     const { latitude, longitude, altitude, speed } = position.coords;
     const { timestamp } = position;
     
@@ -238,13 +145,15 @@ export class TrackingService {
           latitude,
           longitude
         );
+        // Only add distance if it's more than 2 meters to avoid GPS noise
         if (dist > 2) {
           this.currentDistance.update(d => d + dist);
         }
 
+        // Calculate altitude changes
         if (altitude !== null && last.altitude !== null && last.altitude !== undefined) {
           const diff = altitude - last.altitude;
-          if (Math.abs(diff) > 0.5) {
+          if (Math.abs(diff) > 0.5) { // Filter noise
             if (diff > 0) {
               this.currentClimb.update(c => c + diff);
             } else {
@@ -269,9 +178,6 @@ export class TrackingService {
     }
 
     this.stopTimer();
-    await this.releaseWakeLock();
-    this.stopAudioHack();
-    await this.closeTrackingNotification();
 
     const totalDistance = this.currentDistance();
     const totalTime = this.currentTime();
