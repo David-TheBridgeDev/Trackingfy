@@ -22,8 +22,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/sw-custom.js"
+              }
             ],
             "styles": ["src/styles.css"]
           },
