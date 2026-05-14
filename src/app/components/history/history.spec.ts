@@ -28,4 +28,26 @@ describe('HistoryComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should enter selection mode and select an activity', () => {
+    component.enterSelectionMode(1);
+    expect(component.isSelectionMode()).toBe(true);
+    expect(component.selectedIds().has(1)).toBe(true);
+  });
+
+  it('should toggle selection and exit mode when no items are selected', () => {
+    component.enterSelectionMode(1);
+    component.toggleSelection(1);
+    expect(component.isSelectionMode()).toBe(false);
+    expect(component.selectedIds().size).toBe(0);
+  });
+
+  it('should select all items and then exit selection mode', () => {
+    component.enterSelectionMode(1);
+    component.toggleSelection(2);
+    expect(component.selectedIds().size).toBe(2);
+    component.exitSelectionMode();
+    expect(component.isSelectionMode()).toBe(false);
+    expect(component.selectedIds().size).toBe(0);
+  });
 });

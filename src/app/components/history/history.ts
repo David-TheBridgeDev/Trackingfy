@@ -14,10 +14,15 @@ interface DayGroup {
   selector: 'app-history',
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './history.html',
+  styleUrl: './history.css',
 })
 export class HistoryComponent implements OnInit {
   activities = signal<Activity[]>([]);
   activeDeleteId = signal<number | null>(null);
+
+  // Selection
+  isSelectionMode = signal(false);
+  selectedIds = signal<Set<number>>(new Set());
 
   // Filters & Sorting
   filterType = signal('All');
@@ -108,8 +113,54 @@ export class HistoryComponent implements OnInit {
     this.sortOrder.update(o => o === 'asc' ? 'desc' : 'asc');
   }
 
+  enterSelectionMode(id?: number) {
+    this.isSelectionMode.set(true);
+    if (id !== undefined) {
+      this.selectedIds.update(set => {
+        const newSet = new Set(set);
+        newSet.add(id);
+        return newSet;
+      });
+    }
+  }
+
+  exitSelectionMode() {
+    this.isSelectionMode.set(false);
+    this.selectedIds.set(new Set());
+  }
+
+  toggleSelection(id: number | undefined, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (id === undefined) return;
+
+    this.selectedIds.update(set => {
+      const newSet = new Set(set);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+        if (newSet.size === 0) {
+          this.isSelectionMode.set(false);
+        }
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }
+
+  isSelected(id: number | undefined): boolean {
+    return id !== undefined && this.selectedIds().has(id);
+  }
+
   navigateToActivity(id: number | undefined) {
     if (!id) return;
+
+    if (this.isSelectionMode()) {
+      this.toggleSelection(id);
+      return;
+    }
 
     if (this.activeDeleteId() === id) {
       this.activeDeleteId.set(null);
@@ -128,10 +179,32 @@ export class HistoryComponent implements OnInit {
 
   onLongPress(event: Event, id: number | undefined) {
     if (!id) return;
-    if (window.matchMedia('(hover: none)').matches) {
-      event.preventDefault();
-      this.activeDeleteId.set(this.activeDeleteId() === id ? null : id);
-      if ('vibrate' in navigator) navigator.vibrate(50);
+    event.preventDefault();
+
+    if ('vibrate' in navigator) navigator.vibrate(50);
+
+    if (this.isSelectionMode()) {
+      this.toggleSelection(id);
+    } else {
+      this.enterSelectionMode(id);
+    }
+  }
+
+  async deleteSelected() {
+    const ids = Array.from(this.selectedIds());
+    if (ids.length === 0) return;
+
+    const confirmed = await this.uiService.confirm({
+      title: 'Delete Activities',
+      message: `Are you sure you want to delete ${ids.length} activities? This action cannot be undone.`,
+      confirmText: 'Delete All',
+      type: 'danger'
+    });
+
+    if (confirmed) {
+      await this.db.deleteActivities(ids);
+      await this.loadActivities();
+      this.exitSelectionMode();
     }
   }
 

@@ -69,4 +69,11 @@ export class DatabaseService extends Dexie {
       await this.activities.delete(id);
     });
   }
+
+  async deleteActivities(ids: number[]): Promise<void> {
+    await this.transaction('rw', this.activities, this.coordinates, async () => {
+      await this.coordinates.where('activityId').anyOf(ids).delete();
+      await this.activities.bulkDelete(ids);
+    });
+  }
 }
