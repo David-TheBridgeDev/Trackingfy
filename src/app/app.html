@@ -21,7 +21,7 @@
       </div>
       <div class="flex items-center space-x-6 font-semibold">
         @if (uiService.deferredPrompt()) {
-          <button (click)="uiService.installPwa()" class="text-accent text-xs uppercase font-black hover:underline">Instalar App</button>
+          <button (click)="uiService.installPwa()" class="text-accent text-xs uppercase font-black hover:underline">Install App</button>
         }
         <a routerLink="/history" routerLinkActive="text-accent" class="hover:text-accent transition-colors">History</a>
       </div>
@@ -89,7 +89,7 @@
                 (click)="uiService.installPwa()"
                 class="w-full bg-white text-accent border-2 border-accent py-4 rounded-3xl font-black uppercase tracking-widest active:scale-95 transition-all hover:bg-accent/5"
               >
-                Instalar App
+                Install App
               </button>
             }
 
