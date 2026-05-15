@@ -18,8 +18,37 @@ export class UIService {
   private confirmResolver?: (value: boolean) => void;
   confirmation = signal<ConfirmOptions | null>(null);
 
+  deferredPrompt = signal<any>(null);
+
   constructor() {
     this.checkOnboarding();
+    this.initPwaLogic();
+  }
+
+  private initPwaLogic() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.deferredPrompt.set(e);
+    });
+  }
+
+  async installPwa() {
+    const prompt = this.deferredPrompt();
+    if (!prompt) return;
+
+    // Show the install prompt
+    prompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await prompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the PWA install prompt');
+    } else {
+      console.log('User dismissed the PWA install prompt');
+    }
+    // We've used the prompt, and can't use it again, throw it away
+    this.deferredPrompt.set(null);
   }
 
   private checkOnboarding() {

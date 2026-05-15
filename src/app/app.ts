@@ -44,7 +44,6 @@ export class App {
   }
 
   isOnline = signal(navigator.onLine);
-  deferredPrompt = signal<any>(null);
 
   @HostListener('window:online')
   onOnline() {
@@ -54,30 +53,5 @@ export class App {
   @HostListener('window:offline')
   onOffline() {
     this.isOnline.set(false);
-  }
-
-  @HostListener('window:beforeinstallprompt', ['$event'])
-  onBeforeInstallPrompt(e: Event) {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later.
-    this.deferredPrompt.set(e);
-  }
-
-  async installPwa() {
-    const prompt = this.deferredPrompt();
-    if (!prompt) return;
-
-    // Show the install prompt
-    prompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await prompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('User accepted the PWA install prompt');
-    } else {
-      console.log('User dismissed the PWA install prompt');
-    }
-    // We've used the prompt, and can't use it again, throw it away
-    this.deferredPrompt.set(null);
   }
 }
