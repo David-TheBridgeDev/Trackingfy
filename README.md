@@ -2,6 +2,8 @@
 
 Trackingfy is a local-first Progressive Web App (PWA) designed to replicate the core tracking features of Strava, Trailforks, Komoot, etc. It allows users to track their physical activities (route, time, distance, speed, and elevation gain) with a focus on privacy and offline capability.
 
+**🚀 View it live at: [Trackingfy](https://trackingfy.web.app)**
+
 All data is stored locally in the browser's IndexedDB, ensuring your tracks stay on your device.
 
 ## ✨ Features
