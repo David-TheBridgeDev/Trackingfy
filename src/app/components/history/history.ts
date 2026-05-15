@@ -96,6 +96,7 @@ export class HistoryComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.uiService.setFullScreen(false);
     await this.loadActivities();
   }
 

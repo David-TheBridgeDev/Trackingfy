@@ -137,7 +137,7 @@ export class TrackingService {
     const { timestamp } = position;
     
     const newCoord: Coordinate = {
-      activityId: this.currentActivityId!,
+      activityId: this.currentActivityId || 0,
       lat: latitude,
       lng: longitude,
       timestamp,

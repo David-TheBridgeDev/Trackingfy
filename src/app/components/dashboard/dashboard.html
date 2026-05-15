@@ -1,152 +1,124 @@
-<div class="flex flex-col h-full w-full space-y-4 relative">
-  <!-- Stats Card (Hidden in Full Screen) -->
-  @if (!uiService.isFullScreen()) {
-    <div class="bg-bg-surface rounded-2xl shadow-sm p-4 grid grid-cols-2 md:grid-cols-5 gap-2 border border-gray-100 shrink-0 transition-all duration-300">
-      <div class="text-center">
-        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Duration</p>
-        <p class="text-xl font-black text-text-heading">{{ formattedTime() }}</p>
-      </div>
-      <div class="text-center border-x border-gray-100">
-        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Distance</p>
-        <p class="text-xl font-black text-text-heading">{{ formattedDistance() }}</p>
-      </div>
-      <div class="text-center md:border-r border-gray-100">
-        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Avg Speed</p>
-        <p class="text-xl font-black text-text-heading">{{ formattedSpeed() }}</p>
-      </div>
-      <div class="text-center border-r border-gray-100">
-        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Climb</p>
-        <p class="text-xl font-black text-text-heading text-green-600">{{ formattedClimb() }}</p>
-      </div>
-      <div class="text-center">
-        <p class="text-text-primary text-[10px] uppercase font-bold tracking-wider mb-1">Descent</p>
-        <p class="text-xl font-black text-text-heading text-red-600">{{ formattedDescent() }}</p>
-      </div>
-    </div>
-  }
-
-  <!-- Map Container -->
-  <div
-    [ngClass]="uiService.isFullScreen() ? 'fixed inset-0 z-[9999] bg-bg-base' : 'flex-1 bg-bg-surface rounded-2xl border border-gray-100 overflow-hidden relative shadow-sm'"
-    class="transition-all duration-300"
-  >
+<div class="relative h-full w-full overflow-hidden bg-bg-base">
+  <!-- Map Background -->
+  <div class="absolute inset-0 z-0">
     <app-map class="w-full h-full" [currentPoint]="trackingService.lastCoordinate()"></app-map>
-
-    <!-- Full Screen Toggle Button -->
-    <button
-      (click)="uiService.toggleFullScreen()"
-      class="absolute bottom-6 right-6 bg-white p-3 rounded-2xl shadow-2xl text-text-heading z-[10000] active:scale-95 transition-all border border-gray-200"
-    >
-      @if (uiService.isFullScreen()) {
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      } @else {
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-        </svg>
-      }
-    </button>
-
-    <!-- Tracking Indicator -->
-    @if (trackingService.state() === 'tracking') {
-      <div class="absolute top-6 right-6 bg-red-600 text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest animate-pulse shadow-md uppercase z-[10000]">
-        Rec
-      </div>
-    } @else if (trackingService.state() === 'paused') {
-      <div class="absolute top-6 right-6 bg-accent text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest shadow-md uppercase z-[10000]">
-        Paused
-      </div>
-    }
-
-    <!-- Mini Stats Overlay (Only in Full Screen) - MOVED TO BOTTOM LEFT -->
-    @if (uiService.isFullScreen()) {
-      <div class="absolute bottom-6 left-6 flex flex-col space-y-2 z-[10000]">
-        <div class="flex space-x-2">
-          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
-             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Climb</p>
-             <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
-          </div>
-          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
-             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Descent</p>
-             <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
-          </div>
-        </div>
-        <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
-           <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Distance</p>
-           <p class="text-lg font-black text-text-heading">{{ formattedDistance() }}</p>
-        </div>
-        <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
-           <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Duration</p>
-           <p class="text-lg font-black text-text-heading">{{ formattedTime() }}</p>
-        </div>
-      </div>
-    }
   </div>
 
-  <!-- Controls (Hidden in Full Screen) -->
-  @if (!uiService.isFullScreen()) {
-    <div class="flex flex-col items-center shrink-0 pt-1 pb-1 space-y-4">
+  <!-- Top Overlay -->
+  <div class="absolute top-4 left-4 right-4 z-10 pointer-events-none">
+    <div class="max-w-4xl mx-auto">
+      @if (trackingService.state() === 'idle') {
+        <!-- Idle Branding Header -->
+        <div class="flex justify-center pt-2">
+          <div class="bg-white/80 backdrop-blur-md px-8 py-3 rounded-full shadow-xl border border-white/20 pointer-events-auto">
+            <h1 class="text-2xl font-black text-text-heading uppercase tracking-tight">Trackingfy</h1>
+          </div>
+        </div>
+      } @else {
+        <!-- Active Metrics Overlay -->
+        <div class="flex flex-col space-y-2 animate-in slide-in-from-top-4 duration-500">
+          <!-- Main Stats Row -->
+          <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 grid grid-cols-3 md:grid-cols-5 gap-2 border border-white/20 pointer-events-auto">
+            <div class="text-center">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Duration</p>
+              <p class="text-lg font-black text-text-heading">{{ formattedTime() }}</p>
+            </div>
+            <div class="text-center border-x border-gray-100/50">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Distance</p>
+              <p class="text-lg font-black text-text-heading">{{ formattedDistance() }}</p>
+            </div>
+            <div class="text-center md:border-r border-gray-100/50">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Speed</p>
+              <p class="text-lg font-black text-text-heading">{{ formattedSpeed() }}</p>
+            </div>
+            <div class="text-center border-r border-gray-100/50 hidden md:block">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Climb</p>
+              <p class="text-lg font-black text-green-600">{{ formattedClimb() }}</p>
+            </div>
+            <div class="text-center hidden md:block">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Descent</p>
+              <p class="text-lg font-black text-red-600">{{ formattedDescent() }}</p>
+            </div>
+          </div>
 
-      <div class="flex justify-center items-center space-x-6 w-full">
-        <!-- Secondary Controls -->
-        @if (trackingService.state() !== 'idle') {
-          <button
-            (click)="requestStopTracking()"
-            class="w-14 h-14 rounded-full bg-white border-2 border-red-600 text-red-600 shadow-md flex items-center justify-center active:scale-90 transition-transform"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <rect x="6" y="6" width="12" height="12" rx="2" />
-            </svg>
-          </button>
-        } @else {
-          <!-- Placeholder for symmetry when idle -->
-          <div class="w-14 h-14"></div>
-        }
-
-        <!-- Main Play/Pause Button -->
-        <button
-          (click)="toggleTracking()"
-          class="w-20 h-20 rounded-full bg-accent text-white shadow-xl flex items-center justify-center transition-all active:scale-90 focus:outline-none focus:ring-8 focus:ring-accent/20 shadow-accent/20"
-        >
-          @if (trackingService.state() === 'idle') {
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          } @else if (trackingService.state() === 'tracking') {
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          } @else if (trackingService.state() === 'paused') {
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            </svg>
-          }
-        </button>
-
-        <!-- Activity Type Selector (Only in Idle) -->
-        @if (trackingService.state() === 'idle') {
-          <button
-            (click)="showTypeModal.set(true)"
-            class="w-14 h-14 rounded-full bg-white border border-gray-100 shadow-md flex flex-col items-center justify-center active:scale-90 transition-transform text-text-heading overflow-hidden"
-          >
-            <span class="text-[7px] font-black uppercase tracking-tighter leading-none mb-0.5">{{ selectedType() }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        } @else {
-          <!-- Placeholder for symmetry -->
-          <div class="w-14 h-14"></div>
-        }
-      </div>
+          <!-- Secondary Stats (Mobile Only) -->
+          <div class="flex space-x-2 md:hidden">
+            <div class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 pointer-events-auto text-center">
+              <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Climb</p>
+              <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
+            </div>
+            <div class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 pointer-events-auto text-center">
+              <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Descent</p>
+              <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
+            </div>
+          </div>
+        </div>
+      }
     </div>
-  }
+  </div>
+
+  <!-- Bottom Controls Overlay -->
+  <div class="absolute bottom-10 left-0 right-0 z-20 px-6 flex justify-center pointer-events-none">
+    <div class="flex items-center space-x-6 pointer-events-auto">
+      
+      <!-- Stop Button -->
+      @if (trackingService.state() !== 'idle') {
+        <button
+          (click)="$event.stopPropagation(); requestStopTracking()"
+          class="w-14 h-14 rounded-full bg-white text-red-600 shadow-2xl flex items-center justify-center active:scale-90 transition-all border border-gray-100"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <rect x="6" y="6" width="12" height="12" rx="2" />
+          </svg>
+        </button>
+      } @else {
+        <!-- History Shortcut -->
+        <button
+          routerLink="/history"
+          class="w-14 h-14 rounded-full bg-white text-text-heading shadow-2xl flex items-center justify-center active:scale-90 transition-all border border-gray-100"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+      }
+
+      <!-- Main Play/Pause Button -->
+      <button
+        (click)="$event.stopPropagation(); toggleTracking()"
+        class="w-24 h-24 rounded-full bg-accent text-white shadow-[0_20px_50px_rgba(239,188,33,0.3)] flex items-center justify-center transition-all active:scale-90 focus:outline-none hover:scale-105 border-4 border-white"
+      >
+        @if (trackingService.state() === 'idle') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          </svg>
+        } @else if (trackingService.state() === 'tracking') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6" />
+          </svg>
+        } @else if (trackingService.state() === 'paused') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          </svg>
+        }
+      </button>
+
+      <!-- Activity Type Selector -->
+      <button
+        (click)="$event.stopPropagation(); showTypeModal.set(true)"
+        class="w-14 h-14 rounded-full bg-white text-text-heading shadow-2xl flex flex-col items-center justify-center active:scale-90 transition-all border border-gray-100 overflow-hidden"
+      >
+        <span class="text-[7px] font-black uppercase tracking-tighter leading-none mb-0.5">{{ selectedType() }}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+  </div>
 
   <!-- Activity Type Modal -->
   @if (showTypeModal()) {
-    <div class="fixed inset-0 z-[100001] flex items-end sm:items-center justify-center p-4">
+    <div class="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-4">
       <!-- Backdrop -->
       <div
         class="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"

@@ -50,10 +50,3 @@ Build a personal-use PWA to replicate Strava's core tracking features. The app w
 2. **Integration Tests:** Verify data persistence in IndexedDB using browser dev tools. [MANUALLY VERIFIED VIA BUILD]
 3. **PWA Audit:** Run Lighthouse to ensure PWA compliance.
 4. **Manual Test:** Record a "walk" (simulated or real) and verify the path and stats.
-
-## Future Roadmap: Automatic Activity Detection
-Research and implement methods to detect activity type (Walking, Running, Cycling) without user input:
-1. **Velocity-Based Classifier:** Analyze GPS speed profiles (e.g., Walk < 7km/h, Run 7-15km/h, Bike > 15km/h).
-2. **Motion Sensor Analysis:** Implement `DeviceMotionEvent` listeners to detect gait patterns (cadence/impact vs. smooth cycling vibrations).
-3. **Machine Learning (TF.js):** Integrate a lightweight HAR (Human Activity Recognition) model for high-precision detection using accelerometer data.
-4. **Native API Integration:** Monitor "Web Activity Recognition" standards for potential future native support or browser-level activity detection.

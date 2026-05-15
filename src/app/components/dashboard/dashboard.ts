@@ -1,16 +1,17 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrackingService } from '../../services/tracking';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, MapComponent, FormsModule],
+  imports: [CommonModule, MapComponent, FormsModule, RouterLink],
   templateUrl: './dashboard.html',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   selectedType = signal('Cycling');
   activityTypes = ['Cycling', 'Running', 'Walking'];
   showTypeModal = signal(false);
@@ -19,6 +20,10 @@ export class DashboardComponent {
     public trackingService: TrackingService,
     public uiService: UIService
   ) {}
+
+  ngOnInit() {
+    this.uiService.setFullScreen(true);
+  }
 
   formattedTime = computed(() => {
     const seconds = this.trackingService.currentTime();

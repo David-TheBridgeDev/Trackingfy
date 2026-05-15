@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { Coordinate } from '../../services/database';
 import { UIService } from '../../services/ui';
+import { TrackingService } from '../../services/tracking';
 
 @Component({
   selector: 'app-map',
@@ -16,7 +17,7 @@ import { UIService } from '../../services/ui';
       @if (!isFollowing()) {
         <button 
           (click)="recenter()"
-          class="absolute top-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm text-text-heading px-4 py-2 rounded-full shadow-xl border border-gray-100 flex items-center space-x-2 z-[1000] active:scale-95 transition-all animate-in fade-in slide-in-from-top-2 duration-300"
+          class="absolute bottom-40 right-6 bg-white/95 backdrop-blur-sm text-text-heading px-4 py-2 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-2 z-[1000] active:scale-95 transition-all animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -45,7 +46,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private isMapInitialized = signal(false);
   private ignoreInteraction = true;
 
-  constructor(public uiService: UIService) {
+  constructor(public uiService: UIService, private trackingService: TrackingService) {
+    // Clear map when tracking stops
+    effect(() => {
+      const state = this.trackingService.state();
+      if (state === 'idle' && this.isMapInitialized()) {
+        this.polyline.setLatLngs([]);
+      }
+    });
+
     effect(() => {
       this.uiService.isFullScreen();
       if (this.isMapInitialized()) {
@@ -142,7 +151,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     L.Marker.prototype.options.icon = iconDefault;
 
     this.map = L.map(this.mapContainer.nativeElement, {
-      zoomControl: true,
+      zoomControl: false,
       dragging: true,
       touchZoom: true
     }).setView([0, 0], 2);
