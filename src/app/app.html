@@ -3,9 +3,18 @@
   @if (!uiService.isFullScreen()) {
     <header class="bg-bg-surface text-text-heading shadow-sm p-4 flex justify-between items-center border-b border-gray-200 shrink-0">
       <div class="flex items-center space-x-2">
-        <a routerLink="/" class="hover:opacity-80 transition-opacity">
-          <h1 class="text-xl font-black tracking-tight uppercase">Trackingfy</h1>
-        </a>
+        @if (isHomePage()) {
+          <button (click)="uiService.showOnboarding.set(true)" class="hover:opacity-80 transition-opacity text-left group">
+            <h1 class="text-xl font-black tracking-tighter uppercase text-black transition-all">Trackingfy</h1>
+          </button>
+        } @else {
+          <button (click)="location.back()" class="flex items-center space-x-1 hover:opacity-70 transition-opacity text-black">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span class="font-black uppercase tracking-tighter text-lg">Back</span>
+          </button>
+        }
         @if (!isOnline()) {
           <span class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">Offline</span>
         }
@@ -22,7 +31,7 @@
   <!-- Main Content Area -->
   <main class="flex-1 overflow-hidden relative">
     <div class="h-full w-full overflow-y-auto">
-      <div 
+      <div
         class="h-full w-full mx-auto"
         [ngClass]="uiService.isFullScreen() ? 'max-w-none p-0' : 'max-w-4xl p-4 md:p-6'"
       >
@@ -36,7 +45,7 @@
     <div class="fixed inset-0 z-[200000] flex items-center justify-center p-4">
       <!-- Backdrop -->
       <div class="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-500"></div>
-      
+
       <!-- Modal Content -->
       <div class="relative bg-white rounded-[40px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-gray-100">
         <div class="p-10 text-center">
@@ -46,14 +55,14 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          
-          <h2 class="text-3xl font-black text-text-heading mb-4 uppercase tracking-tighter">Welcome to Trackingfy</h2>
-          
+
+          <h2 class="text-3xl font-black text-black mb-4 uppercase tracking-tighter">Welcome to Trackingfy</h2>
+
           @if (trackingService.permissionDenied()) {
             <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm font-bold">
               GPS access was denied. Please enable location permissions in your browser settings to continue.
             </div>
-            <button 
+            <button
                 (click)="handleStart()"
                 class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-red-200 active:scale-95 transition-all mb-4"
               >
@@ -67,16 +76,16 @@
 
           <div class="flex flex-col space-y-4">
             @if (!trackingService.permissionDenied()) {
-              <button 
+              <button
                 (click)="handleStart()"
-                class="w-full bg-accent text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-accent/30 active:scale-95 transition-all"
+                class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.4)] active:scale-95 transition-all hover:brightness-110"
               >
-                Get Started
+                Go
               </button>
             }
-            
-            <a 
-              href="https://github.com/David-TheBridgeDev" 
+
+            <a
+              href="https://github.com/David-TheBridgeDev"
               target="_blank"
               class="flex items-center justify-center space-x-2 text-text-primary hover:text-text-heading transition-colors py-2 font-bold uppercase text-[10px] tracking-widest"
             >
@@ -95,11 +104,11 @@
   @if (uiService.confirmation(); as config) {
     <div class="fixed inset-0 z-[100000] flex items-center justify-center p-4">
       <!-- Backdrop -->
-      <div 
+      <div
         class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         (click)="uiService.resolveConfirm(false)"
       ></div>
-      
+
       <!-- Modal Content -->
       <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100">
         <div class="p-6">
@@ -110,18 +119,18 @@
             {{ config.message }}
           </p>
         </div>
-        
+
         <div class="flex p-4 gap-3 bg-gray-50">
-          <button 
+          <button
             (click)="uiService.resolveConfirm(false)"
             class="flex-1 px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors uppercase text-sm"
           >
             {{ config.cancelText }}
           </button>
-          <button 
+          <button
             (click)="uiService.resolveConfirm(true)"
-            [class]="config.type === 'danger' ? 
-              'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm' : 
+            [class]="config.type === 'danger' ?
+              'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm' :
               'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm'"
           >
             {{ config.confirmText }}
