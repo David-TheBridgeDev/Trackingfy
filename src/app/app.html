@@ -41,7 +41,7 @@
   </main>
 
   <!-- Onboarding / Permissions Modal -->
-  @if (uiService.showOnboarding() || trackingService.permissionDenied()) {
+  @if (uiService.showOnboarding()) {
     <div class="fixed inset-0 z-[200000] flex items-center justify-center p-4">
       <!-- Backdrop -->
       <div class="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-500"></div>
@@ -58,31 +58,17 @@
 
           <h2 class="text-3xl font-black text-black mb-4 uppercase tracking-tighter">Welcome to Trackingfy</h2>
 
-          @if (trackingService.permissionDenied()) {
-            <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm font-bold">
-              GPS access was denied. Please enable location permissions in your browser settings to continue.
-            </div>
-            <button
-                (click)="handleStart()"
-                class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-red-200 active:scale-95 transition-all mb-4"
-              >
-                Try Again
-            </button>
-          } @else {
-            <p class="text-text-primary leading-relaxed mb-8 font-medium">
-              Track your outdoor activities with precision. Real-time stats, interactive maps, and full history.
-            </p>
-          }
+          <p class="text-text-primary leading-relaxed mb-8 font-medium">
+            Track your outdoor activities with precision. Real-time stats, interactive maps, and full history.
+          </p>
 
           <div class="flex flex-col space-y-4">
-            @if (!trackingService.permissionDenied()) {
-              <button
-                (click)="handleStart()"
-                class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.4)] active:scale-95 transition-all hover:brightness-110"
-              >
-                Go
-              </button>
-            }
+            <button
+              (click)="handleStart()"
+              class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.4)] active:scale-95 transition-all hover:brightness-110"
+            >
+              Go
+            </button>
 
             @if (uiService.deferredPrompt()) {
               <button

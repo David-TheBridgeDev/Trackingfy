@@ -1,5 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { DatabaseService, Activity, Coordinate } from './database';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
+
+const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export type TrackingState = 'idle' | 'tracking' | 'paused';
 
@@ -7,7 +11,7 @@ export type TrackingState = 'idle' | 'tracking' | 'paused';
   providedIn: 'root'
 })
 export class TrackingService {
-  private watchId: number | null = null;
+  private watchId: number | string | null = null;
   private currentActivityId: number | null = null;
 
   state = signal<TrackingState>('idle');
@@ -26,6 +30,22 @@ export class TrackingService {
   constructor(private db: DatabaseService) {}
 
   async requestPermission(): Promise<boolean> {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        // We can use start/stop briefly to request permissions
+        await BackgroundGeolocation.start(
+          { requestPermissions: true, stale: true },
+          () => {}
+        );
+        await BackgroundGeolocation.stop();
+        this.permissionDenied.set(false);
+        return true;
+      } catch (e) {
+        this.permissionDenied.set(true);
+        return false;
+      }
+    }
+
     if (!('geolocation' in navigator)) {
       console.error('Geolocation not supported');
       return false;
@@ -84,7 +104,7 @@ export class TrackingService {
     this.lastCoordinate.set(null);
 
     this.startTimer();
-    this.startGeolocation();
+    await this.startGeolocation();
   }
 
   pauseTracking() {
@@ -113,8 +133,42 @@ export class TrackingService {
     }
   }
 
-  private startGeolocation() {
-    if ('geolocation' in navigator) {
+  private async startGeolocation() {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await BackgroundGeolocation.start(
+          {
+            backgroundMessage: "Trackingfy está registrando tu actividad.",
+            backgroundTitle: "Rastreo en curso",
+            requestPermissions: true,
+            stale: false,
+            distanceFilter: 2
+          },
+          (location) => {
+            if (location) {
+              // Map Capgo location to standard GeolocationPosition-like object
+              const position = {
+                coords: {
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  altitude: location.altitude,
+                  speed: location.speed,
+                  accuracy: location.accuracy,
+                  altitudeAccuracy: location.altitudeAccuracy,
+                  heading: 0 // Default heading
+                },
+                timestamp: location.time || Date.now()
+              } as GeolocationPosition;
+              this.handlePosition(position);
+            }
+          }
+        );
+        this.watchId = 'native';
+      } catch (e) {
+        console.error('Error starting background geolocation:', e);
+        this.stopTracking();
+      }
+    } else if ('geolocation' in navigator) {
       this.watchId = navigator.geolocation.watchPosition(
         (position) => this.handlePosition(position),
         (error) => console.error('Geolocation error:', error),
@@ -182,7 +236,11 @@ export class TrackingService {
     if (this.state() === 'idle') return;
 
     if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
+      if (Capacitor.isNativePlatform()) {
+        await BackgroundGeolocation.stop();
+      } else {
+        navigator.geolocation.clearWatch(this.watchId as number);
+      }
       this.watchId = null;
     }
 

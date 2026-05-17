@@ -13,19 +13,18 @@ import { TrackingService } from '../../services/tracking';
     <div class="relative w-full h-full">
       <div #mapContainer class="w-full h-full"></div>
       
-      <!-- Recenter Button -->
-      @if (!isFollowing()) {
-        <button 
-          (click)="recenter()"
-          class="absolute bottom-40 right-6 bg-white/95 backdrop-blur-sm text-text-heading px-4 py-2 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-2 z-[1000] active:scale-95 transition-all animate-in fade-in slide-in-from-bottom-2 duration-300"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span class="text-[10px] font-black uppercase tracking-widest">Recenter</span>
-        </button>
-      }
+      <!-- GPS Location Button (Google Maps/Waze style) -->
+      <button 
+        (click)="recenter()"
+        [class]="'absolute bottom-40 right-4 w-12 h-12 flex items-center justify-center rounded-full shadow-2xl border transition-all active:scale-90 z-[1000] ' + 
+                 (trackingService.permissionDenied() || !currentPoint() ? 'bg-red-500 text-white border-red-400 animate-pulse' : 
+                 (isFollowing() ? 'bg-accent text-white border-accent' : 'bg-white/95 text-gray-700 border-gray-100'))"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M3 12h3m12 0h3M12 3v3m0 12v3" />
+        </svg>
+      </button>
     </div>
   `,
   styles: [`
@@ -46,7 +45,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private isMapInitialized = signal(false);
   private ignoreInteraction = true;
 
-  constructor(public uiService: UIService, private trackingService: TrackingService) {
+  constructor(public uiService: UIService, public trackingService: TrackingService) {
     // Clear map when tracking stops
     effect(() => {
       const state = this.trackingService.state();
@@ -120,8 +119,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  recenter() {
-    const point = this.currentPoint();
+  async recenter() {
+    let point = this.currentPoint();
+    
+    // If we don't have a point, it might be because permissions weren't granted or GPS is off.
+    // We try to request/activate it.
+    if (!point) {
+      const granted = await this.trackingService.requestPermission();
+      if (granted) {
+        point = this.currentPoint();
+      }
+    }
+
     const coords = this.coordinates();
 
     if (point) {

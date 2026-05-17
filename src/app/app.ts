@@ -28,19 +28,14 @@ export class App {
   );
 
   constructor() {
-    // If user has already seen onboarding but permissions are missing, try to get them
-    if (!this.uiService.showOnboarding()) {
-      this.trackingService.requestPermission();
-    }
+    // Request permissions immediately on startup
+    this.trackingService.requestPermission();
   }
 
   protected readonly title = signal('trackingfy');
 
   async handleStart() {
-    const success = await this.trackingService.requestPermission();
-    if (success) {
-      this.uiService.completeOnboarding();
-    }
+    this.uiService.completeOnboarding();
   }
 
   isOnline = signal(navigator.onLine);

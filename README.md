@@ -60,6 +60,62 @@ npm run build
 
 The build artifacts will be stored in the `dist/` directory.
 
+### Generating Android APK
+
+To generate an APK for Android using Capacitor, follow these steps:
+
+1.  **Build the Angular application:**
+    ```bash
+    npm run build
+    ```
+
+2.  **Sync the build with Android project:**
+    ```bash
+    npx cap sync android
+    ```
+
+3.  **Build the APK:**
+
+    #### 🟢 Debug Build (For Development)
+    Use this for testing on your device. It doesn't require signing.
+    - **Option A (Terminal):**
+      ```bash
+      cd android && ./gradlew assembleDebug
+      ```
+      The APK will be at: `android/app/build/outputs/apk/debug/app-debug.apk`
+    - **Option B (Android Studio):**
+      Go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+
+    #### 🔵 Release Build (For Production)
+    Optimized for performance. **Must be signed** to be installed on most devices.
+    - **Option A (Terminal - Unsigned):**
+      ```bash
+      cd android && ./gradlew assembleRelease
+      ```
+      The APK will be at: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
+    - **Option B (Android Studio - Signed):**
+      1. Open the project: `npx cap open android`
+      2. Go to **Build > Generate Signed Bundle / APK...**
+      3. Follow the wizard to create/use a KeyStore and select the **release** variant.
+
+### Generating Mobile Assets
+
+To generate app icons and splash screens for Android and iOS:
+
+1.  **Setup:** Ensure you have the assets generator installed:
+    ```bash
+    npm install @capacitor/assets --save-dev
+    ```
+
+2.  **Preparation:** Create an `assets/` folder in the root and add your source images (recommended 1024x1024px for icons, 2732x2732px for splash):
+    *   `assets/icon-foreground.png` & `assets/icon-background.png` (for adaptive icons)
+    *   `assets/splash.png` (for the splash screen)
+
+3.  **Generate:** Run the command to update all platforms:
+    ```bash
+    npx capacitor-assets generate
+    ```
+
 ### Running Tests
 
 To execute unit tests with Vitest, run:
