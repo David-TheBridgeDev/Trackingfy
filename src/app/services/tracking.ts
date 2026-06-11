@@ -20,7 +20,10 @@ export class TrackingService {
   currentSpeed = signal(0); // in m/s
   currentClimb = signal(0); // in meters
   currentDescent = signal(0); // in meters
+  currentAltitude = signal<number | null>(null);
   lastCoordinate = signal<Coordinate | null>(null);
+  private lastSmoothedAltitude: number | null = null;
+  private lastAccumulatedAltitude: number | null = null;
 
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
@@ -63,6 +66,7 @@ export class TrackingService {
                     altitude: location.altitude ?? null,
                     speed: location.speed ?? null
                   });
+                  this.currentAltitude.set(location.altitude ?? null);
                 });
                 await BackgroundGeolocation.stop();
                 resolve(true);
@@ -106,6 +110,7 @@ export class TrackingService {
               altitude: altitude ?? null,
               speed: speed ?? null
             });
+            this.currentAltitude.set(altitude ?? null);
           });
           resolve(true);
         },
@@ -146,6 +151,8 @@ export class TrackingService {
     this.currentClimb.set(0);
     this.currentDescent.set(0);
     this.lastCoordinate.set(null);
+    this.lastSmoothedAltitude = null;
+    this.lastAccumulatedAltitude = null;
 
     this.startTimer();
     await this.startGeolocation();
@@ -256,18 +263,40 @@ export class TrackingService {
           // Only add distance if it's more than 2 meters to avoid GPS noise
           if (dist > 2) {
             this.currentDistance.update(d => d + dist);
-          }
 
-          // Calculate altitude changes
-          if (altitude !== null && last.altitude !== null && last.altitude !== undefined) {
-            const diff = altitude - last.altitude;
-            if (Math.abs(diff) > 0.5) { // Filter noise
-              if (diff > 0) {
-                this.currentClimb.update(c => c + diff);
-              } else {
-                this.currentDescent.update(d => d + Math.abs(diff));
+            // Calculate altitude changes only when there is horizontal movement
+            if (altitude !== null) {
+              // 1. Smooth the altitude using Exponential Moving Average (EMA)
+              let smoothed = altitude;
+              if (this.lastSmoothedAltitude !== null) {
+                const alpha = 0.2; // Smoothing factor (lower = smoother, but more lag)
+                smoothed = alpha * altitude + (1 - alpha) * this.lastSmoothedAltitude;
+              }
+              this.lastSmoothedAltitude = smoothed;
+
+              if (this.lastAccumulatedAltitude === null) {
+                this.lastAccumulatedAltitude = smoothed;
+              }
+
+              // 2. Accumulate differences using a threshold and comparing with the last accumulated baseline
+              const diff = smoothed - this.lastAccumulatedAltitude;
+              const ALTITUDE_THRESHOLD = 2.0; // 2 meters threshold to filter GPS jitter
+
+              if (Math.abs(diff) >= ALTITUDE_THRESHOLD) {
+                if (diff > 0) {
+                  this.currentClimb.update(c => c + diff);
+                } else {
+                  this.currentDescent.update(d => d + Math.abs(diff));
+                }
+                this.lastAccumulatedAltitude = smoothed;
               }
             }
+          }
+        } else {
+          // First coordinate recorded: initialize baseline
+          if (altitude !== null) {
+            this.lastSmoothedAltitude = altitude;
+            this.lastAccumulatedAltitude = altitude;
           }
         }
         this.db.addCoordinate(newCoord);
@@ -275,6 +304,7 @@ export class TrackingService {
       }
 
       this.lastCoordinate.set(newCoord);
+      this.currentAltitude.set(altitude ?? null);
     });
   }
 
@@ -317,6 +347,8 @@ export class TrackingService {
     this.currentSpeed.set(0);
     this.currentClimb.set(0);
     this.currentDescent.set(0);
+    this.lastSmoothedAltitude = null;
+    this.lastAccumulatedAltitude = null;
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

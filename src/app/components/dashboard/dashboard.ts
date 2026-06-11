@@ -53,6 +53,11 @@ export class DashboardComponent implements OnInit {
     return this.trackingService.currentDescent().toFixed(0) + ' m';
   });
 
+  formattedAltitude = computed(() => {
+    const alt = this.trackingService.currentAltitude();
+    return alt !== null ? alt.toFixed(0) + ' m' : '--';
+  });
+
   toggleTracking() {
     const state = this.trackingService.state();
     if (state === 'idle') {

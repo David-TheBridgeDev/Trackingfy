@@ -32,7 +32,7 @@
         <!-- Active Metrics Overlay -->
         <div class="flex flex-col space-y-2 animate-in slide-in-from-top-4 duration-500">
           <!-- Main Stats Row -->
-          <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 grid grid-cols-3 md:grid-cols-5 gap-2 border border-white/20 pointer-events-auto">
+          <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 grid grid-cols-3 md:grid-cols-6 gap-2 border border-white/20 pointer-events-auto">
             <div class="text-center">
               <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Duration</p>
               <p class="text-lg font-black text-text-heading">{{ formattedTime() }}</p>
@@ -49,9 +49,13 @@
               <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Climb</p>
               <p class="text-lg font-black text-green-600">{{ formattedClimb() }}</p>
             </div>
-            <div class="text-center hidden md:block">
+            <div class="text-center border-r border-gray-100/50 hidden md:block">
               <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Descent</p>
               <p class="text-lg font-black text-red-600">{{ formattedDescent() }}</p>
+            </div>
+            <div class="text-center hidden md:block">
+              <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">Altitude</p>
+              <p class="text-lg font-black text-blue-600">{{ formattedAltitude() }}</p>
             </div>
           </div>
 
@@ -64,6 +68,10 @@
             <div class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 pointer-events-auto text-center">
               <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Descent</p>
               <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
+            </div>
+            <div class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 pointer-events-auto text-center">
+              <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Altitude</p>
+              <p class="text-sm font-black text-blue-600">{{ formattedAltitude() }}</p>
             </div>
           </div>
         </div>
