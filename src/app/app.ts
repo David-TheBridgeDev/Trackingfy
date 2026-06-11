@@ -30,6 +30,22 @@ export class App {
     { initialValue: true }
   );
 
+  showToast = signal(false);
+  toastMessage = signal('');
+  private lastBackPress = 0;
+  private toastTimeout: any;
+
+  private triggerToast(message: string) {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    this.toastMessage.set(message);
+    this.showToast.set(true);
+    this.toastTimeout = setTimeout(() => {
+      this.showToast.set(false);
+    }, 2000);
+  }
+
   constructor() {
     // Request permissions immediately on startup
     this.trackingService.requestPermission();
@@ -45,7 +61,13 @@ export class App {
           } else if (this.uiService.showOnboarding()) {
             CapApp.exitApp();
           } else if (this.router.url === '/' || this.router.url === '/dashboard') {
-            CapApp.exitApp();
+            const now = Date.now();
+            if (now - this.lastBackPress < 2000) {
+              CapApp.exitApp();
+            } else {
+              this.lastBackPress = now;
+              this.triggerToast('Presiona atrás de nuevo para salir');
+            }
           } else {
             this.location.back();
           }

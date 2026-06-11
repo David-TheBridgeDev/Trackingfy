@@ -135,4 +135,11 @@
     </div>
   }
 
+  <!-- Toast Notification -->
+  @if (showToast()) {
+    <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300">
+      {{ toastMessage() }}
+    </div>
+  }
+
 </div>
