@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, NgZone } from '@angular/core';
 import { DatabaseService, Activity, Coordinate } from './database';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
@@ -27,21 +27,61 @@ export class TrackingService {
 
   private timerInterval: any;
 
-  constructor(private db: DatabaseService) {}
+  constructor(private db: DatabaseService, private ngZone: NgZone) {}
 
   async requestPermission(): Promise<boolean> {
     if (Capacitor.isNativePlatform()) {
       try {
-        // We can use start/stop briefly to request permissions
-        await BackgroundGeolocation.start(
-          { requestPermissions: true, stale: true },
-          () => {}
-        );
-        await BackgroundGeolocation.stop();
-        this.permissionDenied.set(false);
-        return true;
+        return new Promise((resolve) => {
+          let resolved = false;
+          
+          BackgroundGeolocation.start(
+            { requestPermissions: true, stale: true },
+            async (location, error) => {
+              if (error) {
+                console.error(error);
+                if (!resolved) {
+                  resolved = true;
+                  this.ngZone.run(() => {
+                    this.permissionDenied.set(true);
+                  });
+                  await BackgroundGeolocation.stop();
+                  resolve(false);
+                }
+                return;
+              }
+              
+              if (location && !resolved) {
+                resolved = true;
+                this.ngZone.run(() => {
+                  this.permissionDenied.set(false);
+                  this.lastCoordinate.set({
+                    activityId: 0,
+                    lat: location.latitude,
+                    lng: location.longitude,
+                    timestamp: location.time || Date.now(),
+                    altitude: location.altitude ?? null,
+                    speed: location.speed ?? null
+                  });
+                });
+                await BackgroundGeolocation.stop();
+                resolve(true);
+              }
+            }
+          ).catch(e => {
+            if (!resolved) {
+              resolved = true;
+              this.ngZone.run(() => {
+                this.permissionDenied.set(true);
+              });
+              resolve(false);
+            }
+          });
+        });
       } catch (e) {
-        this.permissionDenied.set(true);
+        this.ngZone.run(() => {
+          this.permissionDenied.set(true);
+        });
         return false;
       }
     }
@@ -54,24 +94,28 @@ export class TrackingService {
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          this.permissionDenied.set(false);
-          const { latitude, longitude, altitude, speed } = position.coords;
-          const { timestamp } = position;
-          this.lastCoordinate.set({
-            activityId: 0,
-            lat: latitude,
-            lng: longitude,
-            timestamp,
-            altitude: altitude ?? null,
-            speed: speed ?? null
+          this.ngZone.run(() => {
+            this.permissionDenied.set(false);
+            const { latitude, longitude, altitude, speed } = position.coords;
+            const { timestamp } = position;
+            this.lastCoordinate.set({
+              activityId: 0,
+              lat: latitude,
+              lng: longitude,
+              timestamp,
+              altitude: altitude ?? null,
+              speed: speed ?? null
+            });
           });
           resolve(true);
         },
         (error) => {
           console.error('Geolocation error:', error);
-          if (error.code === error.PERMISSION_DENIED) {
-            this.permissionDenied.set(true);
-          }
+          this.ngZone.run(() => {
+            if (error.code === error.PERMISSION_DENIED) {
+              this.permissionDenied.set(true);
+            }
+          });
           resolve(false);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
@@ -185,51 +229,53 @@ export class TrackingService {
   }
 
   private handlePosition(position: GeolocationPosition) {
-    // If paused, we still want to keep the "current position" updated for the map, 
-    // but we don't record the point in the DB or add to distance.
-    const { latitude, longitude, altitude, speed } = position.coords;
-    const { timestamp } = position;
-    
-    const newCoord: Coordinate = {
-      activityId: this.currentActivityId || 0,
-      lat: latitude,
-      lng: longitude,
-      timestamp,
-      altitude: altitude ?? null,
-      speed: speed ?? null
-    };
+    this.ngZone.run(() => {
+      // If paused, we still want to keep the "current position" updated for the map, 
+      // but we don't record the point in the DB or add to distance.
+      const { latitude, longitude, altitude, speed } = position.coords;
+      const { timestamp } = position;
+      
+      const newCoord: Coordinate = {
+        activityId: this.currentActivityId || 0,
+        lat: latitude,
+        lng: longitude,
+        timestamp,
+        altitude: altitude ?? null,
+        speed: speed ?? null
+      };
 
-    if (this.state() === 'tracking') {
-      const last = this.lastCoordinate();
-      if (last) {
-        const dist = this.calculateDistance(
-          last.lat,
-          last.lng,
-          latitude,
-          longitude
-        );
-        // Only add distance if it's more than 2 meters to avoid GPS noise
-        if (dist > 2) {
-          this.currentDistance.update(d => d + dist);
-        }
+      if (this.state() === 'tracking') {
+        const last = this.lastCoordinate();
+        if (last) {
+          const dist = this.calculateDistance(
+            last.lat,
+            last.lng,
+            latitude,
+            longitude
+          );
+          // Only add distance if it's more than 2 meters to avoid GPS noise
+          if (dist > 2) {
+            this.currentDistance.update(d => d + dist);
+          }
 
-        // Calculate altitude changes
-        if (altitude !== null && last.altitude !== null && last.altitude !== undefined) {
-          const diff = altitude - last.altitude;
-          if (Math.abs(diff) > 0.5) { // Filter noise
-            if (diff > 0) {
-              this.currentClimb.update(c => c + diff);
-            } else {
-              this.currentDescent.update(d => d + Math.abs(diff));
+          // Calculate altitude changes
+          if (altitude !== null && last.altitude !== null && last.altitude !== undefined) {
+            const diff = altitude - last.altitude;
+            if (Math.abs(diff) > 0.5) { // Filter noise
+              if (diff > 0) {
+                this.currentClimb.update(c => c + diff);
+              } else {
+                this.currentDescent.update(d => d + Math.abs(diff));
+              }
             }
           }
         }
+        this.db.addCoordinate(newCoord);
+        this.currentSpeed.set(speed || 0);
       }
-      this.db.addCoordinate(newCoord);
-      this.currentSpeed.set(speed || 0);
-    }
 
-    this.lastCoordinate.set(newCoord);
+      this.lastCoordinate.set(newCoord);
+    });
   }
 
   async stopTracking() {

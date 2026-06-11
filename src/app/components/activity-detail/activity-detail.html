@@ -47,7 +47,7 @@
       [ngClass]="uiService.isFullScreen() ? 'fixed inset-0 z-[9999] bg-bg-base' : 'flex-1 bg-bg-surface rounded-2xl border border-gray-100 overflow-hidden relative shadow-sm'"
       class="transition-all duration-300"
     >
-      <app-map class="w-full h-full" [coordinates]="coordinates()"></app-map>
+      <app-map class="w-full h-full" [coordinates]="coordinates()" [showLocationButton]="false"></app-map>
       
       <!-- Full Screen Toggle Button -->
       <button 

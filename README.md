@@ -80,8 +80,13 @@ To generate an APK for Android using Capacitor, follow these steps:
     Use this for testing on your device. It doesn't require signing.
     - **Option A (Terminal):**
       ```bash
-      cd android && ./gradlew assembleDebug
+      cd android 
       ```
+      
+      ```bash
+      ./gradlew assembleDebug
+      ```
+
       The APK will be at: `android/app/build/outputs/apk/debug/app-debug.apk`
     - **Option B (Android Studio):**
       Go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
@@ -90,7 +95,10 @@ To generate an APK for Android using Capacitor, follow these steps:
     Optimized for performance. **Must be signed** to be installed on most devices.
     - **Option A (Terminal - Unsigned):**
       ```bash
-      cd android && ./gradlew assembleRelease
+      cd android
+      ```
+      ```bash
+      ./gradlew assembleRelease
       ```
       The APK will be at: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
     - **Option B (Android Studio - Signed):**
