@@ -59,29 +59,7 @@
         }
       </button>
 
-      <!-- Mini Stats Overlay (Only in Full Screen) -->
-      @if (uiService.isFullScreen()) {
-        <div class="absolute bottom-6 left-6 flex flex-col space-y-2 z-[10000]">
-          <div class="flex space-x-2">
-            <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
-               <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Climb</p>
-               <p class="text-sm font-black text-green-600">{{ activity()?.totalClimb | number:'1.0-0' }} m</p>
-            </div>
-            <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[80px]">
-               <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Descent</p>
-               <p class="text-sm font-black text-red-600">{{ activity()?.totalDescent | number:'1.0-0' }} m</p>
-            </div>
-          </div>
-          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
-             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Distance</p>
-             <p class="text-lg font-black text-text-heading">{{ ((activity()?.totalDistance || 0) / 1000) | number:'1.2-2' }} km</p>
-          </div>
-          <div class="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl border border-gray-100 min-w-[100px]">
-             <p class="text-[8px] font-bold uppercase text-text-primary tracking-tighter mb-0.5">Duration</p>
-             <p class="text-lg font-black text-text-heading">{{ formatTime(activity()?.totalTime) }}</p>
-          </div>
-        </div>
-      }
+
     </div>
   </div>
 } @else {
