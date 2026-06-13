@@ -101,7 +101,8 @@ export class HistoryComponent implements OnInit {
   }
 
   async loadActivities() {
-    this.activities.set(await this.db.getActivities());
+    const allActivities = await this.db.getActivities();
+    this.activities.set(allActivities.filter(a => a.endTime !== undefined));
   }
 
   clearFilters() {
