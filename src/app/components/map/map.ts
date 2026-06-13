@@ -76,13 +76,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.marker.setLatLng(latLng);
         this.marker.setOpacity(1);
 
-        if (point.activityId > 0) {
+        if (point.activityId > 0 && this.coordinates().length === 0) {
           this.polyline.addLatLng(latLng);
         }
         
         if (this.isFollowing()) {
           this.ignoreInteraction = true;
-          if (point.activityId === 0 || this.polyline.getLatLngs().length <= 1) {
+          if (point.activityId === 0 || (this.coordinates().length === 0 && this.polyline.getLatLngs().length <= 1)) {
             this.map.setView(latLng, 16);
           } else {
             this.map.panTo(latLng);
@@ -98,16 +98,25 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       if (coords.length > 0 && this.isMapInitialized()) {
         const latLngs = coords.map(c => [c.lat, c.lng] as L.LatLngExpression);
         this.polyline.setLatLngs(latLngs);
-        try {
-          this.ignoreInteraction = true;
-          this.map.fitBounds(this.polyline.getBounds(), { padding: [20, 20] });
-          this.isFollowing.set(true);
-          setTimeout(() => this.ignoreInteraction = false, 1000);
-        } catch (e) {}
+        
+        if (!this.showLocationButton()) {
+          try {
+            this.ignoreInteraction = true;
+            this.map.fitBounds(this.polyline.getBounds(), { padding: [20, 20] });
+            this.isFollowing.set(true);
+            setTimeout(() => this.ignoreInteraction = false, 1000);
+          } catch (e) {}
+        }
         
         const last = coords[coords.length - 1];
         this.marker.setLatLng([last.lat, last.lng]);
         this.marker.setOpacity(1);
+
+        if (this.showLocationButton() && this.isFollowing()) {
+          this.ignoreInteraction = true;
+          this.map.panTo([last.lat, last.lng]);
+          setTimeout(() => this.ignoreInteraction = false, 500);
+        }
       }
     });
   }

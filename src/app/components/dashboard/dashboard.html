@@ -1,7 +1,7 @@
 <div class="relative h-full w-full overflow-hidden bg-bg-base">
   <!-- Map Background -->
   <div class="absolute inset-0 z-0">
-    <app-map class="w-full h-full" [currentPoint]="trackingService.lastCoordinate()"></app-map>
+    <app-map class="w-full h-full" [currentPoint]="trackingService.lastCoordinate()" [coordinates]="trackingService.currentCoordinates()"></app-map>
   </div>
 
   <!-- Top Overlay -->

@@ -13,6 +13,8 @@ export type TrackingState = 'idle' | 'tracking' | 'paused';
 export class TrackingService {
   private watchId: number | string | null = null;
   private currentActivityId: number | null = null;
+  private startTimeSegment: number | null = null;
+  private accumulatedTime: number = 0;
 
   state = signal<TrackingState>('idle');
   currentDistance = signal(0); // in meters
@@ -22,6 +24,7 @@ export class TrackingService {
   currentDescent = signal(0); // in meters
   currentAltitude = signal<number | null>(null);
   lastCoordinate = signal<Coordinate | null>(null);
+  currentCoordinates = signal<Coordinate[]>([]);
   private lastSmoothedAltitude: number | null = null;
   private lastAccumulatedAltitude: number | null = null;
 
@@ -151,8 +154,10 @@ export class TrackingService {
     this.currentClimb.set(0);
     this.currentDescent.set(0);
     this.lastCoordinate.set(null);
+    this.currentCoordinates.set([]);
     this.lastSmoothedAltitude = null;
     this.lastAccumulatedAltitude = null;
+    this.accumulatedTime = 0;
 
     this.startTimer();
     await this.startGeolocation();
@@ -171,9 +176,20 @@ export class TrackingService {
     this.startTimer();
   }
 
+  private updateCurrentTime() {
+    if (this.state() === 'tracking' && this.startTimeSegment !== null) {
+      const elapsedInSegment = Math.floor((Date.now() - this.startTimeSegment) / 1000);
+      this.currentTime.set(this.accumulatedTime + elapsedInSegment);
+    } else {
+      this.currentTime.set(this.accumulatedTime);
+    }
+  }
+
   private startTimer() {
+    this.startTimeSegment = Date.now();
+    this.updateCurrentTime();
     this.timerInterval = setInterval(() => {
-      this.currentTime.update(t => t + 1);
+      this.updateCurrentTime();
     }, 1000);
   }
 
@@ -182,6 +198,11 @@ export class TrackingService {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    if (this.startTimeSegment !== null) {
+      this.accumulatedTime += Math.floor((Date.now() - this.startTimeSegment) / 1000);
+      this.startTimeSegment = null;
+    }
+    this.updateCurrentTime();
   }
 
   private async startGeolocation() {
@@ -300,7 +321,9 @@ export class TrackingService {
           }
         }
         this.db.addCoordinate(newCoord);
+        this.currentCoordinates.update(coords => [...coords, newCoord]);
         this.currentSpeed.set(speed || 0);
+        this.updateCurrentTime();
       }
 
       this.lastCoordinate.set(newCoord);
@@ -347,8 +370,11 @@ export class TrackingService {
     this.currentSpeed.set(0);
     this.currentClimb.set(0);
     this.currentDescent.set(0);
+    this.currentCoordinates.set([]);
     this.lastSmoothedAltitude = null;
     this.lastAccumulatedAltitude = null;
+    this.accumulatedTime = 0;
+    this.startTimeSegment = null;
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
