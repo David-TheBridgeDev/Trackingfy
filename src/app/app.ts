@@ -30,6 +30,15 @@ export class App {
     { initialValue: true }
   );
 
+  // Tracks if we are on the dashboard or activity detail page
+  isActivityOrDetail = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.url === '/' || this.router.url === '/dashboard' || this.router.url.startsWith('/activity/'))
+    ),
+    { initialValue: true }
+  );
+
   showToast = signal(false);
   toastMessage = signal('');
   private lastBackPress = 0;

@@ -23,7 +23,11 @@
         @if (uiService.deferredPrompt()) {
           <button (click)="uiService.installPwa()" class="text-accent text-xs uppercase font-black hover:underline">Install App</button>
         }
-        <a routerLink="/history" routerLinkActive="text-accent" class="hover:text-accent transition-colors">History</a>
+        @if (isActivityOrDetail()) {
+          <span class="text-accent cursor-default">History</span>
+        } @else {
+          <a routerLink="/history" routerLinkActive="text-accent" class="hover:text-accent transition-colors">History</a>
+        }
       </div>
     </header>
   }
