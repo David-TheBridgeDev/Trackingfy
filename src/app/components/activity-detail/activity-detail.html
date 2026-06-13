@@ -1,66 +1,89 @@
 @if (activity()) {
   <div class="h-full w-full flex flex-col space-y-4 relative">
-    <!-- Header Controls (Hidden in FS) -->
+    <!-- Header and Stats Controls (Hidden in FS) -->
     @if (!uiService.isFullScreen()) {
-      <div class="flex items-center justify-center shrink-0">
-        <h2 class="text-lg font-black text-text-heading uppercase tracking-tight">
-          {{ activity()?.type }}
-        </h2>
-      </div>
-
-      <!-- Stats Grid (Hidden in FS) -->
       <div
-        class="bg-bg-surface rounded-2xl shadow-sm p-4 grid grid-cols-2 md:grid-cols-6 gap-4 border border-gray-100 shrink-0"
+        class="bg-bg-surface rounded-2xl shadow-sm p-4 border border-gray-100 shrink-0 flex flex-col gap-4"
       >
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Date
-          </p>
-          <p class="font-black text-text-heading text-sm">
-            {{ activity()?.date | date: 'mediumDate' }}
-          </p>
+        <!-- Row 1: Activity Type and Date -->
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="bg-accent/10 text-accent text-xs font-black uppercase px-3 py-1 rounded-full tracking-wider">
+              {{ activity()?.type }}
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 text-text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="font-bold text-text-heading text-sm">
+              {{ activity()?.date | date: 'mediumDate' }}
+            </span>
+          </div>
         </div>
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Distance
-          </p>
-          <p class="font-black text-text-heading text-lg">
-            {{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }}
-            <span class="text-xs">km</span>
-          </p>
+
+        <!-- Row 2: Distance, Duration, Avg Speed -->
+        <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              Distance
+            </p>
+            <p class="font-black text-text-heading text-base md:text-lg">
+              {{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }}
+              <span class="text-xs">km</span>
+            </p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              Duration
+            </p>
+            <p class="font-black text-text-heading text-base md:text-lg">
+              {{ formatTime(activity()?.totalTime) }}
+            </p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              Avg Speed
+            </p>
+            <p class="font-black text-text-heading text-base md:text-lg">
+              {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
+              <span class="text-xs">km/h</span>
+            </p>
+          </div>
         </div>
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Duration
-          </p>
-          <p class="font-black text-text-heading text-lg">
-            {{ formatTime(activity()?.totalTime) }}
-          </p>
-        </div>
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Avg Speed
-          </p>
-          <p class="font-black text-text-heading text-lg">
-            {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
-            <span class="text-xs">km/h</span>
-          </p>
-        </div>
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Climb
-          </p>
-          <p class="font-black text-green-600 text-lg">
-            {{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-xs">m</span>
-          </p>
-        </div>
-        <div>
-          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-            Descent
-          </p>
-          <p class="font-black text-red-600 text-lg">
-            {{ activity()?.totalDescent | number: '1.0-0' }} <span class="text-xs">m</span>
-          </p>
+
+        <!-- Row 3: Climb & Descent -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 bg-green-50 rounded-xl text-green-600 border border-green-100/30">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+                Climb
+              </p>
+              <p class="font-black text-green-600 text-sm md:text-base">
+                {{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-xs font-bold text-green-600/70">m</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 bg-red-50 rounded-xl text-red-600 border border-red-100/30">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7-7 7-7-7" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+                Descent
+              </p>
+              <p class="font-black text-red-600 text-sm md:text-base">
+                {{ activity()?.totalDescent | number: '1.0-0' }} <span class="text-xs font-bold text-red-600/70">m</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     }
