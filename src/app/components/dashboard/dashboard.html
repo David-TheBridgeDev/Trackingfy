@@ -19,7 +19,7 @@
         <!-- History Button -->
         <button
           routerLink="/history"
-          class="w-16 h-14 flex flex-col items-center justify-center text-text-heading hover:text-accent bg-gray-50/50 hover:bg-white rounded-full hover:shadow-md transition-all border border-transparent hover:border-gray-100"
+          class="w-16 h-14 flex flex-col items-center justify-center text-text-heading bg-gray-50/50 rounded-full transition-all border border-transparent active:scale-95 active:bg-gray-100 active:shadow-inner"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +44,7 @@
         <!-- Trackingfy Button -->
         <button
           (click)="uiService.showOnboarding.set(true)"
-          class="flex-1 flex justify-center hover:scale-105 active:scale-95 transition-all group"
+          class="flex-1 flex justify-center active:scale-95 active:opacity-70 transition-all group"
         >
           <h1 class="text-2xl font-black uppercase tracking-tighter text-accent transition-all">
             Trackingfy
@@ -55,22 +55,12 @@
         <div class="w-px h-10 bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
 
         <!-- Center View Button -->
-        <button
-          (click)="recenterMap()"
-          class="w-16 h-14 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-white rounded-full hover:shadow-md transition-all border border-transparent hover:border-gray-100"
-          [class.text-accent]="map.isFollowing()"
-          [class.text-text-heading]="!map.isFollowing()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mb-1"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+        <button (click)="recenterMap()" 
+          class="w-16 h-14 flex flex-col items-center justify-center rounded-full transition-all border border-transparent active:scale-95 active:shadow-inner" 
+          [ngClass]="trackingService.permissionDenied() || !trackingService.lastCoordinate() ? 
+            'bg-red-50 text-red-500 animate-pulse active:bg-red-100' : 
+            (map.isFollowing() ? 'bg-accent/10 text-accent active:bg-accent/20' : 'bg-gray-50/50 text-text-heading active:bg-gray-100')">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3" />
             <path d="M3 12h3m12 0h3M12 3v3m0 12v3" />
           </svg>
