@@ -1,4 +1,4 @@
-import { Component, computed, signal, OnInit } from '@angular/core';
+import { Component, computed, signal, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrackingService } from '../../services/tracking';
@@ -12,6 +12,8 @@ import {RouterLink} from '@angular/router';
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {
+  @ViewChild('map') mapComponent!: MapComponent;
+
   selectedType = signal('Cycling');
   activityTypes = ['Cycling', 'Running', 'Walking'];
   showTypeModal = signal(false);
@@ -80,6 +82,12 @@ export class DashboardComponent implements OnInit {
 
     if (confirmed) {
       this.trackingService.stopTracking();
+    }
+  }
+
+  recenterMap() {
+    if (this.mapComponent) {
+      this.mapComponent.recenter();
     }
   }
 }
