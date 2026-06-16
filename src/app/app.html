@@ -1,32 +1,68 @@
 <div class="h-[100dvh] w-full bg-bg-base flex flex-col overflow-hidden">
   <!-- Header (Hidden in Full Screen) -->
   @if (!uiService.isFullScreen()) {
-    <header class="bg-bg-surface text-text-heading shadow-sm p-4 flex justify-between items-center border-b border-gray-200 shrink-0">
+    <header
+      class="bg-bg-surface text-text-heading shadow-sm p-4 flex justify-between items-center border-b border-gray-200 shrink-0"
+    >
       <div class="flex items-center space-x-2">
         @if (isHomePage()) {
-          <button (click)="uiService.showOnboarding.set(true)" class="hover:opacity-80 transition-opacity text-left group">
-            <h1 class="text-xl font-black tracking-tighter uppercase text-black transition-all">Trackingfy</h1>
+          <button
+            (click)="uiService.showOnboarding.set(true)"
+            class="hover:opacity-80 transition-opacity text-left group"
+          >
+            <h1 class="text-xl font-black tracking-tighter uppercase text-black transition-all">
+              Trackingfy
+            </h1>
           </button>
         } @else {
-          <button (click)="location.back()" class="flex items-center space-x-1 hover:opacity-70 transition-opacity text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+          <button
+            (click)="location.back()"
+            class="flex items-center space-x-1 hover:opacity-70 transition-opacity text-black"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
-            <span class="font-black uppercase tracking-tighter text-lg">Back</span>
+            <span class="font-black uppercase tracking-tighter text-lg">{{
+              ts.t('app.back')
+            }}</span>
           </button>
         }
         @if (!isOnline()) {
-          <span class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">Offline</span>
+          <span
+            class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold"
+            >{{ ts.t('app.offline') }}</span
+          >
         }
       </div>
       <div class="flex items-center space-x-6 font-semibold">
         @if (uiService.deferredPrompt()) {
-          <button (click)="uiService.installPwa()" class="text-accent text-xs uppercase font-black hover:underline">Install App</button>
+          <button
+            (click)="uiService.installPwa()"
+            class="text-accent text-xs uppercase font-black hover:underline"
+          >
+            {{ ts.t('app.install_app') }}
+          </button>
         }
         @if (isActivityOrDetail()) {
-          <span class="text-accent cursor-default">History</span>
+          <span class="text-accent cursor-default">{{ ts.t('app.history') }}</span>
         } @else {
-          <a routerLink="/history" routerLinkActive="text-accent" class="hover:text-accent transition-colors">History</a>
+          <a
+            routerLink="/history"
+            routerLinkActive="text-accent"
+            class="hover:text-accent transition-colors"
+            >{{ ts.t('app.history') }}</a
+          >
         }
       </div>
     </header>
@@ -44,54 +80,200 @@
     </div>
   </main>
 
-  <!-- Onboarding / Permissions Modal -->
+  <!-- Onboarding / Settings Modal -->
   @if (uiService.showOnboarding()) {
     <div class="fixed inset-0 z-[200000] flex items-center justify-center p-4">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-500"></div>
+      <div
+        class="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-500"
+        (click)="uiService.isOnboardingCompleted() ? uiService.showOnboarding.set(false) : null"
+      ></div>
 
       <!-- Modal Content -->
-      <div class="relative bg-white rounded-[40px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-gray-100">
-        <div class="p-10 text-center">
-          <div class="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-8 animate-bounce duration-[2000ms]">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      <div
+        class="relative bg-white rounded-[40px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-gray-100 max-h-95dvh] flex flex-col"
+      >
+        <!-- Close Button (only when onboarding completed) -->
+        @if (uiService.isOnboardingCompleted()) {
+          <button
+            (click)="uiService.showOnboarding.set(false)"
+            class="absolute top-6 right-6 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-text-heading z-10"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        }
+
+        <div class="p-6 md:p-8 text-center overflow-y-auto flex-1">
+          <!-- Animated Settings Gear Icon -->
+          <div
+            class="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10 text-accent animate-spin duration-[15s] ease-linear"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
           </div>
 
-          <h2 class="text-3xl font-black text-black mb-4 uppercase tracking-tighter">Welcome to Trackingfy</h2>
+          @if (!uiService.isOnboardingCompleted()) {
+            <!-- Onboarding View -->
+            <h2 class="text-3xl font-black text-black mb-4 uppercase tracking-tighter">
+              {{ ts.t('onboarding.welcome') }}
+            </h2>
 
-          <p class="text-text-primary leading-relaxed mb-8 font-medium">
-            Track your outdoor activities with precision. Real-time stats, interactive maps, and full history.
-          </p>
+            <p class="text-text-primary leading-relaxed mb-6 font-medium text-sm">
+              {{ ts.t('onboarding.description') }}
+            </p>
+          } @else {
+            <!-- Settings View -->
+            <h2 class="text-3xl font-black text-black mb-6 uppercase tracking-tighter">
+              {{ ts.t('settings.title') }}
+            </h2>
+          }
 
-          <div class="flex flex-col space-y-4">
-            <button
-              (click)="handleStart()"
-              class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.4)] active:scale-95 transition-all hover:brightness-110"
+          <!-- Language Selector -->
+          <div class="mb-6 text-left bg-gray-50 p-4 rounded-3xl border border-gray-100/50">
+            <label
+              class="text-[10px] font-black uppercase tracking-wider text-text-primary block mb-2"
+              >{{ ts.t('settings.language') }}</label
             >
-              Go
-            </button>
+            <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/50 rounded-2xl">
+              <button
+                (click)="ts.setLanguage('en')"
+                class="py-2 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+                [ngClass]="
+                  ts.currentLang() === 'en'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-text-primary hover:text-text-heading'
+                "
+              >
+                English
+              </button>
+              <button
+                (click)="ts.setLanguage('es')"
+                class="py-2 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+                [ngClass]="
+                  ts.currentLang() === 'es'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-text-primary hover:text-text-heading'
+                "
+              >
+                Español
+              </button>
+            </div>
+          </div>
+
+          @if (uiService.isOnboardingCompleted()) {
+            <!-- Theme Toggle Placeholder (Future Feature) -->
+            <div class="mb-6 text-left bg-gray-50 p-4 rounded-3xl border border-gray-100/50">
+              <div class="flex justify-between items-center mb-2">
+                <label
+                  class="text-[10px] font-black uppercase tracking-wider text-text-primary block"
+                  >{{ ts.t('settings.theme') }}</label
+                >
+                <span
+                  class="text-[9px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full uppercase tracking-tighter"
+                  >{{ ts.t('settings.theme.coming_soon') }}</span
+                >
+              </div>
+              <div
+                class="grid grid-cols-2 gap-2 p-1 bg-gray-200/20 rounded-2xl opacity-50 cursor-not-allowed select-none"
+              >
+                <button
+                  disabled
+                  class="py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white/50 text-text-primary/70"
+                >
+                  {{ ts.t('settings.theme.light') }}
+                </button>
+                <button
+                  disabled
+                  class="py-2 rounded-xl text-xs font-black uppercase tracking-wider text-text-primary/30"
+                >
+                  {{ ts.t('settings.theme.dark') }}
+                </button>
+              </div>
+            </div>
+
+            <!-- App Version -->
+            <div
+              class="mb-8 flex justify-between items-center px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100/50 text-left"
+            >
+              <span class="text-[10px] font-black uppercase tracking-wider text-text-primary">{{
+                ts.t('settings.version')
+              }}</span>
+              <span class="text-xs font-black text-text-heading bg-gray-200/60 px-3 py-1 rounded-lg"
+                >v{{ ts.version }}</span
+              >
+            </div>
+          }
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col space-y-4">
+            @if (!uiService.isOnboardingCompleted()) {
+              <button
+                (click)="handleStart()"
+                class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-5 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.3)] active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center"
+              >
+                {{ ts.t('onboarding.go') }}
+              </button>
+            } @else {
+              <button
+                (click)="uiService.showOnboarding.set(false)"
+                class="w-full bg-text-heading text-white py-5 rounded-3xl font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center"
+              >
+                {{ ts.t('settings.close') }}
+              </button>
+            }
 
             @if (uiService.deferredPrompt()) {
               <button
                 (click)="uiService.installPwa()"
-                class="w-full bg-white text-accent border-2 border-accent py-4 rounded-3xl font-black uppercase tracking-widest active:scale-95 transition-all hover:bg-accent/5"
+                class="w-full bg-white text-accent border-2 border-accent py-4 rounded-3xl font-black uppercase tracking-widest active:scale-95 transition-all hover:bg-accent/5 cursor-pointer text-center"
               >
-                Install App
+                {{ ts.t('app.install_app') }}
               </button>
             }
 
+            <!-- Creator info -->
             <a
               href="https://github.com/David-TheBridgeDev"
               target="_blank"
               class="flex items-center justify-center space-x-2 text-text-primary hover:text-text-heading transition-colors py-2 font-bold uppercase text-[10px] tracking-widest"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.683-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.696 1.028 1.59 1.028 2.683 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                <path
+                  fill-rule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.683-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.696 1.028 1.59 1.028 2.683 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  clip-rule="evenodd"
+                />
               </svg>
-              <span>Made by David</span>
+              <span>{{ ts.t('settings.made_by') }}</span>
             </a>
           </div>
         </div>
@@ -109,7 +291,9 @@
       ></div>
 
       <!-- Modal Content -->
-      <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100">
+      <div
+        class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100"
+      >
         <div class="p-6">
           <h3 class="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">
             {{ config.title }}
@@ -128,9 +312,11 @@
           </button>
           <button
             (click)="uiService.resolveConfirm(true)"
-            [class]="config.type === 'danger' ?
-              'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm' :
-              'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm'"
+            [class]="
+              config.type === 'danger'
+                ? 'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm'
+                : 'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm'
+            "
           >
             {{ config.confirmText }}
           </button>
@@ -141,9 +327,10 @@
 
   <!-- Toast Notification -->
   @if (showToast()) {
-    <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300">
+    <div
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300"
+    >
       {{ toastMessage() }}
     </div>
   }
-
 </div>

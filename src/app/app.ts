@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } fro
 import { CommonModule, Location } from '@angular/common';
 import { UIService } from './services/ui';
 import { TrackingService } from './services/tracking';
+import { TranslationService } from './services/translation';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
@@ -19,6 +20,7 @@ export class App {
   public location = inject(Location);
   public uiService = inject(UIService);
   public trackingService = inject(TrackingService);
+  public ts = inject(TranslationService);
   private ngZone = inject(NgZone);
 
   // Tracks if we are on the dashboard
@@ -75,7 +77,7 @@ export class App {
               CapApp.exitApp();
             } else {
               this.lastBackPress = now;
-              this.triggerToast('Presiona atrás de nuevo para salir');
+              this.triggerToast(this.ts.t('app.toast_exit'));
             }
           } else {
             this.location.back();

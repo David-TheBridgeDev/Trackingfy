@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatabaseService, Activity } from '../../services/database';
 import { UIService } from '../../services/ui';
+import { TranslationService } from '../../services/translation';
 
 interface DayGroup {
   date: string;
@@ -92,7 +93,8 @@ export class HistoryComponent implements OnInit {
   constructor(
     private db: DatabaseService,
     private router: Router,
-    private uiService: UIService
+    private uiService: UIService,
+    public ts: TranslationService
   ) {}
 
   async ngOnInit() {
@@ -197,9 +199,10 @@ export class HistoryComponent implements OnInit {
     if (ids.length === 0) return;
 
     const confirmed = await this.uiService.confirm({
-      title: 'Delete Activities',
-      message: `Are you sure you want to delete ${ids.length} activities? This action cannot be undone.`,
-      confirmText: 'Delete All',
+      title: this.ts.t('confirm.title.delete_multiple'),
+      message: this.ts.t('confirm.message.delete_multiple', { count: ids.length }),
+      confirmText: this.ts.t('confirm.btn.delete_all'),
+      cancelText: this.ts.t('confirm.btn.cancel'),
       type: 'danger'
     });
 
@@ -216,9 +219,10 @@ export class HistoryComponent implements OnInit {
     event.preventDefault();
 
     const confirmed = await this.uiService.confirm({
-      title: 'Delete Activity',
-      message: 'Are you sure you want to delete this activity? This action cannot be undone.',
-      confirmText: 'Delete',
+      title: this.ts.t('confirm.title.delete_single'),
+      message: this.ts.t('confirm.message.delete_single'),
+      confirmText: this.ts.t('confirm.btn.delete'),
+      cancelText: this.ts.t('confirm.btn.cancel'),
       type: 'danger'
     });
 

@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
           <div class="flex items-center gap-2">
             <span class="bg-accent/10 text-accent text-xs font-black uppercase px-3 py-1 rounded-full tracking-wider">
-              {{ activity()?.type }}
+              {{ ts.t('activity.' + (activity()?.type || 'Activity')) }}
             </span>
           </div>
           <div class="flex items-center gap-1.5 text-text-primary">
@@ -26,7 +26,7 @@
         <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              Distance
+              {{ ts.t('dashboard.distance') }}
             </p>
             <p class="font-black text-text-heading text-base md:text-lg">
               {{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }}
@@ -35,7 +35,7 @@
           </div>
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              Duration
+              {{ ts.t('dashboard.duration') }}
             </p>
             <p class="font-black text-text-heading text-base md:text-lg">
               {{ formatTime(activity()?.totalTime) }}
@@ -43,7 +43,7 @@
           </div>
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              Avg Speed
+              {{ ts.t('dashboard.avg_speed') }}
             </p>
             <p class="font-black text-text-heading text-base md:text-lg">
               {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
@@ -62,7 +62,7 @@
             </div>
             <div>
               <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-                Climb
+                {{ ts.t('dashboard.climb') }}
               </p>
               <p class="font-black text-green-600 text-sm md:text-base">
                 {{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-xs font-bold text-green-600/70">m</span>
@@ -77,7 +77,7 @@
             </div>
             <div>
               <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-                Descent
+                {{ ts.t('dashboard.descent') }}
               </p>
               <p class="font-black text-red-600 text-sm md:text-base">
                 {{ activity()?.totalDescent | number: '1.0-0' }} <span class="text-xs font-bold text-red-600/70">m</span>
@@ -144,12 +144,12 @@
   </div>
 } @else {
   <div class="p-12 text-center bg-bg-surface rounded-2xl border border-gray-100 border-dashed">
-    <p class="text-text-primary font-medium">Activity not found.</p>
+    <p class="text-text-primary font-medium">{{ ts.t('detail.not_found') }}</p>
     <button
       routerLink="/history"
       class="mt-4 text-accent font-bold uppercase text-sm hover:underline"
     >
-      Back to History
+      {{ ts.t('detail.back_history') }}
     </button>
   </div>
 }

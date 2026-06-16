@@ -35,7 +35,7 @@
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span class="text-[8px] font-black uppercase tracking-widest">History</span>
+          <span class="text-[8px] font-black uppercase tracking-widest">{{ ts.t('app.history') }}</span>
         </button>
 
         <!-- Separator -->
@@ -64,7 +64,7 @@
             <circle cx="12" cy="12" r="3" />
             <path d="M3 12h3m12 0h3M12 3v3m0 12v3" />
           </svg>
-          <span class="text-[8px] font-black uppercase tracking-widest">Center</span>
+          <span class="text-[8px] font-black uppercase tracking-widest">{{ ts.t('dashboard.center') }}</span>
         </button>
       </div>
 
@@ -73,7 +73,7 @@
           (click)="uiService.installPwa()"
           class="bg-accent/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border border-white/20 pointer-events-auto hover:scale-105 active:scale-95 transition-all animate-in slide-in-from-top-2 duration-700"
         >
-          <span class="text-white text-xs font-black uppercase tracking-widest">Install App</span>
+          <span class="text-white text-xs font-black uppercase tracking-widest">{{ ts.t('app.install_app') }}</span>
         </button>
       }
     </div>
@@ -92,37 +92,37 @@
         >
           <div class="text-center">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Duration
+              {{ ts.t('dashboard.duration') }}
             </p>
             <p class="text-lg font-black text-text-heading">{{ formattedTime() }}</p>
           </div>
           <div class="text-center border-x border-gray-100/50">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Distance
+              {{ ts.t('dashboard.distance') }}
             </p>
             <p class="text-lg font-black text-text-heading">{{ formattedDistance() }}</p>
           </div>
           <div class="text-center md:border-r border-gray-100/50">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Avg Speed
+              {{ ts.t('dashboard.avg_speed') }}
             </p>
             <p class="text-lg font-black text-text-heading">{{ formattedSpeed() }}</p>
           </div>
           <div class="text-center border-r border-gray-100/50 hidden md:block">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Climb
+              {{ ts.t('dashboard.climb') }}
             </p>
             <p class="text-lg font-black text-green-600">{{ formattedClimb() }}</p>
           </div>
           <div class="text-center border-r border-gray-100/50 hidden md:block">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Descent
+              {{ ts.t('dashboard.descent') }}
             </p>
             <p class="text-lg font-black text-red-600">{{ formattedDescent() }}</p>
           </div>
           <div class="text-center hidden md:block">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              Altitude
+              {{ ts.t('dashboard.altitude') }}
             </p>
             <p class="text-lg font-black text-blue-600">{{ formattedAltitude() }}</p>
           </div>
@@ -132,20 +132,20 @@
           <div
             class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
           >
-            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Climb</p>
+            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.climb') }}</p>
             <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
           </div>
           <div
             class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
           >
-            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">Descent</p>
+            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.descent') }}</p>
             <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
           </div>
           <div
             class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
           >
             <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">
-              Altitude
+              {{ ts.t('dashboard.altitude') }}
             </p>
             <p class="text-sm font-black text-blue-600">{{ formattedAltitude() }}</p>
           </div>
@@ -226,7 +226,7 @@
           class="w-14 h-14 rounded-full bg-white text-text-heading shadow-2xl flex flex-col items-center justify-center active:scale-90 transition-all border border-gray-100 overflow-hidden"
         >
           <span class="text-[7px] font-black uppercase tracking-tighter leading-none mb-0.5">{{
-            selectedType()
+            ts.t('activity.' + selectedType())
           }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +260,7 @@
       >
         <div class="p-8">
           <div class="flex items-center justify-between mb-8">
-            <h3 class="text-2xl font-black text-text-heading uppercase tracking-tight">Activity</h3>
+            <h3 class="text-2xl font-black text-text-heading uppercase tracking-tight">{{ ts.t('dashboard.activity') }}</h3>
             <button
               (click)="showTypeModal.set(false)"
               class="p-2 -mr-2 text-gray-400 hover:text-text-heading"
@@ -347,7 +347,7 @@
                     }
                   </div>
                   <span class="font-black text-xl text-text-heading uppercase tracking-tight">{{
-                    type
+                    ts.t('activity.' + type)
                   }}</span>
                 </div>
 
@@ -378,7 +378,7 @@
             (click)="showTypeModal.set(false)"
             class="w-full py-4 rounded-2xl font-black text-white bg-text-heading hover:bg-black uppercase tracking-widest text-sm transition-all shadow-lg active:scale-95"
           >
-            Cerrar
+            {{ ts.t('settings.close') }}
           </button>
         </div>
       </div>

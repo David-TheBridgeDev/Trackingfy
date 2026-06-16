@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatabaseService, Activity, Coordinate } from '../../services/database';
 import { MapComponent } from '../map/map';
-
 import { UIService } from '../../services/ui';
+import { TranslationService } from '../../services/translation';
 
 @Component({
   selector: 'app-activity-detail',
@@ -18,7 +18,8 @@ export class ActivityDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private db: DatabaseService,
-    public uiService: UIService
+    public uiService: UIService,
+    public ts: TranslationService
   ) {}
 
   async ngOnInit() {

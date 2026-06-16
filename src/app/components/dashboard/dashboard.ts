@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { TrackingService } from '../../services/tracking';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
-import {RouterLink} from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { TranslationService } from '../../services/translation';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     public trackingService: TrackingService,
-    public uiService: UIService
+    public uiService: UIService,
+    public ts: TranslationService
   ) {}
 
   ngOnInit() {
@@ -73,10 +75,10 @@ export class DashboardComponent implements OnInit {
 
   async requestStopTracking() {
     const confirmed = await this.uiService.confirm({
-      title: 'Stop Activity?',
-      message: 'Are you sure you want to end and save this session?',
-      confirmText: 'Stop and Save',
-      cancelText: 'Resume',
+      title: this.ts.t('confirm.title.stop'),
+      message: this.ts.t('confirm.message.stop'),
+      confirmText: this.ts.t('confirm.btn.stop'),
+      cancelText: this.ts.t('confirm.btn.resume'),
       type: 'danger'
     });
 

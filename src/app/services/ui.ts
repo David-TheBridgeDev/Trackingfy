@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { TranslationService } from './translation';
 
 export interface ConfirmOptions {
   title: string;
@@ -12,6 +13,7 @@ export interface ConfirmOptions {
   providedIn: 'root'
 })
 export class UIService {
+  private ts = inject(TranslationService);
   isFullScreen = signal<boolean>(false);
   showOnboarding = signal<boolean>(false);
   
@@ -51,6 +53,8 @@ export class UIService {
     this.deferredPrompt.set(null);
   }
 
+  isOnboardingCompleted = signal<boolean>(localStorage.getItem('trackingfy_onboarding') === 'true');
+
   private checkOnboarding() {
     const hasSeen = localStorage.getItem('trackingfy_onboarding');
     if (!hasSeen) {
@@ -60,6 +64,7 @@ export class UIService {
 
   completeOnboarding() {
     localStorage.setItem('trackingfy_onboarding', 'true');
+    this.isOnboardingCompleted.set(true);
     this.showOnboarding.set(false);
   }
 
@@ -73,8 +78,8 @@ export class UIService {
 
   confirm(options: ConfirmOptions): Promise<boolean> {
     this.confirmation.set({
-      confirmText: 'Confirm',
-      cancelText: 'Cancel',
+      confirmText: this.ts.t('confirm.btn.confirm'),
+      cancelText: this.ts.t('confirm.btn.cancel'),
       type: 'info',
       ...options
     });

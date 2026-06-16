@@ -1,5 +1,6 @@
 import { Injectable, signal, NgZone } from '@angular/core';
 import { DatabaseService, Activity, Coordinate } from './database';
+import { TranslationService } from './translation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
 
@@ -33,7 +34,11 @@ export class TrackingService {
 
   private timerInterval: any;
 
-  constructor(private db: DatabaseService, private ngZone: NgZone) {}
+  constructor(
+    private db: DatabaseService,
+    private ngZone: NgZone,
+    private ts: TranslationService
+  ) {}
 
   async requestPermission(): Promise<boolean> {
     if (Capacitor.isNativePlatform()) {
@@ -210,8 +215,8 @@ export class TrackingService {
       try {
         await BackgroundGeolocation.start(
           {
-            backgroundMessage: "Trackingfy está registrando tu actividad.",
-            backgroundTitle: "Rastreo en curso",
+            backgroundMessage: this.ts.t('tracking.bg_message'),
+            backgroundTitle: this.ts.t('tracking.bg_title'),
             requestPermissions: true,
             stale: false,
             distanceFilter: 2
