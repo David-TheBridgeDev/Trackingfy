@@ -42,14 +42,14 @@
         <div class="w-px h-10 bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
 
         <!-- Trackingfy Button -->
-        <button
-          (click)="uiService.showOnboarding.set(true)"
-          class="flex-1 flex justify-center active:scale-95 active:opacity-70 transition-all group"
+        <a
+          routerLink="/settings"
+          class="flex-1 flex justify-center active:scale-95 active:opacity-70 transition-all group cursor-pointer"
         >
           <h1 class="text-2xl font-black uppercase tracking-tighter text-accent transition-all">
             Trackingfy
           </h1>
-        </button>
+        </a>
 
         <!-- Separator -->
         <div class="w-px h-10 bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>

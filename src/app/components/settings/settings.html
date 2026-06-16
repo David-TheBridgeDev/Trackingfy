@@ -1,0 +1,165 @@
+<div class="space-y-6 pb-20 settings-screen">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Card 1: Language & Theme Preferences -->
+    <div
+      class="bg-bg-surface p-6 rounded-[32px] shadow-sm border border-gray-100/50 flex flex-col justify-between space-y-6"
+    >
+      <div>
+        <h3
+          class="text-base font-black text-text-heading uppercase tracking-tight mb-4 flex items-center space-x-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-accent"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5c-.006 2.153-.47 4.225-1.365 6.163m0 0A18.022 18.022 0 016.412 9m4.974 2.163c-.958 1.93-2.186 3.655-3.614 5.115M2 12h10"
+            />
+          </svg>
+          <span>{{ ts.t('settings.language') }}</span>
+        </h3>
+
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl">
+          <button
+            (click)="ts.setLanguage('en')"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+            [ngClass]="
+              ts.currentLang() === 'en'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-text-primary hover:text-text-heading'
+            "
+          >
+            English
+          </button>
+          <button
+            (click)="ts.setLanguage('es')"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+            [ngClass]="
+              ts.currentLang() === 'es'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-text-primary hover:text-text-heading'
+            "
+          >
+            Español
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 pt-4">
+        <div class="flex justify-between items-center mb-3">
+          <h3
+            class="text-xs font-black text-text-heading uppercase tracking-tight flex items-center space-x-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+            <span>{{ ts.t('settings.theme') }}</span>
+          </h3>
+          <span
+            class="text-[9px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full uppercase tracking-tighter"
+          >
+            {{ ts.t('settings.theme.coming_soon') }}
+          </span>
+        </div>
+
+        <div
+          class="grid grid-cols-2 gap-2 p-1 bg-gray-200/20 rounded-2xl opacity-50 cursor-not-allowed select-none"
+        >
+          <button
+            disabled
+            class="py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white/50 text-text-primary/70"
+          >
+            {{ ts.t('settings.theme.light') }}
+          </button>
+          <button
+            disabled
+            class="py-2 rounded-xl text-xs font-black uppercase tracking-wider text-text-primary/30"
+          >
+            {{ ts.t('settings.theme.dark') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: App Information & PWA -->
+    <div
+      class="bg-bg-surface p-6 rounded-[32px] shadow-sm border border-gray-100/50 flex flex-col justify-between space-y-6"
+    >
+      <div>
+        <h3
+          class="text-base font-black text-text-heading uppercase tracking-tight mb-4 flex items-center space-x-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-accent"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{{ ts.t('settings.tab.info') }}</span>
+        </h3>
+
+        <div
+          class="flex justify-between items-center px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100/50"
+        >
+          <span class="text-[10px] font-black uppercase tracking-wider text-text-primary">
+            {{ ts.t('settings.version') }}
+          </span>
+          <span class="text-xs font-black text-text-heading bg-gray-200/60 px-3 py-1 rounded-lg">
+            v{{ ts.version }}
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-4 border-t border-gray-100 pt-4">
+        @if (uiService.deferredPrompt()) {
+          <button
+            (click)="uiService.installPwa()"
+            class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-3.5 rounded-2xl font-black uppercase text-xs tracking-wider active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center shadow-md shadow-accent/20"
+          >
+            {{ ts.t('app.install_app') }}
+          </button>
+        }
+
+        <a
+          href="https://github.com/David-TheBridgeDev"
+          target="_blank"
+          class="flex items-center justify-center space-x-2 text-text-primary hover:text-text-heading transition-colors py-2 font-bold uppercase text-[10px] tracking-widest cursor-pointer"
+        >
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              fill-rule="evenodd"
+              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.683-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.696 1.028 1.59 1.028 2.683 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ ts.t('settings.made_by') }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

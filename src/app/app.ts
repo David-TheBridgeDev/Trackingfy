@@ -1,5 +1,5 @@
 import { Component, signal, HostListener, inject, NgZone } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { UIService } from './services/ui';
 import { TrackingService } from './services/tracking';
@@ -11,7 +11,7 @@ import { App as CapApp } from '@capacitor/app';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -32,13 +32,22 @@ export class App {
     { initialValue: true }
   );
 
-  // Tracks if we are on the dashboard or activity detail page
-  isActivityOrDetail = toSignal(
+  // Tracks if we are on the history or activity details page
+  isHistoryPage = toSignal(
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url === '/' || this.router.url === '/dashboard' || this.router.url.startsWith('/activity/'))
+      map(() => this.router.url === '/history' || this.router.url.startsWith('/activity/'))
     ),
-    { initialValue: true }
+    { initialValue: false }
+  );
+
+  // Tracks if we are on the settings page
+  isSettingsPage = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.url === '/settings')
+    ),
+    { initialValue: false }
   );
 
   showToast = signal(false);
