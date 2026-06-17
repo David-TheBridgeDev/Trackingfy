@@ -31,6 +31,14 @@ export class TrackingService {
 
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
+  
+  activityTypes = ['Cycling', 'Running', 'Walking'];
+  selectedActivityType = signal<string>(localStorage.getItem('trackingfy_selected_activity_type') || 'Cycling');
+
+  setSelectedActivityType(type: string) {
+    localStorage.setItem('trackingfy_selected_activity_type', type);
+    this.selectedActivityType.set(type);
+  }
 
   private timerInterval: any;
 
@@ -136,7 +144,7 @@ export class TrackingService {
     });
   }
 
-  async startTracking(type: string = 'Activity') {
+  async startTracking(type: string = this.selectedActivityType()) {
     if (this.state() !== 'idle') return;
 
     const activity: Activity = {

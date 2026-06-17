@@ -33,6 +33,7 @@ export class TranslationService {
       'settings.close': 'Cerrar',
       'settings.tab.info': 'Información',
       'settings.tab.settings': 'Ajustes',
+      'settings.default_activity': 'Actividad predeterminada',
       
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
@@ -107,6 +108,7 @@ export class TranslationService {
       'settings.close': 'Close',
       'settings.tab.info': 'Info',
       'settings.tab.settings': 'Settings',
+      'settings.default_activity': 'Default Activity',
       
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',

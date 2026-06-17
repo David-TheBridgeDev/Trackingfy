@@ -15,9 +15,7 @@ import { TranslationService } from '../../services/translation';
 export class DashboardComponent implements OnInit {
   @ViewChild('map') mapComponent!: MapComponent;
 
-  selectedType = signal('Cycling');
-  activityTypes = ['Cycling', 'Running', 'Walking'];
-  showTypeModal = signal(false);
+
 
   constructor(
     public trackingService: TrackingService,
@@ -65,7 +63,7 @@ export class DashboardComponent implements OnInit {
   toggleTracking() {
     const state = this.trackingService.state();
     if (state === 'idle') {
-      this.trackingService.startTracking(this.selectedType());
+      this.trackingService.startTracking();
     } else if (state === 'tracking') {
       this.trackingService.pauseTracking();
     } else if (state === 'paused') {

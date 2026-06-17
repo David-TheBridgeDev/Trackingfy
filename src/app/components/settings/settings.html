@@ -52,6 +52,44 @@
       </div>
 
       <div class="border-t border-gray-100 pt-4">
+        <h3
+          class="text-xs font-black text-text-heading uppercase tracking-tight mb-3 flex items-center space-x-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-accent"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+          <span>{{ ts.t('settings.default_activity') }}</span>
+        </h3>
+
+        <div class="grid grid-cols-3 gap-2 p-1 bg-gray-200/30 rounded-2xl">
+          @for (type of trackingService.activityTypes; track type) {
+            <button
+              (click)="trackingService.setSelectedActivityType(type)"
+              class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+              [ngClass]="
+                trackingService.selectedActivityType() === type
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-text-primary hover:text-text-heading'
+              "
+            >
+              {{ ts.t('activity.' + type) }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 pt-4">
         <div class="flex justify-between items-center mb-3">
           <h3
             class="text-xs font-black text-text-heading uppercase tracking-tight flex items-center space-x-2"
