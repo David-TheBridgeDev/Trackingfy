@@ -162,7 +162,7 @@
   </div>
 
   <!-- Hidden Sticker Export Container -->
-  <div #exportContainer class="fixed -left-[9999px] top-0 w-[1080px] h-[1080px] bg-gradient-to-br from-gray-900 to-black overflow-hidden flex items-center justify-center">
+  <div #exportContainer class="fixed -left-[9999px] top-0 w-[1080px] h-[1080px] overflow-hidden flex items-center justify-center" style="background: linear-gradient(to bottom right, #111827, #000000);">
     <!-- SVG Route -->
     <svg class="absolute inset-0 w-full h-full p-16" [attr.viewBox]="svgViewBox()" preserveAspectRatio="xMidYMid meet">
       <!-- Glow effect for the route -->
@@ -172,25 +172,25 @@
     
     <!-- Sticker Overlay -->
     <div class="absolute bottom-16 left-16 right-16">
-      <div class="bg-black/60 backdrop-blur-md rounded-3xl p-8 text-white border border-white/20 shadow-2xl">
-        <h1 class="text-4xl font-black italic tracking-wider mb-6 flex items-center gap-3 text-accent">
-           <svg class="w-10 h-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+      <div class="backdrop-blur-md rounded-3xl p-8 shadow-2xl" style="background-color: rgba(0, 0, 0, 0.6); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <h1 class="text-4xl font-black italic tracking-wider mb-6 flex items-center gap-3" style="color: #ef4444;">
+           <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" style="color: #ef4444;">
              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
            </svg>
            TRACKINGFY
         </h1>
         <div class="grid grid-cols-3 gap-8">
           <div>
-            <p class="text-lg text-white/70 uppercase font-bold tracking-widest mb-1">{{ ts.t('dashboard.distance') }}</p>
-            <p class="font-black text-5xl leading-tight">{{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }} <span class="text-2xl font-medium">km</span></p>
+            <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.distance') }}</p>
+            <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }} <span class="text-2xl font-medium">km</span></p>
           </div>
           <div>
-            <p class="text-lg text-white/70 uppercase font-bold tracking-widest mb-1">{{ ts.t('dashboard.avg_speed') }}</p>
-            <p class="font-black text-5xl leading-tight">{{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span></p>
+            <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.avg_speed') }}</p>
+            <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span></p>
           </div>
           <div>
-            <p class="text-lg text-white/70 uppercase font-bold tracking-widest mb-1">{{ ts.t('dashboard.climb') }}</p>
-            <p class="font-black text-5xl leading-tight">{{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-2xl font-medium">m</span></p>
+            <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.climb') }}</p>
+            <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-2xl font-medium">m</span></p>
           </div>
         </div>
       </div>
