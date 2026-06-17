@@ -15,11 +15,14 @@ import html2canvas from 'html2canvas';
   templateUrl: './activity-detail.html',
 })
 export class ActivityDetailComponent implements OnInit {
-  @ViewChild('stickerContainer') stickerContainer!: ElementRef;
+  @ViewChild('exportContainer') exportContainer!: ElementRef;
   
   activity = signal<Activity | null>(null);
   coordinates = signal<Coordinate[]>([]);
   isGeneratingSticker = signal(false);
+
+  svgViewBox = signal<string>('0 0 100 100');
+  svgPath = signal<string>('');
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +37,30 @@ export class ActivityDetailComponent implements OnInit {
     if (id) {
       const act = await this.db.getActivity(id);
       this.activity.set(act || null);
-      this.coordinates.set(await this.db.getCoordinates(id));
+      const coords = await this.db.getCoordinates(id);
+      this.coordinates.set(coords);
+
+      if (coords.length > 0) {
+        const lats = coords.map(c => c.lat);
+        const lngs = coords.map(c => c.lng);
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        const minLng = Math.min(...lngs);
+        const maxLng = Math.max(...lngs);
+        
+        const latRange = maxLat - minLat;
+        const lngRange = maxLng - minLng;
+        const padding = Math.max(latRange, lngRange) * 0.1 || 0.01;
+        
+        const vbMinX = minLng - padding;
+        const vbMinY = -(maxLat + padding);
+        const vbWidth = (maxLng - minLng) + padding * 2;
+        const vbHeight = (maxLat - minLat) + padding * 2;
+        
+        this.svgViewBox.set(`${vbMinX} ${vbMinY} ${vbWidth} ${vbHeight}`);
+        const path = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.lng} ${-c.lat}`).join(' ');
+        this.svgPath.set(path);
+      }
     }
   }
 
@@ -47,22 +73,21 @@ export class ActivityDetailComponent implements OnInit {
   }
 
   async shareSticker() {
-    if (!this.stickerContainer) return;
+    if (!this.exportContainer) return;
     this.isGeneratingSticker.set(true);
 
     try {
-      // Small delay to allow Angular to render any states if needed
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const canvas = await html2canvas(this.stickerContainer.nativeElement, {
+      const canvas = await html2canvas(this.exportContainer.nativeElement, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#f8f9fa', // fallback background
-        scale: 2 // High resolution
+        backgroundColor: null, // Keep transparent or background from css
+        scale: 1 // No need to upscale, we are exporting a 1080x1080 block
       });
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-      const fileName = `trackingfy-route-${Date.now()}.jpg`;
+      const dataUrl = canvas.toDataURL('image/png'); // Export as PNG
+      const fileName = `trackingfy-route-${Date.now()}.png`;
 
       const savedFile = await Filesystem.writeFile({
         path: fileName,
