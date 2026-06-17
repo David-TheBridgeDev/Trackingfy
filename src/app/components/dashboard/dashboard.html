@@ -205,24 +205,96 @@
           </svg>
         }
       </button>
-
-      @if (trackingService.state() !== 'idle') {
-        <button
-          (click)="$event.stopPropagation(); requestStopTracking()"
-          class="w-14 h-14 rounded-full bg-white text-red-600 shadow-2xl flex items-center justify-center active:scale-90 transition-all border border-gray-100"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <rect x="6" y="6" width="12" height="12" rx="2" />
-          </svg>
-        </button>
-      }
     </div>
   </div>
 
+  <!-- Activity Control Modal -->
+  @if (showControlModal()) {
+    <div class="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div
+        class="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+        (click)="closeControlModal()"
+      ></div>
 
+      <!-- Modal Content -->
+      <div
+        class="relative bg-white rounded-[32px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 border border-gray-100 p-6 flex flex-col pointer-events-auto"
+      >
+        <!-- Close Button (X) in Top Right -->
+        <button
+          (click)="closeControlModal()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 cursor-pointer rounded-full hover:bg-gray-100 active:scale-95"
+          aria-label="Cerrar"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        <!-- Title & Icon -->
+        <div class="text-center mt-3 mb-6">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-accent animate-pulse"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">
+            {{ ts.t('confirm.title.stop') }}
+          </h3>
+          <p class="text-gray-500 font-bold text-xs mt-2 uppercase tracking-wide px-2 leading-relaxed">
+            @if (trackingService.state() === 'paused') {
+              {{ ts.t('confirm.message.paused') }}
+            } @else {
+              {{ ts.t('confirm.message.active') }}
+            }
+          </p>
+        </div>
+
+        <!-- Options Buttons -->
+        <div class="flex flex-col space-y-3">
+          @if (trackingService.state() === 'tracking') {
+            <button
+              (click)="pauseActivity()"
+              class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-4 rounded-2xl font-black uppercase tracking-wider transition-all active:scale-95 text-center cursor-pointer text-xs"
+            >
+              {{ ts.t('confirm.btn.pause') }}
+            </button>
+          } @else if (trackingService.state() === 'paused') {
+            <button
+              (click)="resumeActivity()"
+              class="w-full bg-accent hover:brightness-110 text-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-accent/20 transition-all active:scale-95 text-center cursor-pointer text-xs"
+            >
+              {{ ts.t('confirm.btn.resume') }}
+            </button>
+          }
+          <button
+            (click)="stopActivity()"
+            class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-red-200 transition-all active:scale-95 text-center cursor-pointer text-xs"
+          >
+            {{ ts.t('confirm.btn.stop') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

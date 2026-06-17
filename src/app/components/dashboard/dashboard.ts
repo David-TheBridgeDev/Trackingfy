@@ -1,4 +1,4 @@
-import { Component, computed, signal, OnInit, ViewChild } from '@angular/core';
+import { Component, computed, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrackingService } from '../../services/tracking';
@@ -15,12 +15,12 @@ import { TranslationService } from '../../services/translation';
 export class DashboardComponent implements OnInit {
   @ViewChild('map') mapComponent!: MapComponent;
 
-
+  showControlModal = signal(false);
 
   constructor(
     public trackingService: TrackingService,
     public uiService: UIService,
-    public ts: TranslationService
+    public ts: TranslationService,
   ) {}
 
   ngOnInit() {
@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return [h, m, s].map(v => v < 10 ? '0' + v : v).join(':');
+    return [h, m, s].map((v) => (v < 10 ? '0' + v : v)).join(':');
   });
 
   formattedDistance = computed(() => {
@@ -64,25 +64,28 @@ export class DashboardComponent implements OnInit {
     const state = this.trackingService.state();
     if (state === 'idle') {
       this.trackingService.startTracking();
-    } else if (state === 'tracking') {
-      this.trackingService.pauseTracking();
-    } else if (state === 'paused') {
-      this.trackingService.resumeTracking();
+    } else {
+      this.showControlModal.set(true);
     }
   }
 
-  async requestStopTracking() {
-    const confirmed = await this.uiService.confirm({
-      title: this.ts.t('confirm.title.stop'),
-      message: this.ts.t('confirm.message.stop'),
-      confirmText: this.ts.t('confirm.btn.stop'),
-      cancelText: this.ts.t('confirm.btn.resume'),
-      type: 'danger'
-    });
+  pauseActivity() {
+    this.trackingService.pauseTracking();
+    this.showControlModal.set(false);
+  }
 
-    if (confirmed) {
-      this.trackingService.stopTracking();
-    }
+  resumeActivity() {
+    this.trackingService.resumeTracking();
+    this.showControlModal.set(false);
+  }
+
+  stopActivity() {
+    this.showControlModal.set(false);
+    this.trackingService.stopTracking();
+  }
+
+  closeControlModal() {
+    this.showControlModal.set(false);
   }
 
   recenterMap() {

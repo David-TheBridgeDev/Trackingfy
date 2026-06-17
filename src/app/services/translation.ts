@@ -39,6 +39,9 @@ export class TranslationService {
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
       'confirm.btn.stop': 'Detener y guardar',
       'confirm.btn.resume': 'Reanudar',
+      'confirm.btn.pause': 'Pausar',
+      'confirm.message.active': 'Actividad en curso. ¿Qué deseas hacer?',
+      'confirm.message.paused': 'Tu actividad está pausada.',
       'confirm.btn.confirm': 'Confirmar',
       'confirm.btn.cancel': 'Cancelar',
       
@@ -114,6 +117,9 @@ export class TranslationService {
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
       'confirm.btn.stop': 'Stop and Save',
       'confirm.btn.resume': 'Resume',
+      'confirm.btn.pause': 'Pause',
+      'confirm.message.active': 'Activity in progress. What would you like to do?',
+      'confirm.message.paused': 'Your activity is paused.',
       'confirm.btn.confirm': 'Confirm',
       'confirm.btn.cancel': 'Cancel',
       
