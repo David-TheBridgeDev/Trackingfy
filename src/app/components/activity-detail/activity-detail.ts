@@ -23,6 +23,7 @@ export class ActivityDetailComponent implements OnInit {
 
   svgViewBox = signal<string>('0 0 100 100');
   svgPath = signal<string>('');
+  svgStrokeWidth = signal<number>(0.001);
 
   constructor(
     private route: ActivatedRoute,
@@ -58,6 +59,8 @@ export class ActivityDetailComponent implements OnInit {
         const vbHeight = (maxLat - minLat) + padding * 2;
         
         this.svgViewBox.set(`${vbMinX} ${vbMinY} ${vbWidth} ${vbHeight}`);
+        this.svgStrokeWidth.set(Math.max(vbWidth, vbHeight) * 0.01); // 1% of the view box
+        
         const path = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.lng} ${-c.lat}`).join(' ');
         this.svgPath.set(path);
       }
