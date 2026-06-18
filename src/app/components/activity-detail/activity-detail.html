@@ -217,23 +217,73 @@
     </div>
     
     <!-- Sticker Overlay -->
-    <div class="rounded-3xl p-8 shadow-2xl shrink-0" style="background-color: rgba(0, 0, 0, 0.85); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <h1 class="text-4xl font-black italic tracking-wider mb-8 flex justify-center items-center gap-3 leading-none" style="color: #efbc21;">
-         <img src="icons/favicon-96x96.png" class="w-10 h-10 rounded-xl object-contain" alt="Trackingfy Logo" crossorigin="anonymous" />
-         <span class="mt-1">TRACKINGFY</span>
-      </h1>
-      <div class="grid grid-cols-3 gap-8">
-        <div>
-          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.distance') }}</p>
+    <div class="rounded-3xl p-8 shrink-0 flex flex-col gap-8" style="background-color: rgba(0, 0, 0, 0.85); color: #ffffff;">
+      
+      <!-- Top Row: Distance - Logo - Duration -->
+      <div class="flex justify-between items-center">
+        <!-- Distance -->
+        <div class="text-left w-1/3">
+          <p class="text-xl uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.distance') }}</p>
           <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }} <span class="text-2xl font-medium">km</span></p>
         </div>
-        <div>
-          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.avg_speed') }}</p>
-          <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span></p>
+
+        <!-- Logo -->
+        <div class="w-1/3 flex justify-center">
+          <h1 class="text-4xl font-black italic tracking-wider flex items-center gap-3 leading-none m-0" style="color: #efbc21;">
+             <img src="icons/favicon-96x96.png" class="w-10 h-10 rounded-xl object-contain mt-2" alt="Trackingfy Logo" crossorigin="anonymous" />
+             <span>TRACKINGFY</span>
+          </h1>
         </div>
+
+        <!-- Duration -->
+        <div class="text-right w-1/3">
+          <p class="text-xl uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.duration') }}</p>
+          <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ formatTime(activity()?.totalTime) }}</p>
+        </div>
+      </div>
+
+      <!-- Rest of Stats -->
+      <div class="grid grid-cols-3 gap-y-8 gap-x-4 pt-6 border-t" style="border-top-color: rgba(255, 255, 255, 0.2);">
+        <div>
+          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">
+            @if (activity()?.type === 'Cycling') {
+              {{ ts.t('dashboard.avg_speed') }}
+            } @else {
+              {{ ts.t('dashboard.pace') }}
+            }
+          </p>
+          <p class="font-black text-4xl leading-tight" style="color: #ffffff;">
+            @if (activity()?.type === 'Cycling') {
+              {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span>
+            } @else {
+              {{ formatPace(activity()?.avgSpeed) }}
+            }
+          </p>
+        </div>
+        
+        <div>
+          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.max_speed') }}</p>
+          <p class="font-black text-4xl leading-tight" style="color: #ffffff;">{{ formatMaxSpeed(activity()?.maxSpeed) }}</p>
+        </div>
+
+        <div>
+          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.moving_time') }}</p>
+          <p class="font-black text-4xl leading-tight" style="color: #ffffff;">{{ formatTime(activity()?.movingTime || activity()?.totalTime) }}</p>
+        </div>
+
         <div>
           <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.climb') }}</p>
-          <p class="font-black text-5xl leading-tight" style="color: #ffffff;">{{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-2xl font-medium">m</span></p>
+          <p class="font-black text-4xl leading-tight" style="color: #22c55e;">{{ activity()?.totalClimb | number: '1.0-0' }} <span class="text-2xl font-medium" style="color: rgba(34, 197, 94, 0.7);">m</span></p>
+        </div>
+
+        <div>
+          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">{{ ts.t('dashboard.descent') }}</p>
+          <p class="font-black text-4xl leading-tight" style="color: #ef4444;">{{ activity()?.totalDescent | number: '1.0-0' }} <span class="text-2xl font-medium" style="color: rgba(239, 68, 68, 0.7);">m</span></p>
+        </div>
+
+        <div>
+          <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">Pendiente Máx</p>
+          <p class="font-black text-4xl leading-tight" style="color: #ffffff;">{{ formatMaxGrade(activity()?.maxGrade) }}</p>
         </div>
       </div>
     </div>

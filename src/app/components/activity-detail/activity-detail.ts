@@ -7,6 +7,7 @@ import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 import html2canvas from 'html2canvas';
 
 @Component({
@@ -116,18 +117,27 @@ export class ActivityDetailComponent implements OnInit {
       const dataUrl = canvas.toDataURL('image/png'); // Export as PNG
       const fileName = `trackingfy-route-${Date.now()}.png`;
 
-      const savedFile = await Filesystem.writeFile({
-        path: fileName,
-        data: dataUrl,
-        directory: Directory.Cache
-      });
+      if (Capacitor.getPlatform() === 'web') {
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: dataUrl,
+          directory: Directory.Cache
+        });
 
-      await Share.share({
-        title: this.ts.t('share.title'),
-        text: this.ts.t('share.text'),
-        url: savedFile.uri,
-        dialogTitle: this.ts.t('share.dialog_title')
-      });
+        await Share.share({
+          title: this.ts.t('share.title'),
+          text: this.ts.t('share.text'),
+          url: savedFile.uri,
+          dialogTitle: this.ts.t('share.dialog_title')
+        });
+      }
     } catch (e) {
       console.error('Error generating or sharing sticker', e);
     } finally {
