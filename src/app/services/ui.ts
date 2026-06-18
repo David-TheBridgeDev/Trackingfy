@@ -1,5 +1,7 @@
-import { Injectable, signal, inject } from '@angular/core';
 import { TranslationService } from './translation';
+import { inject, Injectable, signal } from '@angular/core';
+
+export type Theme = 'light' | 'dark';
 
 export interface ConfirmOptions {
   title: string;
@@ -10,13 +12,14 @@ export interface ConfirmOptions {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UIService {
   private ts = inject(TranslationService);
   isFullScreen = signal<boolean>(false);
   showOnboarding = signal<boolean>(false);
-  
+  currentTheme = signal<Theme>('light');
+
   private confirmResolver?: (value: boolean) => void;
   confirmation = signal<ConfirmOptions | null>(null);
 
@@ -25,6 +28,28 @@ export class UIService {
   constructor() {
     this.checkOnboarding();
     this.initPwaLogic();
+    this.loadTheme();
+  }
+
+  private loadTheme() {
+    const saved = localStorage.getItem('trackingfy_theme') as Theme;
+    if (saved === 'light' || saved === 'dark') {
+      this.setTheme(saved);
+    } else {
+      const prefersDark =
+        window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.setTheme(prefersDark ? 'dark' : 'light');
+    }
+  }
+
+  setTheme(theme: Theme) {
+    this.currentTheme.set(theme);
+    localStorage.setItem('trackingfy_theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
 
   private initPwaLogic() {
@@ -69,7 +94,7 @@ export class UIService {
   }
 
   toggleFullScreen() {
-    this.isFullScreen.update(v => !v);
+    this.isFullScreen.update((v) => !v);
   }
 
   setFullScreen(value: boolean) {
@@ -81,7 +106,7 @@ export class UIService {
       confirmText: this.ts.t('confirm.btn.confirm'),
       cancelText: this.ts.t('confirm.btn.cancel'),
       type: 'info',
-      ...options
+      ...options,
     });
     return new Promise((resolve) => {
       this.confirmResolver = resolve;

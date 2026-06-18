@@ -233,12 +233,12 @@
 
       <!-- Modal Content -->
       <div
-        class="relative bg-white rounded-[32px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 border border-gray-100 p-6 flex flex-col pointer-events-auto"
+        class="relative bg-bg-surface rounded-[32px] shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 border border-gray-100/20 p-6 flex flex-col pointer-events-auto"
       >
         <!-- Close Button (X) in Top Right -->
         <button
           (click)="closeControlModal()"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 cursor-pointer rounded-full hover:bg-gray-100 active:scale-95"
+          class="absolute top-4 right-4 text-text-primary hover:text-text-heading transition-colors p-2 cursor-pointer rounded-full hover:bg-bg-base active:scale-95"
           aria-label="Cerrar"
         >
           <svg
@@ -272,10 +272,10 @@
               <polyline points="12 6 12 12 16 14" />
             </svg>
           </div>
-          <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">
+          <h3 class="text-2xl font-black text-text-heading uppercase tracking-tighter">
             {{ ts.t('confirm.title.stop') }}
           </h3>
-          <p class="text-gray-500 font-bold text-xs mt-2 uppercase tracking-wide px-2 leading-relaxed">
+          <p class="text-text-primary font-bold text-xs mt-2 uppercase tracking-wide px-2 leading-relaxed">
             @if (trackingService.state() === 'paused') {
               {{ ts.t('confirm.message.paused') }}
             } @else {
@@ -289,7 +289,7 @@
           @if (trackingService.state() === 'tracking') {
             <button
               (click)="pauseActivity()"
-              class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-4 rounded-2xl font-black uppercase tracking-wider transition-all active:scale-95 text-center cursor-pointer text-xs"
+              class="w-full bg-bg-base hover:brightness-95 text-text-heading py-4 rounded-2xl font-black uppercase tracking-wider transition-all active:scale-95 text-center cursor-pointer text-xs"
             >
               {{ ts.t('confirm.btn.pause') }}
             </button>
@@ -303,7 +303,7 @@
           }
           <button
             (click)="stopActivity()"
-            class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-red-200 transition-all active:scale-95 text-center cursor-pointer text-xs"
+            class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-red-500/30 transition-all active:scale-95 text-center cursor-pointer text-xs"
           >
             {{ ts.t('confirm.btn.stop') }}
           </button>

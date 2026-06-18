@@ -3,10 +3,31 @@
 @theme {
   --color-accent: #efbc21;
   --color-accent-hover: #d4a71d;
-  --color-bg-base: #eeeeee;
-  --color-bg-surface: #ffffff;
-  --color-text-primary: #777777;
-  --color-text-heading: #444444;
+  --color-bg-base: var(--theme-bg-base);
+  --color-bg-surface: var(--theme-bg-surface);
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-heading: var(--theme-text-heading);
+}
+
+:root {
+  --theme-bg-base: #eeeeee;
+  --theme-bg-surface: #ffffff;
+  --theme-text-primary: #777777;
+  --theme-text-heading: #444444;
+}
+
+:root.dark {
+  --theme-bg-base: #121212;
+  --theme-bg-surface: #1e1e1e;
+  --theme-text-primary: #a1a1aa;
+  --theme-text-heading: #f3f4f6;
+  
+  /* Overrides for common utility colors used in the app */
+  --color-white: #2a2a2a;
+  --color-black: #ffffff;
+  --color-gray-50: #1a1a1a;
+  --color-gray-100: #2a2a2a;
+  --color-gray-200: #333333;
 }
 
 @layer base {

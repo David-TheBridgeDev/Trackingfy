@@ -205,21 +205,21 @@
 
       <!-- Modal Content -->
       <div
-        class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100"
+        class="relative bg-bg-surface rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100/20"
       >
         <div class="p-6">
-          <h3 class="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">
+          <h3 class="text-xl font-black text-text-heading mb-2 uppercase tracking-tight">
             {{ config.title }}
           </h3>
-          <p class="text-gray-600 leading-relaxed">
+          <p class="text-text-primary leading-relaxed">
             {{ config.message }}
           </p>
         </div>
 
-        <div class="flex p-4 gap-3 bg-gray-50">
+        <div class="flex p-4 gap-3 bg-bg-base/50">
           <button
             (click)="uiService.resolveConfirm(false)"
-            class="flex-1 px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors uppercase text-sm cursor-pointer"
+            class="flex-1 px-4 py-3 rounded-xl font-bold text-text-primary hover:text-text-heading hover:bg-bg-base transition-colors uppercase text-sm cursor-pointer"
           >
             {{ config.cancelText }}
           </button>
@@ -227,7 +227,7 @@
             (click)="uiService.resolveConfirm(true)"
             [class]="
               config.type === 'danger'
-                ? 'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200 transition-all uppercase text-sm cursor-pointer'
+                ? 'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all uppercase text-sm cursor-pointer'
                 : 'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm cursor-pointer'
             "
           >

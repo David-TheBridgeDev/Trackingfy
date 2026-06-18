@@ -96,7 +96,7 @@
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 text-text-primary"
+              class="h-4 w-4 text-accent"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -110,25 +110,28 @@
             </svg>
             <span>{{ ts.t('settings.theme') }}</span>
           </h3>
-          <span
-            class="text-[9px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full uppercase tracking-tighter"
-          >
-            {{ ts.t('settings.theme.coming_soon') }}
-          </span>
         </div>
 
-        <div
-          class="grid grid-cols-2 gap-2 p-1 bg-gray-200/20 rounded-2xl opacity-50 cursor-not-allowed select-none"
-        >
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl">
           <button
-            disabled
-            class="py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white/50 text-text-primary/70"
+            (click)="uiService.setTheme('light')"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+            [ngClass]="
+              uiService.currentTheme() === 'light'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-text-primary hover:text-text-heading'
+            "
           >
             {{ ts.t('settings.theme.light') }}
           </button>
           <button
-            disabled
-            class="py-2 rounded-xl text-xs font-black uppercase tracking-wider text-text-primary/30"
+            (click)="uiService.setTheme('dark')"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+            [ngClass]="
+              uiService.currentTheme() === 'dark'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-text-primary hover:text-text-heading'
+            "
           >
             {{ ts.t('settings.theme.dark') }}
           </button>
@@ -161,14 +164,20 @@
           <span>{{ ts.t('settings.tab.info') }}</span>
         </h3>
 
-        <div class="px-4 py-4 bg-gray-50 rounded-2xl border border-gray-100/50 mb-3 text-center">
+        <div class="px-4 py-4 bg-bg-base/30 rounded-2xl border border-gray-100/20 mb-3 text-center">
           <p class="text-sm font-medium text-text-primary leading-relaxed">
             {{ ts.t('onboarding.description') }}
           </p>
         </div>
 
+        <div class="px-4 py-3 bg-accent/5 rounded-2xl border border-accent/20 mb-3 text-center">
+          <p class="text-[11px] font-bold text-text-heading/80 leading-relaxed uppercase tracking-wide">
+            {{ ts.t('onboarding.disclaimer') }}
+          </p>
+        </div>
+
         <div
-          class="flex justify-between items-center px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100/50"
+          class="flex justify-between items-center px-4 py-3 bg-bg-base/30 rounded-2xl border border-gray-100/20"
         >
           <span class="text-[10px] font-black uppercase tracking-wider text-text-primary">
             {{ ts.t('settings.version') }}

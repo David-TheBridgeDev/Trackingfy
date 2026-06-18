@@ -20,6 +20,7 @@ export class TranslationService {
       
       'onboarding.welcome': 'Bienvenido a Trackingfy',
       'onboarding.description': 'Registra tus actividades al aire libre con precisión. Estadísticas en tiempo real, mapas interactivos e historial completo. No hay registro ni tampoco recopilamos tu información.',
+      'onboarding.disclaimer': 'Como no recopilamos ningún tipo de datos, y todo se almacena de forma local, cuando borres la aplicación se borrarán todos tus datos, incluido el historial. Ten en cuenta esto y recuerda hacer una copia de seguridad de todo para que puedas restaurarlo posteriormente si cambias de móvil.',
       'onboarding.go': 'Comenzar',
       
       'settings.title': 'Ajustes',
@@ -103,6 +104,7 @@ export class TranslationService {
       
       'onboarding.welcome': 'Welcome to Trackingfy',
       'onboarding.description': 'Track your outdoor activities with precision. Real-time stats, interactive maps, and full history. No registration required, and we do not collect your information.',
+      'onboarding.disclaimer': 'Since we do not collect any type of data, and everything is stored locally, when you delete the application all your data will be deleted, including your history. Keep this in mind and remember to backup everything so you can restore it later if you change your phone.',
       'onboarding.go': 'Go',
       
       'settings.title': 'Settings',
