@@ -1,17 +1,28 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 
+export interface Split {
+  kilometer: number; // e.g., 1, 2, 3...
+  time: number; // elapsed time for this split in seconds
+  speed: number; // average speed in m/s for this split
+}
+
 export interface Activity {
   id?: number;
   date: Date;
   type: string;
   totalDistance: number; // in meters
   totalTime: number; // in seconds
+  movingTime?: number; // in seconds
   avgSpeed: number; // in m/s
+  maxSpeed?: number; // in m/s
+  maxGrade?: number; // in %
+  minGrade?: number; // in %
   totalClimb: number; // in meters
   totalDescent: number; // in meters
   startTime: number;
   endTime?: number;
+  splits?: Split[];
 }
 
 export interface Coordinate {

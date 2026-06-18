@@ -88,8 +88,9 @@
         class="w-full max-w-4xl mx-auto flex flex-col space-y-2 animate-in slide-in-from-bottom-4 duration-500 pointer-events-auto"
       >
         <div
-          class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 grid grid-cols-3 md:grid-cols-6 gap-2 border border-white/20"
+          class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 grid grid-cols-3 md:grid-cols-6 gap-y-4 gap-x-2 border border-white/20"
         >
+          <!-- Row 1 / Main Info -->
           <div class="text-center">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
               {{ ts.t('dashboard.duration') }}
@@ -102,33 +103,46 @@
             </p>
             <p class="text-lg font-black text-text-heading">{{ formattedDistance() }}</p>
           </div>
-          <div class="text-center md:border-r border-gray-100/50">
+          <div class="text-center">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              {{ ts.t('dashboard.avg_speed') }}
+              @if (trackingService.selectedActivityType() === 'Cycling') {
+                {{ ts.t('dashboard.avg_speed') }}
+              } @else {
+                {{ ts.t('dashboard.pace') }}
+              }
             </p>
-            <p class="text-lg font-black text-text-heading">{{ formattedSpeed() }}</p>
+            <p class="text-lg font-black text-text-heading">
+              @if (trackingService.selectedActivityType() === 'Cycling') {
+                {{ formattedSpeed() }}
+              } @else {
+                {{ formattedPace() }}
+              }
+            </p>
           </div>
-          <div class="text-center border-r border-gray-100/50 hidden md:block">
+          
+          <!-- Row 2 / Secondary Info -->
+          <div class="text-center md:border-l border-gray-100/50">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              {{ ts.t('dashboard.climb') }}
+              {{ ts.t('dashboard.moving_time') }}
             </p>
-            <p class="text-lg font-black text-green-600">{{ formattedClimb() }}</p>
+            <p class="text-lg font-black text-text-heading">{{ formattedMovingTime() }}</p>
           </div>
-          <div class="text-center border-r border-gray-100/50 hidden md:block">
+          <div class="text-center border-x border-gray-100/50">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              {{ ts.t('dashboard.descent') }}
+              {{ ts.t('dashboard.max_speed') }}
             </p>
-            <p class="text-lg font-black text-red-600">{{ formattedDescent() }}</p>
+            <p class="text-lg font-black text-text-heading">{{ formattedMaxSpeed() }}</p>
           </div>
-          <div class="text-center hidden md:block">
+          <div class="text-center">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              {{ ts.t('dashboard.altitude') }}
+              {{ ts.t('dashboard.grade') }}
             </p>
-            <p class="text-lg font-black text-blue-600">{{ formattedAltitude() }}</p>
+            <p class="text-lg font-black" [ngClass]="trackingService.currentGrade() > 0 ? 'text-green-600' : (trackingService.currentGrade() < 0 ? 'text-red-600' : 'text-text-heading')">{{ formattedGrade() }}</p>
           </div>
         </div>
 
-        <div class="flex space-x-2 md:hidden">
+        <!-- Hidden by default on mobile, can be scrolled or added as smaller pills -->
+        <div class="flex space-x-2">
           <div
             class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
           >

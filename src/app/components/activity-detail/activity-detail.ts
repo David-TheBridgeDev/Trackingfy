@@ -75,6 +75,30 @@ export class ActivityDetailComponent implements OnInit {
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
   }
 
+  formatPace(speed: number | undefined): string {
+    if (!speed || !isFinite(speed) || speed === 0) return '--:-- /km';
+    const pace = (1000 / speed) / 60;
+    if (pace > 60) return '--:-- /km';
+    const m = Math.floor(pace);
+    const s = Math.floor((pace - m) * 60);
+    return `${m}:${s < 10 ? '0' + s : s} /km`;
+  }
+
+  formatMaxSpeed(speed: number | undefined): string {
+    if (!speed) return '0.0 km/h';
+    return (speed * 3.6).toFixed(1) + ' km/h';
+  }
+
+  formatMaxGrade(grade: number | undefined): string {
+    if (grade === undefined || grade === null) return '0%';
+    return grade.toFixed(1) + '%';
+  }
+
+  formatMinGrade(grade: number | undefined): string {
+    if (grade === undefined || grade === null) return '0%';
+    return grade.toFixed(1) + '%';
+  }
+
   async shareSticker() {
     if (!this.exportContainer) return;
     this.isGeneratingSticker.set(true);

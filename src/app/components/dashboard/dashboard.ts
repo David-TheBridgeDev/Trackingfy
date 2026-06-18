@@ -60,6 +60,30 @@ export class DashboardComponent implements OnInit {
     return alt !== null ? alt.toFixed(0) + ' m' : '--';
   });
 
+  formattedPace = computed(() => {
+    const pace = this.trackingService.currentPace();
+    if (!pace || !isFinite(pace) || pace > 60) return '--:--';
+    const m = Math.floor(pace);
+    const s = Math.floor((pace - m) * 60);
+    return `${m}:${s < 10 ? '0' + s : s} /km`;
+  });
+
+  formattedMaxSpeed = computed(() => {
+    return (this.trackingService.maxSpeed() * 3.6).toFixed(1) + ' km/h';
+  });
+
+  formattedMovingTime = computed(() => {
+    const seconds = Math.floor(this.trackingService.movingTime());
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map((v) => (v < 10 ? '0' + v : v)).join(':');
+  });
+
+  formattedGrade = computed(() => {
+    return this.trackingService.currentGrade().toFixed(1) + '%';
+  });
+
   toggleTracking() {
     const state = this.trackingService.state();
     if (state === 'idle') {

@@ -1,5 +1,5 @@
 import { Injectable, signal, NgZone } from '@angular/core';
-import { DatabaseService, Activity, Coordinate } from './database';
+import { DatabaseService, Activity, Coordinate, Split } from './database';
 import { TranslationService } from './translation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
@@ -26,8 +26,22 @@ export class TrackingService {
   currentAltitude = signal<number | null>(null);
   lastCoordinate = signal<Coordinate | null>(null);
   currentCoordinates = signal<Coordinate[]>([]);
+  
+  // New metrics
+  currentPace = signal(0); // in minutes per km
+  avgPace = signal(0); // in minutes per km
+  maxSpeed = signal(0); // in m/s
+  movingTime = signal(0); // in seconds
+  currentGrade = signal(0); // percentage (-100 to +100)
+  maxGrade = signal(0); // in % (highest climb)
+  minGrade = signal(0); // in % (steepest descent)
+  splits = signal<Split[]>([]);
+  
+  private lastSplitTime: number = 0;
   private lastSmoothedAltitude: number | null = null;
   private lastAccumulatedAltitude: number | null = null;
+  private gradeDistanceAccumulator: number = 0;
+  private gradeAltitudeBaseline: number | null = null;
 
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
@@ -168,8 +182,19 @@ export class TrackingService {
     this.currentDescent.set(0);
     this.lastCoordinate.set(null);
     this.currentCoordinates.set([]);
+    this.currentPace.set(0);
+    this.avgPace.set(0);
+    this.maxSpeed.set(0);
+    this.movingTime.set(0);
+    this.currentGrade.set(0);
+    this.maxGrade.set(0);
+    this.minGrade.set(0);
+    this.splits.set([]);
+    this.lastSplitTime = 0;
     this.lastSmoothedAltitude = null;
     this.lastAccumulatedAltitude = null;
+    this.gradeDistanceAccumulator = 0;
+    this.gradeAltitudeBaseline = null;
     this.accumulatedTime = 0;
 
     this.startTimer();
@@ -189,6 +214,8 @@ export class TrackingService {
     this.startTimer();
   }
 
+  private lastTimerTick: number | null = null;
+
   private updateCurrentTime() {
     if (this.state() === 'tracking' && this.startTimeSegment !== null) {
       const elapsedInSegment = Math.floor((Date.now() - this.startTimeSegment) / 1000);
@@ -196,12 +223,27 @@ export class TrackingService {
     } else {
       this.currentTime.set(this.accumulatedTime);
     }
+    
+    // Update avgPace
+    const distKm = this.currentDistance() / 1000;
+    if (distKm > 0) {
+      this.avgPace.set((this.currentTime() / 60) / distKm);
+    }
   }
 
   private startTimer() {
     this.startTimeSegment = Date.now();
+    this.lastTimerTick = Date.now();
     this.updateCurrentTime();
     this.timerInterval = setInterval(() => {
+      const now = Date.now();
+      if (this.lastTimerTick) {
+        const deltaSec = (now - this.lastTimerTick) / 1000;
+        if (this.currentSpeed() > 0.3) {
+          this.movingTime.update(m => m + deltaSec);
+        }
+      }
+      this.lastTimerTick = now;
       this.updateCurrentTime();
     }, 1000);
   }
@@ -296,7 +338,24 @@ export class TrackingService {
           );
           // Only add distance if it's more than 2 meters to avoid GPS noise
           if (dist > 2) {
-            this.currentDistance.update(d => d + dist);
+            this.currentDistance.update(d => {
+              const newDist = d + dist;
+              const currentKm = Math.floor(newDist / 1000);
+              const lastKm = Math.floor(d / 1000);
+              
+              if (currentKm > lastKm) {
+                const splitTime = this.currentTime() - this.lastSplitTime;
+                const splitSpeed = splitTime > 0 ? 1000 / splitTime : 0;
+                this.splits.update(s => [...s, {
+                  kilometer: currentKm,
+                  time: splitTime,
+                  speed: splitSpeed
+                }]);
+                this.lastSplitTime = this.currentTime();
+              }
+              
+              return newDist;
+            });
 
             // Calculate altitude changes only when there is horizontal movement
             if (altitude !== null) {
@@ -311,8 +370,33 @@ export class TrackingService {
               if (this.lastAccumulatedAltitude === null) {
                 this.lastAccumulatedAltitude = smoothed;
               }
+              
+              if (this.gradeAltitudeBaseline === null) {
+                this.gradeAltitudeBaseline = smoothed;
+              }
 
-              // 2. Accumulate differences using a threshold and comparing with the last accumulated baseline
+              // 2. Grade calculation (accumulating over 15 meters for stability)
+              this.gradeDistanceAccumulator += dist;
+              if (this.gradeDistanceAccumulator >= 15) {
+                 const grade = ((smoothed - this.gradeAltitudeBaseline) / this.gradeDistanceAccumulator) * 100;
+                 // Cap impossible grades (e.g. GPS jumps) to reasonable limits (-45% to +45%)
+                 const cappedGrade = Math.max(-45, Math.min(45, grade));
+                 
+                 this.currentGrade.set(cappedGrade);
+                 
+                 if (cappedGrade > this.maxGrade()) {
+                   this.maxGrade.set(cappedGrade);
+                 }
+                 if (cappedGrade < this.minGrade()) {
+                   this.minGrade.set(cappedGrade);
+                 }
+                 
+                 // Reset baseline for next segment
+                 this.gradeDistanceAccumulator = 0;
+                 this.gradeAltitudeBaseline = smoothed;
+              }
+
+              // 3. Accumulate differences using a threshold and comparing with the last accumulated baseline
               const diff = smoothed - this.lastAccumulatedAltitude;
               const ALTITUDE_THRESHOLD = 2.0; // 2 meters threshold to filter GPS jitter
 
@@ -335,7 +419,20 @@ export class TrackingService {
         }
         this.db.addCoordinate(newCoord);
         this.currentCoordinates.update(coords => [...coords, newCoord]);
-        this.currentSpeed.set(speed || 0);
+        
+        const currentSpeedVal = speed || 0;
+        this.currentSpeed.set(currentSpeedVal);
+        
+        if (currentSpeedVal > this.maxSpeed()) {
+          this.maxSpeed.set(currentSpeedVal);
+        }
+        
+        if (currentSpeedVal > 0) {
+          this.currentPace.set((1000 / currentSpeedVal) / 60);
+        } else {
+          this.currentPace.set(0);
+        }
+        
         this.updateCurrentTime();
       }
 
@@ -368,10 +465,15 @@ export class TrackingService {
       await this.db.updateActivity(this.currentActivityId, {
         totalDistance,
         totalTime,
+        movingTime: Math.floor(this.movingTime()),
         avgSpeed,
+        maxSpeed: this.maxSpeed(),
+        maxGrade: this.maxGrade(),
+        minGrade: this.minGrade(),
         totalClimb,
         totalDescent,
-        endTime: Date.now()
+        endTime: Date.now(),
+        splits: this.splits()
       });
     }
 
@@ -384,10 +486,20 @@ export class TrackingService {
     this.currentClimb.set(0);
     this.currentDescent.set(0);
     this.currentCoordinates.set([]);
+    this.currentPace.set(0);
+    this.avgPace.set(0);
+    this.maxSpeed.set(0);
+    this.movingTime.set(0);
+    this.currentGrade.set(0);
+    this.maxGrade.set(0);
+    this.minGrade.set(0);
+    this.splits.set([]);
+    this.lastSplitTime = 0;
     this.lastSmoothedAltitude = null;
     this.lastAccumulatedAltitude = null;
     this.accumulatedTime = 0;
     this.startTimeSegment = null;
+    this.lastTimerTick = null;
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

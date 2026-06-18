@@ -22,7 +22,7 @@
           </div>
         </div>
 
-        <!-- Row 2: Distance, Duration, Avg Speed -->
+        <!-- Row 2: Distance, Duration, Pace/Speed -->
         <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
@@ -43,11 +43,55 @@
           </div>
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              {{ ts.t('dashboard.avg_speed') }}
+              @if (activity()?.type === 'Cycling') {
+                {{ ts.t('dashboard.avg_speed') }}
+              } @else {
+                {{ ts.t('dashboard.pace') }}
+              }
             </p>
             <p class="font-black text-text-heading text-base md:text-lg">
-              {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
-              <span class="text-xs">km/h</span>
+              @if (activity()?.type === 'Cycling') {
+                {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
+                <span class="text-xs">km/h</span>
+              } @else {
+                {{ formatPace(activity()?.avgSpeed) }}
+              }
+            </p>
+          </div>
+        </div>
+
+        <!-- Row 2.5: Moving Time, Max Speed, Max Grade & Min Grade -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-gray-100 pb-4">
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              {{ ts.t('dashboard.moving_time') }}
+            </p>
+            <p class="font-black text-text-heading text-sm md:text-base">
+              {{ formatTime(activity()?.movingTime || activity()?.totalTime) }}
+            </p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              {{ ts.t('dashboard.max_speed') }}
+            </p>
+            <p class="font-black text-text-heading text-sm md:text-base">
+              {{ formatMaxSpeed(activity()?.maxSpeed) }}
+            </p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              Pendiente Máx
+            </p>
+            <p class="font-black text-green-600 text-sm md:text-base">
+              {{ formatMaxGrade(activity()?.maxGrade) }}
+            </p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              Pendiente Mín
+            </p>
+            <p class="font-black text-red-600 text-sm md:text-base">
+              {{ formatMinGrade(activity()?.minGrade) }}
             </p>
           </div>
         </div>
