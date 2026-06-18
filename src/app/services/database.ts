@@ -87,4 +87,56 @@ export class DatabaseService extends Dexie {
       await this.activities.bulkDelete(ids);
     });
   }
+
+  async exportData(): Promise<string> {
+    const activities = await this.activities.toArray();
+    const coordinates = await this.coordinates.toArray();
+    return JSON.stringify({ activities, coordinates });
+  }
+
+  async importData(jsonString: string): Promise<void> {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data && data.activities && data.coordinates) {
+        await this.transaction('rw', this.activities, this.coordinates, async () => {
+          // Get existing activities to prevent duplicates
+          const existingActivities = await this.activities.toArray();
+          const existingStartTimes = new Set(existingActivities.map(a => a.startTime));
+
+          const newCoordinatesToAdd: Coordinate[] = [];
+
+          for (const activity of data.activities as Activity[]) {
+            // Check if this activity already exists based on startTime
+            if (!existingStartTimes.has(activity.startTime)) {
+              const oldId = activity.id;
+              
+              // Remove original id so Dexie generates a new one
+              delete activity.id;
+              
+              // Insert the activity to get its new ID
+              const newId = await this.activities.add(activity as Activity);
+              
+              // Find and map associated coordinates
+              const activityCoords = (data.coordinates as Coordinate[]).filter(c => c.activityId === oldId);
+              for (const coord of activityCoords) {
+                delete coord.id;
+                coord.activityId = newId as number;
+                newCoordinatesToAdd.push(coord);
+              }
+            }
+          }
+
+          // Insert all newly mapped coordinates
+          if (newCoordinatesToAdd.length > 0) {
+            await this.coordinates.bulkAdd(newCoordinatesToAdd);
+          }
+        });
+      } else {
+        throw new Error('Invalid backup data format');
+      }
+    } catch (e) {
+      console.error('Import error:', e);
+      throw e;
+    }
+  }
 }

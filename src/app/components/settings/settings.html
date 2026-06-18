@@ -139,6 +139,50 @@
       </div>
     </div>
 
+    <!-- Card 3: Backup & Restore -->
+    <div
+      class="bg-bg-surface p-6 rounded-[32px] shadow-sm border border-gray-100/50 flex flex-col space-y-6"
+    >
+      <div>
+        <h3
+          class="text-base font-black text-text-heading uppercase tracking-tight mb-4 flex items-center space-x-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-accent"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+            />
+          </svg>
+          <span>{{ ts.t('settings.backup') }}</span>
+        </h3>
+        
+        <input type="file" accept=".json" (change)="onFileSelected($event)" class="hidden" #fileInput>
+
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl mb-2">
+          <button
+            (click)="exportData()"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center text-text-primary hover:text-text-heading bg-white shadow-sm"
+          >
+            {{ ts.t('settings.backup.export') }}
+          </button>
+          <button
+            (click)="triggerImport()"
+            class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center text-text-primary hover:text-text-heading bg-white shadow-sm"
+          >
+            {{ ts.t('settings.backup.import') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Card 2: App Information & PWA -->
     <div
       class="bg-bg-surface p-6 rounded-[32px] shadow-sm border border-gray-100/50 flex flex-col justify-between space-y-6"

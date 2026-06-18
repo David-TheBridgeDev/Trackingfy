@@ -36,6 +36,11 @@ export class TranslationService {
       'settings.tab.settings': 'Ajustes',
       'settings.default_activity': 'Actividad predeterminada',
       'settings.created_with_love': 'Creado con mucho amor y cariño:',
+      'settings.backup': 'Copia de seguridad',
+      'settings.backup.export': 'Exportar datos',
+      'settings.backup.import': 'Importar datos',
+      'settings.backup.success': 'Datos restaurados correctamente',
+      'settings.backup.error': 'Error al restaurar los datos',
       
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
@@ -120,6 +125,11 @@ export class TranslationService {
       'settings.tab.settings': 'Settings',
       'settings.default_activity': 'Default activity',
       'settings.created_with_love': 'Created with lots of love and care:',
+      'settings.backup': 'Backup & Restore',
+      'settings.backup.export': 'Export Data',
+      'settings.backup.import': 'Import Data',
+      'settings.backup.success': 'Data restored successfully',
+      'settings.backup.error': 'Error restoring data',
       
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
