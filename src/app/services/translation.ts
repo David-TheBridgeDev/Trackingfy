@@ -98,6 +98,9 @@ export class TranslationService {
       
       'tracking.bg_message': 'Trackingfy está registrando tu actividad.',
       'tracking.bg_title': 'Rastreo en curso',
+      'share.title': 'Mi ruta en Trackingfy',
+      'share.text': '¡Mira mi ruta en Trackingfy!',
+      'share.dialog_title': 'Compartir ruta',
     },
     en: {
       'app.title': 'Trackingfy',
@@ -187,6 +190,9 @@ export class TranslationService {
       
       'tracking.bg_message': 'Trackingfy is tracking your activity.',
       'tracking.bg_title': 'Tracking in progress',
+      'share.title': 'My route on Trackingfy',
+      'share.text': 'Check out my route on Trackingfy!',
+      'share.dialog_title': 'Share route',
     }
   };
 

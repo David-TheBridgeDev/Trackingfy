@@ -123,10 +123,10 @@ export class ActivityDetailComponent implements OnInit {
       });
 
       await Share.share({
-        title: 'Mi ruta en Trackingfy',
-        text: '¡Mira mi ruta en Trackingfy!',
+        title: this.ts.t('share.title'),
+        text: this.ts.t('share.text'),
         url: savedFile.uri,
-        dialogTitle: 'Compartir ruta'
+        dialogTitle: this.ts.t('share.dialog_title')
       });
     } catch (e) {
       console.error('Error generating or sharing sticker', e);
