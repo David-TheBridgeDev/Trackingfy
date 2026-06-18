@@ -19,7 +19,7 @@ export class TranslationService {
       'app.toast_exit': 'Presiona atrás de nuevo para salir',
       
       'onboarding.welcome': 'Bienvenido a Trackingfy',
-      'onboarding.description': 'Registra tus actividades al aire libre con precisión. Estadísticas en tiempo real, mapas interactivos e historial completo.',
+      'onboarding.description': 'Registra tus actividades al aire libre con precisión. Estadísticas en tiempo real, mapas interactivos e historial completo. No hay registro ni tampoco recopilamos tu información.',
       'onboarding.go': 'Comenzar',
       
       'settings.title': 'Ajustes',
@@ -97,7 +97,7 @@ export class TranslationService {
       'app.toast_exit': 'Press back again to exit',
       
       'onboarding.welcome': 'Welcome to Trackingfy',
-      'onboarding.description': 'Track your outdoor activities with precision. Real-time stats, interactive maps, and full history.',
+      'onboarding.description': 'Track your outdoor activities with precision. Real-time stats, interactive maps, and full history. No registration required, and we do not collect your information.',
       'onboarding.go': 'Go',
       
       'settings.title': 'Settings',
