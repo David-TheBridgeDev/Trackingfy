@@ -214,7 +214,7 @@ export class TrackingService {
     this.startTimer();
   }
 
-  private lastTimerTick: number | null = null;
+
 
   private updateCurrentTime() {
     if (this.state() === 'tracking' && this.startTimeSegment !== null) {
@@ -233,17 +233,8 @@ export class TrackingService {
 
   private startTimer() {
     this.startTimeSegment = Date.now();
-    this.lastTimerTick = Date.now();
     this.updateCurrentTime();
     this.timerInterval = setInterval(() => {
-      const now = Date.now();
-      if (this.lastTimerTick) {
-        const deltaSec = (now - this.lastTimerTick) / 1000;
-        if (this.currentSpeed() > 0.3) {
-          this.movingTime.update(m => m + deltaSec);
-        }
-      }
-      this.lastTimerTick = now;
       this.updateCurrentTime();
     }, 1000);
   }
@@ -336,6 +327,19 @@ export class TrackingService {
             latitude,
             longitude
           );
+          const timeDiffSec = (timestamp - last.timestamp) / 1000;
+          
+          if (timeDiffSec > 0) {
+            const calculatedSpeed = dist / timeDiffSec;
+            const currentSpeedVal = speed || calculatedSpeed;
+            
+            // If the average speed between points is greater than 0.3 m/s (approx 1 km/h)
+            // or if the instantaneous speed is high and the interval is small (e.g. just started moving)
+            if (calculatedSpeed > 0.3 || (currentSpeedVal > 0.3 && timeDiffSec < 10)) {
+              this.movingTime.update(m => m + timeDiffSec);
+            }
+          }
+
           // Only add distance if it's more than 2 meters to avoid GPS noise
           if (dist > 2) {
             this.currentDistance.update(d => {
