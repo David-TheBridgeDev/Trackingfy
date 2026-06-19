@@ -21,6 +21,11 @@ export class HistoryComponent implements OnInit {
   activities = signal<Activity[]>([]);
   activeDeleteId = signal<number | null>(null);
 
+  // Swipe gesture tracking
+  touchStartX = 0;
+  touchEndX = 0;
+  wasSwiped = false;
+
   // Selection
   isSelectionMode = signal(false);
   selectedIds = signal<Set<number>>(new Set());
@@ -158,8 +163,33 @@ export class HistoryComponent implements OnInit {
     return id !== undefined && this.selectedIds().has(id);
   }
 
-  navigateToActivity(id: number | undefined) {
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0].screenX;
+  }
+
+  onTouchEnd(event: TouchEvent, id: number | undefined) {
     if (!id) return;
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.handleSwipe(id);
+  }
+
+  handleSwipe(id: number) {
+    const swipeDistance = this.touchStartX - this.touchEndX;
+    if (swipeDistance > 50) {
+      this.activeDeleteId.set(id);
+      this.wasSwiped = true;
+      setTimeout(() => this.wasSwiped = false, 100);
+    } else if (swipeDistance < -50) {
+      if (this.activeDeleteId() === id) {
+        this.activeDeleteId.set(null);
+        this.wasSwiped = true;
+        setTimeout(() => this.wasSwiped = false, 100);
+      }
+    }
+  }
+
+  navigateToActivity(id: number | undefined) {
+    if (!id || this.wasSwiped) return;
 
     if (this.isSelectionMode()) {
       this.toggleSelection(id);

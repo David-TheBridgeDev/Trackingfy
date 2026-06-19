@@ -66,7 +66,7 @@
       <!-- Sort Order Toggle -->
       <button
         (click)="toggleSortOrder()"
-        class="bg-bg-base p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        class="bg-bg-base p-2 rounded-xl transition-colors active:bg-gray-100"
         title="Toggle Sort Order"
       >
         <svg
@@ -111,7 +111,7 @@
       <p class="text-text-primary font-medium">{{ ts.t('history.no_activities') }}</p>
       <button
         routerLink="/dashboard"
-        class="mt-4 text-accent font-bold uppercase text-sm hover:underline"
+        class="mt-4 text-accent font-bold uppercase text-sm active:opacity-70"
       >
         {{ ts.t('history.start_first') }}
       </button>
@@ -163,10 +163,11 @@
                 [class.border-accent]="isSelected(activity.id)"
                 [class.bg-accent]="isSelected(activity.id)"
                 [class.border-gray-100]="!isSelected(activity.id)"
-                [class.hover:shadow-md]="!isSelectionMode()"
                 style="-webkit-touch-callout: none"
                 (click)="navigateToActivity(activity.id)"
                 (contextmenu)="onLongPress($event, activity.id)"
+                (touchstart)="onTouchStart($event)"
+                (touchend)="onTouchEnd($event, activity.id)"
               >
                 <div class="p-4 flex justify-between items-center">
                   <div class="flex items-center space-x-4">
@@ -176,7 +177,6 @@
                         class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                         [class.bg-accent]="isSelected(activity.id)"
                         [class.bg-bg-base]="!isSelected(activity.id)"
-                        [class.sm:group-hover:bg-accent]="!isSelected(activity.id)"
                       >
                         @if (isSelected(activity.id)) {
                           <svg
@@ -292,7 +292,7 @@
                 @if (!isSelectionMode()) {
                   <button
                     (click)="deleteActivity(activity.id, $event)"
-                    class="delete-btn absolute top-1/2 -translate-y-1/2 right-4 text-pure-white bg-red-600 transition-all duration-200 p-3 rounded-2xl shadow-xl z-30 scale-75 opacity-0 active:scale-95 sm:group-hover:scale-100 sm:group-hover:opacity-100"
+                    class="delete-btn absolute top-1/2 -translate-y-1/2 right-4 text-pure-white bg-red-600 transition-all duration-200 p-3 rounded-2xl shadow-xl z-30 scale-75 opacity-0 active:scale-95"
                     [class.scale-100]="activeDeleteId() === activity.id"
                     [class.opacity-100]="activeDeleteId() === activity.id"
                   >
