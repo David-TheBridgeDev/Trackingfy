@@ -503,7 +503,6 @@ export class TrackingService {
     this.lastAccumulatedAltitude = null;
     this.accumulatedTime = 0;
     this.startTimeSegment = null;
-    this.lastTimerTick = null;
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
