@@ -7,6 +7,8 @@
   --color-bg-surface: var(--theme-bg-surface);
   --color-text-primary: var(--theme-text-primary);
   --color-text-heading: var(--theme-text-heading);
+  --color-pure-white: #ffffff;
+  --color-pure-black: #000000;
 }
 
 :root {

@@ -18,8 +18,8 @@ import { TrackingService } from '../../services/tracking';
         <button 
           (click)="recenter()"
           [class]="'absolute bottom-40 right-4 w-12 h-12 flex items-center justify-center rounded-full shadow-2xl border transition-all active:scale-90 z-[1000] ' + 
-                   (trackingService.permissionDenied() || !currentPoint() ? 'bg-red-500 text-white border-red-400 animate-pulse' : 
-                   (isFollowing() ? 'bg-accent text-white border-accent' : 'bg-white/95 text-gray-700 border-gray-100'))"
+                   (trackingService.permissionDenied() || !currentPoint() ? 'bg-red-500 text-pure-white border-red-400 animate-pulse' : 
+                   (isFollowing() ? 'bg-accent text-pure-white border-accent' : 'bg-white/95 text-gray-700 border-gray-100'))"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3" />

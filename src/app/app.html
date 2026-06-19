@@ -35,7 +35,7 @@
         }
         @if (!isOnline()) {
           <span
-            class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold"
+            class="bg-orange-500 text-pure-white text-[10px] px-2 py-0.5 rounded uppercase font-bold"
             >{{ ts.t('app.offline') }}</span
           >
         }
@@ -159,7 +159,7 @@
           <div class="flex flex-col space-y-4">
             <button
               (click)="handleStart()"
-              class="w-full bg-gradient-to-r from-accent to-orange-500 text-white py-5 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.3)] active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center"
+              class="w-full bg-gradient-to-r from-accent to-orange-500 text-pure-white py-5 rounded-3xl font-black uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(239,188,33,0.3)] active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center"
             >
               {{ ts.t('onboarding.go') }}
             </button>
@@ -227,8 +227,8 @@
             (click)="uiService.resolveConfirm(true)"
             [class]="
               config.type === 'danger'
-                ? 'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all uppercase text-sm cursor-pointer'
-                : 'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm cursor-pointer'
+                ? 'flex-1 px-4 py-3 rounded-xl font-bold bg-red-500 text-pure-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all uppercase text-sm cursor-pointer'
+                : 'flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-pure-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm cursor-pointer'
             "
           >
             {{ config.confirmText }}
@@ -241,7 +241,7 @@
   <!-- Toast Notification -->
   @if (showToast()) {
     <div
-      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300"
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-pure-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300"
     >
       {{ toastMessage() }}
     </div>
