@@ -4,32 +4,30 @@
     <div
       class="bg-accent p-4 rounded-3xl shadow-lg shadow-accent/20 flex items-center justify-between sticky top-4 z-50 animate-in slide-in-from-top duration-300"
     >
-      <div class="flex items-center space-x-3 text-pure-white">
-        <div class="bg-pure-white/20 p-2 rounded-xl">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
+      <div class="flex items-center text-pure-white min-w-0">
         <div>
-          <p class="font-black uppercase text-xs leading-none">{{ ts.t('history.selected', { count: selectedIds().size }) }}</p>
-          <p class="text-[10px] font-bold opacity-80 uppercase tracking-wider">{{ ts.t('history.activities') }}</p>
+          <p class="font-black uppercase text-xs leading-none truncate">
+            {{ ts.t('history.selected', { count: selectedIds().size }) }}
+          </p>
+          <p class="text-[10px] font-bold opacity-80 uppercase tracking-wider truncate">
+            {{ ts.t('history.activities') }}
+          </p>
         </div>
       </div>
-      <button
-        (click)="deleteSelected()"
-        class="bg-white text-accent px-4 py-2 rounded-xl font-black uppercase text-[10px] shadow-sm active:scale-95 transition-transform"
-      >
-        {{ ts.t('history.delete_selected') }}
-      </button>
+      <div class="flex items-center space-x-2 shrink-0">
+        <button
+          (click)="exitSelectionMode()"
+          class="bg-transparent border border-pure-white/30 text-pure-white px-3 py-2 rounded-xl font-black uppercase text-[10px] active:scale-95 transition-transform"
+        >
+          {{ ts.t('history.cancel_selection') }}
+        </button>
+        <button
+          (click)="deleteSelected()"
+          class="bg-white text-accent px-3 py-2 rounded-xl font-black uppercase text-[10px] shadow-sm active:scale-95 transition-transform"
+        >
+          {{ ts.t('history.delete_selected') }}
+        </button>
+      </div>
     </div>
   }
 
@@ -46,7 +44,9 @@
         class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
       >
         @for (type of availableTypes(); track type) {
-          <option [value]="type">{{ type === 'All' ? ts.t('history.filter.all') : ts.t('activity.' + type) }}</option>
+          <option [value]="type">
+            {{ type === 'All' ? ts.t('history.filter.all') : ts.t('activity.' + type) }}
+          </option>
         }
       </select>
 
@@ -134,8 +134,12 @@
           />
         </svg>
       </div>
-      <p class="text-text-heading font-black uppercase tracking-tight">{{ ts.t('history.no_results') }}</p>
-      <p class="text-text-primary text-sm font-semibold mb-6">{{ ts.t('history.adjust_filters') }}</p>
+      <p class="text-text-heading font-black uppercase tracking-tight">
+        {{ ts.t('history.no_results') }}
+      </p>
+      <p class="text-text-primary text-sm font-semibold mb-6">
+        {{ ts.t('history.adjust_filters') }}
+      </p>
       <button
         (click)="clearFilters()"
         class="bg-accent text-pure-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform"
