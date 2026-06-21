@@ -461,7 +461,8 @@ export class TrackingService {
 
     const totalDistance = this.currentDistance();
     const totalTime = this.currentTime();
-    const avgSpeed = totalTime > 0 ? totalDistance / totalTime : 0;
+    const movingTime = Math.floor(this.movingTime());
+    const avgSpeed = movingTime > 0 ? totalDistance / movingTime : 0;
     const totalClimb = this.currentClimb();
     const totalDescent = this.currentDescent();
 
@@ -469,7 +470,7 @@ export class TrackingService {
       await this.db.updateActivity(this.currentActivityId, {
         totalDistance,
         totalTime,
-        movingTime: Math.floor(this.movingTime()),
+        movingTime,
         avgSpeed,
         maxSpeed: this.maxSpeed(),
         maxGrade: this.maxGrade(),

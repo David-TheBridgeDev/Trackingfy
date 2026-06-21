@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
 
   formattedSpeed = computed(() => {
     const meters = this.trackingService.currentDistance();
-    const seconds = this.trackingService.currentTime();
+    const seconds = this.trackingService.movingTime();
     const avgSpeed = seconds > 0 ? meters / seconds : 0; // m/s
     return (avgSpeed * 3.6).toFixed(1) + ' km/h';
   });
