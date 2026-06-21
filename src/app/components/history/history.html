@@ -192,20 +192,12 @@
                             />
                           </svg>
                         } @else {
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 text-accent"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                            />
-                          </svg>
+                          <div 
+                            class="h-6 w-6 bg-accent"
+                            [style.mask-image]="'url(icons/' + (activity.type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
+                            [style.-webkit-mask-image]="'url(icons/' + (activity.type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
+                            style="mask-size: contain; mask-repeat: no-repeat; mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;"
+                          ></div>
                         }
                       </div>
 

@@ -46,7 +46,7 @@ export class TrackingService {
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
   
-  activityTypes = ['Cycling', 'Running', 'Walking'];
+  activityTypes = ['Cycling', 'Running'];
   selectedActivityType = signal<string>(localStorage.getItem('trackingfy_selected_activity_type') || 'Cycling');
 
   setSelectedActivityType(type: string) {

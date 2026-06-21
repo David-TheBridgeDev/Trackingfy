@@ -9,7 +9,7 @@ describe('SettingsComponent', () => {
   let fixture: ComponentFixture<SettingsComponent>;
 
   const mockTrackingService = {
-    activityTypes: ['Cycling', 'Running', 'Walking'],
+    activityTypes: ['Cycling', 'Running'],
     selectedActivityType: signal('Cycling'),
     setSelectedActivityType: vi.fn()
   };

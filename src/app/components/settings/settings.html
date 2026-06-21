@@ -72,18 +72,24 @@
           <span>{{ ts.t('settings.default_activity') }}</span>
         </h3>
 
-        <div class="grid grid-cols-3 gap-2 p-1 bg-gray-200/30 rounded-2xl">
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl">
           @for (type of trackingService.activityTypes; track type) {
             <button
               (click)="trackingService.setSelectedActivityType(type)"
-              class="py-2.5 rounded-xl text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
+              class="py-2.5 rounded-xl flex items-center justify-center space-x-2 text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
               [ngClass]="
                 trackingService.selectedActivityType() === type
                   ? 'bg-white text-black shadow-sm'
                   : 'text-text-primary hover:text-text-heading'
               "
             >
-              {{ ts.t('activity.' + type) }}
+              <div 
+                class="h-4 w-4 bg-accent"
+                [style.mask-image]="'url(icons/' + (type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
+                [style.-webkit-mask-image]="'url(icons/' + (type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
+                style="mask-size: contain; mask-repeat: no-repeat; mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;"
+              ></div>
+              <span>{{ ts.t('activity.' + type) }}</span>
             </button>
           }
         </div>

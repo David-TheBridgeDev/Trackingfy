@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, HostListener, computed } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatabaseService, Activity } from '../../services/database';
+import { Activity, DatabaseService } from '../../services/database';
 import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
 
@@ -13,7 +13,7 @@ interface DayGroup {
 
 @Component({
   selector: 'app-history',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './history.html',
   styleUrl: './history.css',
 })
@@ -29,7 +29,7 @@ export class HistoryComponent implements OnInit {
   sortBy = signal<'date' | 'distance' | 'duration' | 'climb' | 'descent'>('date');
   sortOrder = signal<'asc' | 'desc'>('desc');
   availableTypes = computed(() => {
-    const types = new Set(this.activities().map(a => a.type));
+    const types = new Set(this.activities().map((a) => a.type));
     return ['All', ...Array.from(types).sort()];
   });
   filteredActivities = computed(() => {
@@ -38,7 +38,7 @@ export class HistoryComponent implements OnInit {
     // Type Filter
     const type = this.filterType();
     if (type !== 'All') {
-      result = result.filter(a => a.type === type);
+      result = result.filter((a) => a.type === type);
     }
 
     // Sorting
@@ -69,9 +69,9 @@ export class HistoryComponent implements OnInit {
     const groups: DayGroup[] = [];
     const activities = this.filteredActivities();
 
-    activities.forEach(activity => {
+    activities.forEach((activity) => {
       const dateStr = new Date(activity.date).toDateString();
-      let group = groups.find(g => g.date === dateStr);
+      let group = groups.find((g) => g.date === dateStr);
       if (!group) {
         group = { date: dateStr, activities: [] };
         groups.push(group);
@@ -86,7 +86,7 @@ export class HistoryComponent implements OnInit {
     private db: DatabaseService,
     private router: Router,
     private uiService: UIService,
-    public ts: TranslationService
+    public ts: TranslationService,
   ) {}
 
   async ngOnInit() {
@@ -96,7 +96,7 @@ export class HistoryComponent implements OnInit {
 
   async loadActivities() {
     const allActivities = await this.db.getActivities();
-    this.activities.set(allActivities.filter(a => a.endTime !== undefined));
+    this.activities.set(allActivities.filter((a) => a.endTime !== undefined));
   }
 
   clearFilters() {
@@ -106,13 +106,13 @@ export class HistoryComponent implements OnInit {
   }
 
   toggleSortOrder() {
-    this.sortOrder.update(o => o === 'asc' ? 'desc' : 'asc');
+    this.sortOrder.update((o) => (o === 'asc' ? 'desc' : 'asc'));
   }
 
   enterSelectionMode(id?: number) {
     this.isSelectionMode.set(true);
     if (id !== undefined) {
-      this.selectedIds.update(set => {
+      this.selectedIds.update((set) => {
         const newSet = new Set(set);
         newSet.add(id);
         return newSet;
@@ -132,7 +132,7 @@ export class HistoryComponent implements OnInit {
     }
     if (id === undefined) return;
 
-    this.selectedIds.update(set => {
+    this.selectedIds.update((set) => {
       const newSet = new Set(set);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -190,7 +190,7 @@ export class HistoryComponent implements OnInit {
       message: this.ts.t('confirm.message.delete_multiple', { count: ids.length }),
       confirmText: this.ts.t('confirm.btn.delete_all'),
       cancelText: this.ts.t('confirm.btn.cancel'),
-      type: 'danger'
+      type: 'danger',
     });
 
     if (confirmed) {
