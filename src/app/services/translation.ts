@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 export type Lang = 'en' | 'es';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslationService {
   currentLang = signal<Lang>('es');
@@ -17,12 +17,14 @@ export class TranslationService {
       'app.history': 'Historial',
       'app.install_app': 'Instalar App',
       'app.toast_exit': 'Presiona atrás de nuevo para salir',
-      
+
       'onboarding.welcome': 'Bienvenido a Trackingfy',
-      'onboarding.description': 'Registra tus actividades al aire libre con precisión. Estadísticas en tiempo real, mapas interactivos e historial completo. No hay registro ni tampoco recopilamos tu información.',
-      'onboarding.disclaimer': 'Como no recopilamos ningún tipo de datos, y todo se almacena de forma local, cuando borres la aplicación se borrarán todos tus datos, incluido el historial. Ten en cuenta esto y recuerda hacer una copia de seguridad de todo para que puedas restaurarlo posteriormente si cambias de móvil.',
+      'onboarding.description':
+        'Registra tus actividades al aire libre con precisión. Estadísticas en tiempo real, mapas interactivos e historial completo. No hay registro ni tampoco recopilamos tu información.',
+      'onboarding.disclaimer':
+        'Como no recopilamos ningún tipo de datos, y todo se almacena de forma local, cuando borres la aplicación se borrarán todos tus datos, incluido el historial. Ten en cuenta esto y recuerda hacer una copia de seguridad de todo para que puedas restaurarlo posteriormente si cambias de móvil.',
       'onboarding.go': 'Comenzar',
-      
+
       'settings.title': 'Ajustes',
       'settings.language': 'Idioma',
       'settings.theme': 'Tema',
@@ -41,7 +43,7 @@ export class TranslationService {
       'settings.backup.import': 'Importar datos',
       'settings.backup.success': 'Datos restaurados correctamente',
       'settings.backup.error': 'Error al restaurar los datos',
-      
+
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
       'confirm.btn.stop': 'Detener y guardar',
@@ -51,15 +53,17 @@ export class TranslationService {
       'confirm.message.paused': 'Tu actividad está pausada.',
       'confirm.btn.confirm': 'Confirmar',
       'confirm.btn.cancel': 'Cancelar',
-      
+
       'confirm.title.delete_single': 'Eliminar actividad',
-      'confirm.message.delete_single': '¿Estás seguro de que deseas eliminar esta actividad? Esta acción no se puede deshacer.',
+      'confirm.message.delete_single':
+        '¿Estás seguro de que deseas eliminar esta actividad? Esta acción no se puede deshacer.',
       'confirm.btn.delete': 'Eliminar',
-      
+
       'confirm.title.delete_multiple': 'Eliminar actividades',
-      'confirm.message.delete_multiple': '¿Estás seguro de que deseas eliminar {count} actividades? Esta acción no se puede deshacer.',
+      'confirm.message.delete_multiple':
+        '¿Estás seguro de que deseas eliminar {count} actividades? Esta acción no se puede deshacer.',
       'confirm.btn.delete_all': 'Eliminar todas',
-      
+
       'dashboard.duration': 'Duración',
       'dashboard.moving_time': 'T. Movimiento',
       'dashboard.distance': 'Distancia',
@@ -72,12 +76,12 @@ export class TranslationService {
       'dashboard.grade': 'Pendiente',
       'dashboard.activity': 'Actividad',
       'dashboard.center': 'Centrar',
-      
+
       'activity.Cycling': 'Ciclismo',
-      'activity.Running': 'Carrera',
+      'activity.Running': 'Running',
       'activity.Walking': 'Caminata',
       'activity.Activity': 'Actividad',
-      
+
       'history.selected': '{count} seleccionados',
       'history.activities': 'Actividades',
       'history.delete_selected': 'Eliminar selecc.',
@@ -93,10 +97,10 @@ export class TranslationService {
       'history.sort.duration': 'Duración',
       'history.sort.climb': 'Desnivel +',
       'history.sort.descent': 'Desnivel -',
-      
+
       'detail.not_found': 'Actividad no encontrada.',
       'detail.back_history': 'Volver al historial',
-      
+
       'tracking.bg_message': 'Trackingfy está registrando tu actividad.',
       'tracking.bg_title': 'Rastreo en curso',
       'share.title': 'Mi ruta en Trackingfy',
@@ -110,12 +114,14 @@ export class TranslationService {
       'app.history': 'History',
       'app.install_app': 'Install App',
       'app.toast_exit': 'Press back again to exit',
-      
+
       'onboarding.welcome': 'Welcome to Trackingfy',
-      'onboarding.description': 'Track your outdoor activities with precision. Real-time stats, interactive maps, and full history. No registration required, and we do not collect your information.',
-      'onboarding.disclaimer': 'Since we do not collect any type of data, and everything is stored locally, when you delete the application all your data will be deleted, including your history. Keep this in mind and remember to backup everything so you can restore it later if you change your phone.',
+      'onboarding.description':
+        'Track your outdoor activities with precision. Real-time stats, interactive maps, and full history. No registration required, and we do not collect your information.',
+      'onboarding.disclaimer':
+        'Since we do not collect any type of data, and everything is stored locally, when you delete the application all your data will be deleted, including your history. Keep this in mind and remember to backup everything so you can restore it later if you change your phone.',
       'onboarding.go': 'Go',
-      
+
       'settings.title': 'Settings',
       'settings.language': 'Language',
       'settings.theme': 'Theme',
@@ -134,7 +140,7 @@ export class TranslationService {
       'settings.backup.import': 'Import Data',
       'settings.backup.success': 'Data restored successfully',
       'settings.backup.error': 'Error restoring data',
-      
+
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
       'confirm.btn.stop': 'Stop and Save',
@@ -144,15 +150,17 @@ export class TranslationService {
       'confirm.message.paused': 'Your activity is paused.',
       'confirm.btn.confirm': 'Confirm',
       'confirm.btn.cancel': 'Cancel',
-      
+
       'confirm.title.delete_single': 'Delete Activity',
-      'confirm.message.delete_single': 'Are you sure you want to delete this activity? This action cannot be undone.',
+      'confirm.message.delete_single':
+        'Are you sure you want to delete this activity? This action cannot be undone.',
       'confirm.btn.delete': 'Delete',
-      
+
       'confirm.title.delete_multiple': 'Delete Activities',
-      'confirm.message.delete_multiple': 'Are you sure you want to delete {count} activities? This action cannot be undone.',
+      'confirm.message.delete_multiple':
+        'Are you sure you want to delete {count} activities? This action cannot be undone.',
       'confirm.btn.delete_all': 'Delete All',
-      
+
       'dashboard.duration': 'Duration',
       'dashboard.moving_time': 'Moving Time',
       'dashboard.distance': 'Distance',
@@ -165,12 +173,12 @@ export class TranslationService {
       'dashboard.grade': 'Grade',
       'dashboard.activity': 'Activity',
       'dashboard.center': 'Center',
-      
+
       'activity.Cycling': 'Cycling',
       'activity.Running': 'Running',
       'activity.Walking': 'Walking',
       'activity.Activity': 'Activity',
-      
+
       'history.selected': '{count} selected',
       'history.activities': 'Activities',
       'history.delete_selected': 'Delete Selected',
@@ -186,16 +194,16 @@ export class TranslationService {
       'history.sort.duration': 'Duration',
       'history.sort.climb': 'Climb',
       'history.sort.descent': 'Descent',
-      
+
       'detail.not_found': 'Activity not found.',
       'detail.back_history': 'Back to History',
-      
+
       'tracking.bg_message': 'Trackingfy is tracking your activity.',
       'tracking.bg_title': 'Tracking in progress',
       'share.title': 'My route on Trackingfy',
       'share.text': 'Check out my route on Trackingfy!',
       'share.dialog_title': 'Share route',
-    }
+    },
   };
 
   constructor() {
@@ -220,13 +228,13 @@ export class TranslationService {
   t(key: string, params?: Record<string, string | number>): string {
     const lang = this.currentLang();
     let text = this.translations[lang]?.[key] || this.translations['en']?.[key] || key;
-    
+
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         text = text.replace(new RegExp(`{${k}}`, 'g'), String(v));
       });
     }
-    
+
     return text;
   }
 }
