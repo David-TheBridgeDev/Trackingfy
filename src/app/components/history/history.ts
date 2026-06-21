@@ -19,12 +19,6 @@ interface DayGroup {
 })
 export class HistoryComponent implements OnInit {
   activities = signal<Activity[]>([]);
-  activeDeleteId = signal<number | null>(null);
-
-  // Swipe gesture tracking
-  touchStartX = 0;
-  touchEndX = 0;
-  wasSwiped = false;
 
   // Selection
   isSelectionMode = signal(false);
@@ -87,13 +81,6 @@ export class HistoryComponent implements OnInit {
 
     return groups;
   });
-
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event) {
-    if (this.activeDeleteId() !== null) {
-      this.activeDeleteId.set(null);
-    }
-  }
 
   constructor(
     private db: DatabaseService,
@@ -163,41 +150,11 @@ export class HistoryComponent implements OnInit {
     return id !== undefined && this.selectedIds().has(id);
   }
 
-  onTouchStart(event: TouchEvent) {
-    this.touchStartX = event.changedTouches[0].screenX;
-  }
-
-  onTouchEnd(event: TouchEvent, id: number | undefined) {
-    if (!id) return;
-    this.touchEndX = event.changedTouches[0].screenX;
-    this.handleSwipe(id);
-  }
-
-  handleSwipe(id: number) {
-    const swipeDistance = this.touchStartX - this.touchEndX;
-    if (swipeDistance > 50) {
-      this.activeDeleteId.set(id);
-      this.wasSwiped = true;
-      setTimeout(() => this.wasSwiped = false, 100);
-    } else if (swipeDistance < -50) {
-      if (this.activeDeleteId() === id) {
-        this.activeDeleteId.set(null);
-        this.wasSwiped = true;
-        setTimeout(() => this.wasSwiped = false, 100);
-      }
-    }
-  }
-
   navigateToActivity(id: number | undefined) {
-    if (!id || this.wasSwiped) return;
+    if (!id) return;
 
     if (this.isSelectionMode()) {
       this.toggleSelection(id);
-      return;
-    }
-
-    if (this.activeDeleteId() === id) {
-      this.activeDeleteId.set(null);
       return;
     }
 
@@ -240,26 +197,6 @@ export class HistoryComponent implements OnInit {
       await this.db.deleteActivities(ids);
       await this.loadActivities();
       this.exitSelectionMode();
-    }
-  }
-
-  async deleteActivity(id: number | undefined, event: Event) {
-    if (!id) return;
-    event.stopPropagation();
-    event.preventDefault();
-
-    const confirmed = await this.uiService.confirm({
-      title: this.ts.t('confirm.title.delete_single'),
-      message: this.ts.t('confirm.message.delete_single'),
-      confirmText: this.ts.t('confirm.btn.delete'),
-      cancelText: this.ts.t('confirm.btn.cancel'),
-      type: 'danger'
-    });
-
-    if (confirmed) {
-      await this.db.deleteActivity(id);
-      await this.loadActivities();
-      this.activeDeleteId.set(null);
     }
   }
 }
