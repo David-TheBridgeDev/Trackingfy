@@ -78,7 +78,7 @@ export class TranslationService {
       'dashboard.center': 'Centrar',
 
       'activity.Cycling': 'Ciclismo',
-      'activity.Running': 'Running',
+      'activity.Running': 'Correr',
       'activity.Walking': 'Caminata',
       'activity.Activity': 'Actividad',
 
