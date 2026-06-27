@@ -35,19 +35,6 @@
     [class.hidden]="isSelectionMode()"
   >
     <div class="flex flex-wrap gap-2 w-full">
-      <!-- Type Filter -->
-      <select
-        [ngModel]="filterType()"
-        (ngModelChange)="filterType.set($event)"
-        class="flex-1 min-w-[120px] bg-bg-base border-none rounded-xl text-xs font-black uppercase px-3 py-2 focus:ring-2 focus:ring-accent/50"
-      >
-        @for (type of availableTypes(); track type) {
-          <option [value]="type">
-            {{ type === 'All' ? ts.t('history.filter.all') : ts.t('activity.' + type) }}
-          </option>
-        }
-      </select>
-
       <!-- Sort By -->
       <select
         [ngModel]="sortBy()"
@@ -194,8 +181,8 @@
                         } @else {
                           <div 
                             class="h-6 w-6 bg-accent"
-                            [style.mask-image]="'url(icons/' + (activity.type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
-                            [style.-webkit-mask-image]="'url(icons/' + (activity.type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
+                            [style.mask-image]="'url(icons/bike.svg)'"
+                            [style.-webkit-mask-image]="'url(icons/bike.svg)'"
                             style="mask-size: contain; mask-repeat: no-repeat; mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;"
                           ></div>
                         }
@@ -228,7 +215,7 @@
 
                     <div>
                       <h3 class="font-black text-lg text-text-heading uppercase tracking-tight">
-                        {{ ts.t('activity.' + activity.type) }}
+                        {{ ts.t('activity.Cycling') }}
                       </h3>
                       <p class="text-text-primary text-xs font-semibold">
                         {{ activity.date | date: 'shortTime' }}

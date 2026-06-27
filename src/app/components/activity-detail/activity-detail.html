@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
           <div class="flex items-center gap-2">
             <span class="bg-accent/10 text-accent text-xs font-black uppercase px-3 py-1 rounded-full tracking-wider">
-              {{ ts.t('activity.' + (activity()?.type || 'Activity')) }}
+              {{ ts.t('activity.Cycling') }}
             </span>
           </div>
           <div class="flex items-center gap-1.5 text-text-primary">
@@ -43,19 +43,11 @@
           </div>
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              @if (activity()?.type === 'Cycling') {
-                {{ ts.t('dashboard.avg_speed') }}
-              } @else {
-                {{ ts.t('dashboard.pace') }}
-              }
+              {{ ts.t('dashboard.avg_speed') }}
             </p>
             <p class="font-black text-text-heading text-base md:text-lg">
-              @if (activity()?.type === 'Cycling') {
-                {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
-                <span class="text-xs">km/h</span>
-              } @else {
-                {{ formatPace(activity()?.avgSpeed) }}
-              }
+              {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }}
+              <span class="text-xs">km/h</span>
             </p>
           </div>
         </div>
@@ -246,18 +238,10 @@
       <div class="grid grid-cols-3 gap-y-8 gap-x-4 pt-6 border-t" style="border-top-color: rgba(255, 255, 255, 0.2);">
         <div>
           <p class="text-lg uppercase font-bold tracking-widest mb-1" style="color: rgba(255, 255, 255, 0.7);">
-            @if (activity()?.type === 'Cycling') {
-              {{ ts.t('dashboard.avg_speed') }}
-            } @else {
-              {{ ts.t('dashboard.pace') }}
-            }
+            {{ ts.t('dashboard.avg_speed') }}
           </p>
           <p class="font-black text-4xl leading-tight" style="color: #ffffff;">
-            @if (activity()?.type === 'Cycling') {
-              {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span>
-            } @else {
-              {{ formatPace(activity()?.avgSpeed) }}
-            }
+            {{ (activity()?.avgSpeed || 0) * 3.6 | number: '1.1-1' }} <span class="text-2xl font-medium">km/h</span>
           </p>
         </div>
         

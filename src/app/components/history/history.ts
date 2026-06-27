@@ -25,21 +25,11 @@ export class HistoryComponent implements OnInit {
   selectedIds = signal<Set<number>>(new Set());
 
   // Filters & Sorting
-  filterType = signal('All');
   sortBy = signal<'date' | 'distance' | 'duration' | 'climb' | 'descent'>('date');
   sortOrder = signal<'asc' | 'desc'>('desc');
-  availableTypes = computed(() => {
-    const types = new Set(this.activities().map((a) => a.type));
-    return ['All', ...Array.from(types).sort()];
-  });
+
   filteredActivities = computed(() => {
     let result = [...this.activities()];
-
-    // Type Filter
-    const type = this.filterType();
-    if (type !== 'All') {
-      result = result.filter((a) => a.type === type);
-    }
 
     // Sorting
     const order = this.sortOrder() === 'asc' ? 1 : -1;
@@ -100,7 +90,6 @@ export class HistoryComponent implements OnInit {
   }
 
   clearFilters() {
-    this.filterType.set('All');
     this.sortBy.set('date');
     this.sortOrder.set('desc');
   }

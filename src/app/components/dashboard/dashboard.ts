@@ -60,14 +60,6 @@ export class DashboardComponent implements OnInit {
     return alt !== null ? alt.toFixed(0) + ' m' : '--';
   });
 
-  formattedPace = computed(() => {
-    const pace = this.trackingService.currentPace();
-    if (!pace || !isFinite(pace) || pace > 60) return '--:--';
-    const m = Math.floor(pace);
-    const s = Math.floor((pace - m) * 60);
-    return `${m}:${s < 10 ? '0' + s : s} /km`;
-  });
-
   formattedMaxSpeed = computed(() => {
     return (this.trackingService.maxSpeed() * 3.6).toFixed(1) + ' km/h';
   });
