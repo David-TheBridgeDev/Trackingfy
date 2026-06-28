@@ -119,42 +119,25 @@
           </div>
           <div class="text-center">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
-              {{ ts.t('dashboard.grade') }}
-            </p>
-            <p class="text-lg font-black" [ngClass]="trackingService.currentGrade() > 0 ? 'text-green-600' : (trackingService.currentGrade() < 0 ? 'text-red-600' : 'text-text-heading')">{{ formattedGrade() }}</p>
-          </div>
-        </div>
-
-        <!-- Hidden by default on mobile, can be scrolled or added as smaller pills -->
-        <div class="flex space-x-2">
-          <div
-            class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
-          >
-            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.climb') }}</p>
-            <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
-          </div>
-          <div
-            class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
-          >
-            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.descent') }}</p>
-            <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
-          </div>
-          <div
-            class="flex-1 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg border border-white/20 text-center"
-          >
-            <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">
               {{ ts.t('dashboard.altitude') }}
             </p>
-            <p class="text-sm font-black text-blue-600">{{ formattedAltitude() }}</p>
+            <p class="text-lg font-black text-blue-600">{{ formattedAltitude() }}</p>
           </div>
         </div>
       </div>
     }
 
     <div class="flex items-center justify-center space-x-6 pointer-events-auto">
+      @if (trackingService.state() !== 'idle') {
+        <div class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500">
+          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.climb') }}</p>
+          <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
+        </div>
+      }
+
       <button
         (click)="$event.stopPropagation(); toggleTracking()"
-        class="w-24 h-24 rounded-full bg-accent text-white shadow-[0_20px_50px_rgba(239,188,33,0.3)] flex items-center justify-center transition-all active:scale-90 focus:outline-none hover:scale-105 border-4 border-white"
+        class="w-24 h-24 shrink-0 rounded-full bg-accent text-white shadow-[0_20px_50px_rgba(239,188,33,0.3)] flex items-center justify-center transition-all active:scale-90 focus:outline-none hover:scale-105 border-4 border-white"
       >
         @if (trackingService.state() === 'idle') {
           <svg
@@ -203,6 +186,13 @@
           </svg>
         }
       </button>
+
+      @if (trackingService.state() !== 'idle') {
+        <div class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500">
+          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.descent') }}</p>
+          <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
+        </div>
+      }
     </div>
   </div>
 
