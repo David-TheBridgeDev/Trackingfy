@@ -52,50 +52,6 @@
       </div>
 
       <div class="border-t border-gray-100 pt-4">
-        <h3
-          class="text-xs font-black text-text-heading uppercase tracking-tight mb-3 flex items-center space-x-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 text-accent"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-          <span>{{ ts.t('settings.default_activity') }}</span>
-        </h3>
-
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl">
-          @for (type of trackingService.activityTypes; track type) {
-            <button
-              (click)="trackingService.setSelectedActivityType(type)"
-              class="py-2.5 rounded-xl flex items-center justify-center space-x-2 text-xs font-black uppercase transition-all tracking-wider cursor-pointer text-center"
-              [ngClass]="
-                trackingService.selectedActivityType() === type
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-text-primary hover:text-text-heading'
-              "
-            >
-              <div 
-                class="h-4 w-4 bg-accent"
-                [style.mask-image]="'url(icons/' + (type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
-                [style.-webkit-mask-image]="'url(icons/' + (type === 'Cycling' ? 'bike' : 'walking') + '.svg)'"
-                style="mask-size: contain; mask-repeat: no-repeat; mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;"
-              ></div>
-              <span>{{ ts.t('activity.' + type) }}</span>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="border-t border-gray-100 pt-4">
         <div class="flex justify-between items-center mb-3">
           <h3
             class="text-xs font-black text-text-heading uppercase tracking-tight flex items-center space-x-2"

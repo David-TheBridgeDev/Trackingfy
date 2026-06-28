@@ -3,15 +3,13 @@ import { provideRouter } from '@angular/router';
 import { SettingsComponent } from './settings';
 import { TrackingService } from '../../services/tracking';
 import { signal } from '@angular/core';
+import { App } from '../../app';
 
 describe('SettingsComponent', () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
 
   const mockTrackingService = {
-    activityTypes: ['Cycling', 'Running'],
-    selectedActivityType: signal('Cycling'),
-    setSelectedActivityType: vi.fn()
   };
 
   beforeEach(async () => {
@@ -19,6 +17,7 @@ describe('SettingsComponent', () => {
       imports: [SettingsComponent],
       providers: [
         { provide: TrackingService, useValue: mockTrackingService },
+        { provide: App, useValue: {} },
         provideRouter([])
       ]
     }).compileComponents();
