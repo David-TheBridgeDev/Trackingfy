@@ -215,7 +215,7 @@
 
                     <div>
                       <h3 class="font-black text-lg text-text-heading uppercase tracking-tight">
-                        {{ ts.t('activity.Cycling') }}
+                        {{ formatTime(activity.totalTime) }}
                       </h3>
                       <p class="text-text-primary text-xs font-semibold">
                         {{ activity.date | date: 'shortTime' }}
@@ -232,7 +232,6 @@
                     <div
                       class="flex items-center space-x-3 text-[10px] font-bold uppercase tracking-wider text-text-primary"
                     >
-                      <span>{{ formatTime(activity.totalTime) }}</span>
                       <span class="flex items-center text-green-600">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
