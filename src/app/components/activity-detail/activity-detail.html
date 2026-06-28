@@ -8,9 +8,14 @@
         <!-- Row 1: Activity Type and Date -->
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
           <div class="flex items-center gap-2">
-            <span class="bg-accent/10 text-accent text-xs font-black uppercase px-3 py-1 rounded-full tracking-wider">
-              {{ ts.t('activity.Cycling') }}
-            </span>
+            <div>
+              <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+                {{ ts.t('dashboard.duration') }}
+              </p>
+              <p class="font-black text-text-heading text-base md:text-lg">
+                {{ formatTime(activity()?.totalTime) }}
+              </p>
+            </div>
           </div>
           <div class="flex items-center gap-1.5 text-text-primary">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -23,7 +28,7 @@
         </div>
 
         <!-- Row 2: Distance, Duration, Pace/Speed -->
-        <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
+        <div class="grid grid-cols-2 gap-4 border-b border-gray-100 pb-4">
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
               {{ ts.t('dashboard.distance') }}
@@ -31,14 +36,6 @@
             <p class="font-black text-text-heading text-base md:text-lg">
               {{ (activity()?.totalDistance || 0) / 1000 | number: '1.2-2' }}
               <span class="text-xs">km</span>
-            </p>
-          </div>
-          <div>
-            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
-              {{ ts.t('dashboard.duration') }}
-            </p>
-            <p class="font-black text-text-heading text-base md:text-lg">
-              {{ formatTime(activity()?.totalTime) }}
             </p>
           </div>
           <div>
