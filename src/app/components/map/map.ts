@@ -39,6 +39,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   coordinates = input<Coordinate[]>([]);
   currentPoint = input<Coordinate | null>(null);
   showLocationButton = input<boolean>(true);
+  enablePan = input<boolean>(true);
 
   isFollowing = signal(true);
 
@@ -80,7 +81,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           this.polyline.addLatLng(latLng);
         }
         
-        if (this.isFollowing()) {
+        if (this.isFollowing() && this.enablePan()) {
           this.ignoreInteraction = true;
           if (point.activityId === 0 || (this.coordinates().length === 0 && this.polyline.getLatLngs().length <= 1)) {
             this.map.setView(latLng, 16);
@@ -112,7 +113,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.marker.setLatLng([last.lat, last.lng]);
         this.marker.setOpacity(1);
 
-        if (this.showLocationButton() && this.isFollowing()) {
+        if (this.showLocationButton() && this.isFollowing() && this.enablePan()) {
           this.ignoreInteraction = true;
           this.map.panTo([last.lat, last.lng]);
           setTimeout(() => this.ignoreInteraction = false, 500);

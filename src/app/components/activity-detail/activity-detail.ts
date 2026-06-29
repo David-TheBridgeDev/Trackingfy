@@ -10,6 +10,17 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import html2canvas from 'html2canvas';
 
+export interface ChartPoint {
+  distance: number; // in km
+  altitude: number;
+  speed: number;    // in km/h
+  x: number;        // percentage 0 to 100
+  yAlt: number;     // percentage 0 to 100
+  ySpeed: number;   // percentage 0 to 100
+  coordinate: Coordinate;
+}
+
+
 @Component({
   selector: 'app-activity-detail',
   imports: [CommonModule, MapComponent, RouterLink],
@@ -25,6 +36,15 @@ export class ActivityDetailComponent implements OnInit {
   svgViewBox = signal<string>('0 0 100 100');
   svgPath = signal<string>('');
   svgStrokeWidth = signal<number>(0.001);
+
+  // Chart data
+  chartPoints = signal<ChartPoint[]>([]);
+  elevationPathChart = signal<string>('');
+  elevationAreaPathChart = signal<string>('');
+  speedPathChart = signal<string>('');
+  hoveredPoint = signal<ChartPoint | null>(null);
+  hoveredCoordinate = signal<Coordinate | null>(null);
+
 
   constructor(
     private route: ActivatedRoute,
@@ -64,9 +84,126 @@ export class ActivityDetailComponent implements OnInit {
         
         const path = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.lng} ${-c.lat}`).join(' ');
         this.svgPath.set(path);
+
+        this.processChartData(coords);
       }
     }
   }
+
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3;
+    const p1 = (lat1 * Math.PI) / 180;
+    const p2 = (lat2 * Math.PI) / 180;
+    const dp = ((lat2 - lat1) * Math.PI) / 180;
+    const dl = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private processChartData(coords: Coordinate[]) {
+    if (coords.length === 0) return;
+
+    let totalDist = 0;
+    const points: ChartPoint[] = [];
+
+    for (let i = 0; i < coords.length; i++) {
+      const c = coords[i];
+      if (i > 0) {
+        totalDist += this.calculateDistance(coords[i - 1].lat, coords[i - 1].lng, c.lat, c.lng);
+      }
+
+      let alt = c.altitude;
+      if (alt === null || alt === undefined) {
+        let leftAlt = 0, foundLeft = false;
+        for (let j = i - 1; j >= 0; j--) {
+          if (coords[j].altitude != null) { leftAlt = coords[j].altitude!; foundLeft = true; break; }
+        }
+        let rightAlt = 0, foundRight = false;
+        for (let j = i + 1; j < coords.length; j++) {
+          if (coords[j].altitude != null) { rightAlt = coords[j].altitude!; foundRight = true; break; }
+        }
+        if (foundLeft && foundRight) alt = (leftAlt + rightAlt) / 2;
+        else if (foundLeft) alt = leftAlt;
+        else if (foundRight) alt = rightAlt;
+        else alt = 0;
+      }
+
+      const speed = (c.speed || 0) * 3.6;
+      points.push({ distance: totalDist / 1000, altitude: alt, speed, coordinate: c, x: 0, yAlt: 0, ySpeed: 0 });
+    }
+
+    if (points.length === 0) return;
+
+    const maxDist = points[points.length - 1].distance || 1;
+    const altitudes = points.map(p => p.altitude);
+    const speeds = points.map(p => p.speed);
+    const minAlt = Math.min(...altitudes);
+    const maxAlt = Math.max(...altitudes);
+    const altRange = maxAlt - minAlt;
+    const yAltMin = Math.max(0, minAlt - (altRange * 0.1 || 10));
+    const yAltMax = maxAlt + (altRange * 0.1 || 10);
+    const altScale = yAltMax - yAltMin || 1;
+
+    const maxSpeed = Math.max(...speeds, 5); // At least 5 km/h
+
+    for (const p of points) {
+      p.x = (p.distance / maxDist) * 1000;
+      p.yAlt = 200 - ((p.altitude - yAltMin) / altScale) * 200;
+      p.ySpeed = 200 - (p.speed / maxSpeed) * 200;
+    }
+
+    this.chartPoints.set(points);
+
+    const elPath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.yAlt}`).join(' ');
+    this.elevationPathChart.set(elPath);
+    this.elevationAreaPathChart.set(`${elPath} L ${points[points.length - 1].x} 200 L 0 200 Z`);
+    
+    const spPath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.ySpeed}`).join(' ');
+    this.speedPathChart.set(spPath);
+  }
+
+  onChartHover(event: MouseEvent | TouchEvent) {
+    const container = event.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    
+    let clientX = 0;
+    if (window.TouchEvent && event instanceof TouchEvent) {
+      if (event.touches.length === 0) return;
+      clientX = event.touches[0].clientX;
+    } else {
+      clientX = (event as MouseEvent).clientX;
+    }
+    
+    const relativeX = (clientX - rect.left) / rect.width;
+    const clampedX = Math.max(0, Math.min(1, relativeX));
+    
+    const points = this.chartPoints();
+    if (points.length === 0) return;
+    
+    const targetDistance = clampedX * points[points.length - 1].distance;
+    
+    let closest = points[0];
+    let minDiff = Math.abs(closest.distance - targetDistance);
+    
+    // Fast approx binary search could be used, but sequential is fine for < 10k points
+    for (const p of points) {
+      const diff = Math.abs(p.distance - targetDistance);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = p;
+      }
+    }
+    
+    this.hoveredPoint.set(closest);
+    this.hoveredCoordinate.set(closest.coordinate);
+  }
+
+  onChartLeave() {
+    this.hoveredPoint.set(null);
+    this.hoveredCoordinate.set(null);
+  }
+
 
   formatTime(seconds: number | undefined): string {
     if (seconds === undefined) return '0m 0s';
