@@ -6,7 +6,7 @@
         class="bg-bg-surface rounded-2xl shadow-sm p-4 border border-gray-100 shrink-0 flex flex-col gap-4"
       >
         <!-- Row 1: Duration, Distance, Avg Speed -->
-        <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
+        <div class="grid grid-cols-3 gap-2 md:gap-4 border-b border-gray-100 pb-4">
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
               {{ ts.t('dashboard.duration') }}
@@ -36,7 +36,7 @@
         </div>
 
         <!-- Row 2: Moving Time, Min/Max Grade, Max Speed -->
-        <div class="grid grid-cols-3 gap-4 border-b border-gray-100 pb-4">
+        <div class="grid grid-cols-3 gap-2 md:gap-4 border-b border-gray-100 pb-4">
           <div>
             <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
               {{ ts.t('dashboard.moving_time') }}
@@ -46,11 +46,12 @@
             </p>
           </div>
           <div>
-            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5 truncate">
               Pendiente
             </p>
-            <p class="font-black text-sm md:text-base text-text-heading">
-              <span class="text-green-600">{{ formatMaxGrade(activity()?.maxGrade) }}</span> |
+            <p class="font-black text-xs sm:text-sm md:text-base text-text-heading whitespace-nowrap tracking-tight">
+              <span class="text-green-600">{{ formatMaxGrade(activity()?.maxGrade) }}</span>
+              <span class="text-gray-300 mx-0.5">|</span>
               <span class="text-red-600">{{ formatMinGrade(activity()?.minGrade) }}</span>
             </p>
           </div>
@@ -79,24 +80,13 @@
           @if (hoveredPoint()) {
             <div class="flex items-center gap-4 w-full">
               <span class="text-text-primary font-medium">
-                <strong class="text-text-heading text-sm">{{
-                  hoveredPoint()!.distance | number: '1.2-2'
-                }}</strong>
-                km
+                <strong class="text-text-heading text-sm">{{ hoveredPoint()!.distance | number:'1.2-2' }}</strong> km
               </span>
-              <span class="text-indigo-600 font-medium">
-                {{ ts.t('dashboard.altitude') }}:
-                <strong class="text-indigo-700 text-sm">{{
-                  hoveredPoint()!.altitude | number: '1.0-0'
-                }}</strong>
-                m
+              <span class="text-text-primary font-medium">
+                {{ ts.t('dashboard.altitude') }}: <strong class="text-yellow-500 text-sm">{{ hoveredPoint()!.altitude | number:'1.0-0' }}</strong> <span class="text-yellow-500">m</span>
               </span>
-              <span class="text-amber-600 font-medium flex-1">
-                Velocidad:
-                <strong class="text-amber-700 text-sm">{{
-                  hoveredPoint()!.speed | number: '1.1-1'
-                }}</strong>
-                km/h
+              <span class="text-text-primary font-medium flex-1">
+                Velocidad: <strong class="text-text-heading text-sm">{{ hoveredPoint()!.speed | number:'1.1-1' }}</strong> km/h
               </span>
             </div>
           } @else {
@@ -169,42 +159,24 @@
           <svg class="w-full h-full" viewBox="0 0 1000 200" preserveAspectRatio="none">
             <defs>
               <linearGradient id="alt-gradient" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3" />
-                <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05" />
+                <stop offset="0%" stop-color="#eab308" stop-opacity="0.3" />
+                <stop offset="100%" stop-color="#eab308" stop-opacity="0.05" />
               </linearGradient>
             </defs>
-
+            
             <!-- Altitude Area -->
             <path [attr.d]="elevationAreaPathChart()" fill="url(#alt-gradient)" />
             <!-- Altitude Line -->
-            <path
-              [attr.d]="elevationPathChart()"
-              fill="none"
-              stroke="#4f46e5"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-
+            <path [attr.d]="elevationPathChart()" fill="none" stroke="#eab308" stroke-width="2" stroke-linejoin="round" />
+            
             <!-- Hover Indicator -->
             @if (hoveredPoint()) {
-              <line
-                [attr.x1]="hoveredPoint()!.x"
-                [attr.y1]="0"
-                [attr.x2]="hoveredPoint()!.x"
-                [attr.y2]="200"
-                stroke="#9ca3af"
-                stroke-width="1"
-                stroke-dasharray="4"
-              />
-
-              <circle
-                [attr.cx]="hoveredPoint()!.x"
-                [attr.cy]="hoveredPoint()!.yAlt"
-                r="4"
-                fill="#4f46e5"
-                stroke="#ffffff"
-                stroke-width="2"
-              />
+              <line 
+                [attr.x1]="hoveredPoint()!.x" [attr.y1]="0" 
+                [attr.x2]="hoveredPoint()!.x" [attr.y2]="200" 
+                stroke="#9ca3af" stroke-width="1" stroke-dasharray="4" />
+              
+              <circle [attr.cx]="hoveredPoint()!.x" [attr.cy]="hoveredPoint()!.yAlt" r="4" fill="#eab308" stroke="#ffffff" stroke-width="2" />
             }
           </svg>
         </div>
