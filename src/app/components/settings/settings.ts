@@ -70,13 +70,10 @@ export class SettingsComponent implements OnInit {
         try {
           const text = e.target?.result as string;
           await this.db.importData(text);
-          // Show success toast (we can use App component's triggerToast or create a public method)
-          // Actually App component has showToast and toastMessage, but triggerToast is private. Let's make it public in App.
-          // Wait, we can just use alert or we can call App component's triggerToast if we change it to public.
-          alert(this.ts.t('settings.backup.success'));
+          this.appComponent.triggerToast(this.ts.t('settings.backup.success'));
         } catch (err) {
           console.error(err);
-          alert(this.ts.t('settings.backup.error'));
+          this.appComponent.triggerToast(this.ts.t('settings.backup.error'));
         }
       };
       reader.readAsText(file);
@@ -96,11 +93,11 @@ export class SettingsComponent implements OnInit {
       if (apkAsset) {
         window.location.href = apkAsset.browser_download_url;
       } else {
-        alert(this.ts.t('app.error_download') || 'No APK found in the latest release.');
+        this.appComponent.triggerToast(this.ts.t('app.error_download_not_found'));
       }
     } catch (error) {
       console.error('Error downloading APK:', error);
-      alert('Error connecting to GitHub Releases.');
+      this.appComponent.triggerToast(this.ts.t('app.error_download_connection'));
     }
   }
 }

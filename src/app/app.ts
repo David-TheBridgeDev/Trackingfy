@@ -62,7 +62,7 @@ export class App {
     }
   }
 
-  private triggerToast(message: string) {
+  public triggerToast(message: string) {
     if (this.toastTimeout) {
       clearTimeout(this.toastTimeout);
     }

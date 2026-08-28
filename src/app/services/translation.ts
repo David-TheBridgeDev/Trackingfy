@@ -18,6 +18,8 @@ export class TranslationService {
       'app.install_app': 'Instalar App',
       'app.download_apk': 'Descargar APK (Android)',
       'app.toast_exit': 'Presiona atrás de nuevo para salir',
+      'app.error_download_not_found': 'No se encontró un APK en la última versión',
+      'app.error_download_connection': 'Error al buscar actualizaciones',
 
       'onboarding.welcome': 'Bienvenido a Trackingfy',
       'onboarding.description':
@@ -118,6 +120,8 @@ export class TranslationService {
       'app.install_app': 'Install App',
       'app.download_apk': 'Download APK (Android)',
       'app.toast_exit': 'Press back again to exit',
+      'app.error_download_not_found': 'No APK found in the latest release',
+      'app.error_download_connection': 'Error checking for updates',
 
       'onboarding.welcome': 'Welcome to Trackingfy',
       'onboarding.description':
