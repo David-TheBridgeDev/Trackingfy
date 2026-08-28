@@ -1,9 +1,10 @@
 import { Component, OnInit, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatabaseService, Activity, Coordinate } from '../../services/database';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
+import { TrackingService } from '../../services/tracking';
 import { TranslationService } from '../../services/translation';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -48,8 +49,10 @@ export class ActivityDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private db: DatabaseService,
     public uiService: UIService,
+    public trackingService: TrackingService,
     public ts: TranslationService
   ) {}
 
@@ -271,6 +274,15 @@ export class ActivityDetailComponent implements OnInit {
       console.error('Error generating or sharing sticker', e);
     } finally {
       this.isGeneratingSticker.set(false);
+    }
+  }
+
+  followRoute() {
+    const act = this.activity();
+    const coords = this.coordinates();
+    if (act && act.id && coords.length > 0) {
+      this.trackingService.loadReferenceRoute(coords, act.id);
+      this.router.navigate(['/']);
     }
   }
 }

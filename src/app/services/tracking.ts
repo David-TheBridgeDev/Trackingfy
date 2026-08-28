@@ -27,6 +27,10 @@ export class TrackingService {
   lastCoordinate = signal<Coordinate | null>(null);
   currentCoordinates = signal<Coordinate[]>([]);
   
+  // Reference route
+  referenceCoordinates = signal<Coordinate[]>([]);
+  referenceActivityId = signal<number | null>(null);
+
   // New metrics
   currentPace = signal(0); // in minutes per km
   avgPace = signal(0); // in minutes per km
@@ -204,6 +208,16 @@ export class TrackingService {
     if (this.state() !== 'paused') return;
     this.state.set('tracking');
     this.startTimer();
+  }
+
+  loadReferenceRoute(coords: Coordinate[], activityId: number) {
+    this.referenceCoordinates.set(coords);
+    this.referenceActivityId.set(activityId);
+  }
+
+  clearReferenceRoute() {
+    this.referenceCoordinates.set([]);
+    this.referenceActivityId.set(null);
   }
 
 
@@ -496,6 +510,7 @@ export class TrackingService {
     this.lastAccumulatedAltitude = null;
     this.accumulatedTime = 0;
     this.startTimeSegment = null;
+    this.clearReferenceRoute();
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

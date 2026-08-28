@@ -37,6 +37,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef;
   
   coordinates = input<Coordinate[]>([]);
+  referenceCoordinates = input<Coordinate[]>([]);
   currentPoint = input<Coordinate | null>(null);
   showLocationButton = input<boolean>(true);
   enablePan = input<boolean>(true);
@@ -45,6 +46,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private map!: L.Map;
   private polyline!: L.Polyline;
+  private referencePolyline!: L.Polyline;
   private marker!: L.Marker;
   private isMapInitialized = signal(false);
   private ignoreInteraction = true;
@@ -120,6 +122,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         }
       }
     });
+
+    effect(() => {
+      const coords = this.referenceCoordinates();
+      if (this.isMapInitialized()) {
+        if (coords.length > 0) {
+          const latLngs = coords.map(c => [c.lat, c.lng] as L.LatLngExpression);
+          this.referencePolyline.setLatLngs(latLngs);
+        } else {
+          this.referencePolyline.setLatLngs([]);
+        }
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -183,6 +197,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.polyline = L.polyline([], { color: 'red', weight: 6, opacity: 0.8 }).addTo(this.map);
+    this.referencePolyline = L.polyline([], { color: 'blue', weight: 4, opacity: 0.6, dashArray: '5, 10' }).addTo(this.map);
     this.marker = L.marker([0, 0], { opacity: 0 }).addTo(this.map);
 
     // Detect user interaction with guard

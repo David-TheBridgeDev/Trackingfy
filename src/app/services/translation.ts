@@ -76,6 +76,7 @@ export class TranslationService {
       'dashboard.grade': 'Pendiente',
       'dashboard.activity': 'Actividad',
       'dashboard.center': 'Centrar',
+      'dashboard.cancel_route': 'Cancelar Ruta',
 
       'activity.Cycling': 'Ciclismo',
       'activity.Running': 'Correr',
@@ -100,6 +101,7 @@ export class TranslationService {
 
       'detail.not_found': 'Actividad no encontrada.',
       'detail.back_history': 'Volver al historial',
+      'detail.follow_route': 'Seguir esta ruta',
 
       'tracking.bg_message': 'Trackingfy está registrando tu actividad.',
       'tracking.bg_title': 'Rastreo en curso',
@@ -173,6 +175,7 @@ export class TranslationService {
       'dashboard.grade': 'Grade',
       'dashboard.activity': 'Activity',
       'dashboard.center': 'Center',
+      'dashboard.cancel_route': 'Cancel Route',
 
       'activity.Cycling': 'Cycling',
       'activity.Running': 'Running',
@@ -197,6 +200,7 @@ export class TranslationService {
 
       'detail.not_found': 'Activity not found.',
       'detail.back_history': 'Back to History',
+      'detail.follow_route': 'Follow this route',
 
       'tracking.bg_message': 'Trackingfy is tracking your activity.',
       'tracking.bg_title': 'Tracking in progress',
