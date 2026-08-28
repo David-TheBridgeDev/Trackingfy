@@ -13,6 +13,7 @@ All data is stored locally in the browser's IndexedDB, ensuring your tracks stay
 - **Interactive Maps:** Real-time path rendering and history viewing using Leaflet and OpenStreetMap.
 - **Offline Capable:** Works without an internet connection. Maps are cached for offline use.
 - **PWA Ready:** Installable on mobile and desktop devices for a native-like experience.
+- **Direct APK Download:** Users can download the native Android app (APK) directly from the settings page.
 - **Dashboard & History:** Comprehensive view of your current activity stats and a detailed history of past sessions.
 
 ## 🛠 Tech Stack
@@ -62,49 +63,25 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Generating Android APK
 
-To generate an APK for Android using Capacitor, follow these steps:
+Generating the Android app is now fully automated! You can create both Debug and Release APKs with a single command. The scripts will automatically build the Angular app, sync with Capacitor, compile the APK using Gradle, and copy the final file to the `public/apk/` directory so users can download it directly from the app's Settings page.
 
-1.  **Build the Angular application:**
-    ```bash
-    npm run build
-    ```
+#### 🟢 Debug Build (For Development & Testing)
+Generates an APK suitable for testing on your device without manual signing.
 
-2.  **Sync the build with Android project:**
-    ```bash
-    npx cap sync android
-    ```
+```bash
+npm run build:apk
+```
+The final APK will be copied to: `public/apk/app-debug.apk`
 
-3.  **Build the APK:**
+#### 🔵 Release Build (For Production)
+Generates a highly optimized, minified, and signed APK ready for distribution or uploading to the Google Play Store.
 
-    #### 🟢 Debug Build (For Development)
-    Use this for testing on your device. It doesn't require signing.
-    - **Option A (Terminal):**
-      ```bash
-      cd android 
-      ```
-      
-      ```bash
-      ./gradlew assembleDebug
-      ```
+```bash
+npm run build:apk:release
+```
+The final signed APK will be copied to: `public/apk/app-release.apk`
 
-      The APK will be at: `android/app/build/outputs/apk/debug/app-debug.apk`
-    - **Option B (Android Studio):**
-      Go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-
-    #### 🔵 Release Build (For Production)
-    Optimized for performance. **Must be signed** to be installed on most devices.
-    - **Option A (Terminal - Unsigned):**
-      ```bash
-      cd android
-      ```
-      ```bash
-      ./gradlew assembleRelease
-      ```
-      The APK will be at: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
-    - **Option B (Android Studio - Signed):**
-      1. Open the project: `npx cap open android`
-      2. Go to **Build > Generate Signed Bundle / APK...**
-      3. Follow the wizard to create/use a KeyStore and select the **release** variant.
+> **Security Note:** The release build uses a keystore to automatically sign the APK. Keep your `trackingfy.keystore` and `android/keystore.properties` files safe and secure! They are already ignored in `.gitignore` to prevent accidental uploads to GitHub.
 
 ### Generating Mobile Assets
 
