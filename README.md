@@ -63,9 +63,9 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Generating Android APK
 
-Generating the Android app is now fully automated! You can create both Debug and Release APKs with a single command. The scripts will automatically build the Angular app, sync with Capacitor, compile the APK using Gradle, and copy the final file to the `public/apk/` directory so users can download it directly from the app's Settings page.
+The Android app build process is fully automated. You can build it locally for testing or use GitHub Actions for production releases.
 
-#### 🟢 Debug Build (For Development & Testing)
+#### 🟢 Debug Build (Local Development & Testing)
 Generates an APK suitable for testing on your device without manual signing.
 
 ```bash
@@ -73,15 +73,20 @@ npm run build:apk
 ```
 The final APK will be copied to: `public/apk/app-debug.apk`
 
-#### 🔵 Release Build (For Production)
-Generates a highly optimized, minified, and signed APK ready for distribution or uploading to the Google Play Store.
+#### 🔵 Release Build (Production via GitHub Actions)
+The production APK (`Trackingfy.apk`) is highly optimized, minified, and signed automatically in the cloud via GitHub Actions.
 
-```bash
-npm run build:apk:release
-```
-The final signed APK will be copied to: `public/apk/app-release.apk`
+1. Push your code changes to GitHub.
+2. Create and push a new version tag (e.g., `v1.0.0`):
+   ```bash
+   git tag v1.0.0
+   git push --tags
+   ```
+3. GitHub Actions will automatically compile, sign, and publish the new APK to the **Releases** tab on GitHub.
 
-> **Security Note:** The release build uses a keystore to automatically sign the APK. Keep your `trackingfy.keystore` and `android/keystore.properties` files safe and secure! They are already ignored in `.gitignore` to prevent accidental uploads to GitHub.
+> **Direct Download:** The settings page in the web app is configured to always fetch the latest compiled `Trackingfy.apk` directly from GitHub Releases, saving Firebase bandwidth.
+
+> **Security Note:** The GitHub Action requires `KEYSTORE_BASE64` and `KEYSTORE_PROPERTIES` secrets configured in your repository settings. Your local `trackingfy.keystore` and `keystore.properties` are safely ignored in `.gitignore`.
 
 ### Generating Mobile Assets
 
