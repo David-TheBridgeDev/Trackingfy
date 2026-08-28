@@ -88,7 +88,10 @@ npm run release
 3. Pushes the code and tags to GitHub.
 4. Triggers the GitHub Actions pipeline which compiles, signs, and publishes the new APK to the **Releases** tab.
 
-*(Optional)* You can specify the version bump type: `npm run release minor` (e.g., 1.1.0) or `npm run release major` (e.g., 2.0.0).
+*(Optional)* You can specify the version bump type:
+1. `npm run release patch` (e.g., 1.0.x)
+2. `npm run release minor` (e.g., 1.x.0)
+3. `npm run release major` (e.g., x.0.0).
 
 > **Direct Download:** The settings page in the web app is configured to always fetch the latest compiled `Trackingfy.apk` directly from GitHub Releases, saving Firebase bandwidth.
 
