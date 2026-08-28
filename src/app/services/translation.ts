@@ -76,7 +76,7 @@ export class TranslationService {
       'dashboard.grade': 'Pendiente',
       'dashboard.activity': 'Actividad',
       'dashboard.center': 'Centrar',
-      'dashboard.cancel_route': 'Cancelar Ruta',
+      'dashboard.cancel_route': 'Limpiar mapa',
 
       'activity.Cycling': 'Ciclismo',
       'activity.Running': 'Correr',
@@ -175,7 +175,7 @@ export class TranslationService {
       'dashboard.grade': 'Grade',
       'dashboard.activity': 'Activity',
       'dashboard.center': 'Center',
-      'dashboard.cancel_route': 'Cancel Route',
+      'dashboard.cancel_route': 'Clear Map',
 
       'activity.Cycling': 'Cycling',
       'activity.Running': 'Running',
