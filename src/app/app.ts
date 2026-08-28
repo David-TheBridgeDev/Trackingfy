@@ -55,6 +55,13 @@ export class App {
   private lastBackPress = 0;
   private toastTimeout: any;
 
+  onMainScroll(event: Event) {
+    const target = event.target as HTMLElement;
+    if (this.router.url === '/history' && target) {
+      this.uiService.historyScrollTop = target.scrollTop;
+    }
+  }
+
   private triggerToast(message: string) {
     if (this.toastTimeout) {
       clearTimeout(this.toastTimeout);

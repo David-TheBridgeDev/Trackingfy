@@ -19,6 +19,7 @@ export class UIService {
   isFullScreen = signal<boolean>(false);
   showOnboarding = signal<boolean>(false);
   currentTheme = signal<Theme>('light');
+  historyScrollTop = 0;
 
   private confirmResolver?: (value: boolean) => void;
   confirmation = signal<ConfirmOptions | null>(null);

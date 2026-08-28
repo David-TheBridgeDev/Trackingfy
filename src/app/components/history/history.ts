@@ -1,7 +1,8 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs';
 import { Activity, DatabaseService } from '../../services/database';
 import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
@@ -77,11 +78,32 @@ export class HistoryComponent implements OnInit {
     private router: Router,
     private uiService: UIService,
     public ts: TranslationService,
-  ) {}
+  ) {
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        if (event.urlAfterRedirects === '/history' || event.url === '/history') {
+          this.uiService.setFullScreen(false);
+        }
+      });
+  }
 
   async ngOnInit() {
     this.uiService.setFullScreen(false);
     await this.loadActivities();
+    if (this.uiService.historyScrollTop > 0) {
+      const targetScroll = this.uiService.historyScrollTop;
+      const restore = () => {
+        const container = document.getElementById('main-scroll-container');
+        if (container) {
+          container.scrollTop = targetScroll;
+        }
+      };
+      requestAnimationFrame(() => {
+        restore();
+        setTimeout(restore, 50);
+      });
+    }
   }
 
   async loadActivities() {
@@ -145,6 +167,11 @@ export class HistoryComponent implements OnInit {
     if (this.isSelectionMode()) {
       this.toggleSelection(id);
       return;
+    }
+
+    const container = document.getElementById('main-scroll-container');
+    if (container) {
+      this.uiService.historyScrollTop = container.scrollTop;
     }
 
     this.router.navigate(['/activity', id]);

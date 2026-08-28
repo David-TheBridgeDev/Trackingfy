@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.uiService.setFullScreen(true);
+    this.uiService.historyScrollTop = 0;
   }
 
   formattedTime = computed(() => {

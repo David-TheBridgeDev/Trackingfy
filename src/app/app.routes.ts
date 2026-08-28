@@ -7,7 +7,7 @@ import { SettingsComponent } from './components/settings/settings';
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'history', component: HistoryComponent },
+  { path: 'history', component: HistoryComponent, data: { reuse: true } },
   { path: 'activity/:id', component: ActivityDetailComponent },
   { path: 'settings', component: SettingsComponent },
   { path: '**', redirectTo: 'dashboard' }
