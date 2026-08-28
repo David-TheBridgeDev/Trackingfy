@@ -47,6 +47,7 @@ jobs:
         working-directory: ./android
         run: |
           chmod +x ./gradlew
+          sed -i '/org.gradle.java.home/d' ./gradle.properties
           ./gradlew assembleRelease
 
       - name: Renombrar APK
