@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:apk": "node build-apk.js",
+    "build:apk:release": "node build-apk.js --release"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

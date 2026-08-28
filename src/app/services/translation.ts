@@ -16,6 +16,7 @@ export class TranslationService {
       'app.offline': 'Sin conexión',
       'app.history': 'Historial',
       'app.install_app': 'Instalar App',
+      'app.download_apk': 'Descargar APK (Android)',
       'app.toast_exit': 'Presiona atrás de nuevo para salir',
 
       'onboarding.welcome': 'Bienvenido a Trackingfy',
@@ -115,6 +116,7 @@ export class TranslationService {
       'app.offline': 'Offline',
       'app.history': 'History',
       'app.install_app': 'Install App',
+      'app.download_apk': 'Download APK (Android)',
       'app.toast_exit': 'Press back again to exit',
 
       'onboarding.welcome': 'Welcome to Trackingfy',

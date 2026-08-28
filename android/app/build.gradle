@@ -1,8 +1,26 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.canRead()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.trackingfy.app"
     compileSdk = rootProject.ext.compileSdkVersion
+    
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.canRead()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.trackingfy.app"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -18,8 +36,12 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (keystorePropertiesFile.canRead()) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
