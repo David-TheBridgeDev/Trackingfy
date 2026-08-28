@@ -45,7 +45,9 @@ jobs:
 
       - name: Compilar APK (Release) con Gradle
         working-directory: ./android
-        run: ./gradlew assembleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
 
       - name: Renombrar APK
         run: |
