@@ -76,13 +76,19 @@ The final APK will be copied to: `public/apk/app-debug.apk`
 #### 🔵 Release Build (Production via GitHub Actions)
 The production APK (`Trackingfy.apk`) is highly optimized, minified, and signed automatically in the cloud via GitHub Actions.
 
-1. Push your code changes to GitHub.
-2. Create and push a new version tag (e.g., `v1.0.0`):
-   ```bash
-   git tag v1.0.0
-   git push --tags
-   ```
-3. GitHub Actions will automatically compile, sign, and publish the new APK to the **Releases** tab on GitHub.
+To launch a new update, simply run the automated release script from your terminal:
+
+```bash
+npm run release
+```
+
+**What this command does:**
+1. Automatically bumps the version number (e.g., `1.0.0` → `1.0.1`) in both `package.json` and the Angular UI.
+2. Commits the changes and creates a new Git Tag (e.g., `v1.0.1`).
+3. Pushes the code and tags to GitHub.
+4. Triggers the GitHub Actions pipeline which compiles, signs, and publishes the new APK to the **Releases** tab.
+
+*(Optional)* You can specify the version bump type: `npm run release minor` (e.g., 1.1.0) or `npm run release major` (e.g., 2.0.0).
 
 > **Direct Download:** The settings page in the web app is configured to always fetch the latest compiled `Trackingfy.apk` directly from GitHub Releases, saving Firebase bandwidth.
 

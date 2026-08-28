@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:apk": "node build-apk.js",
-    "build:apk:release": "node build-apk.js --release"
+    "build:apk:release": "node build-apk.js --release",
+    "release": "node release.js"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
