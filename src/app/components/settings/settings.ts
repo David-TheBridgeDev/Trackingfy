@@ -84,4 +84,23 @@ export class SettingsComponent implements OnInit {
     // Reset the input so the same file can be imported again if needed
     event.target.value = '';
   }
+
+  async downloadLatestApk() {
+    try {
+      const response = await fetch('https://api.github.com/repos/David-TheBridgeDev/Trackingfy/releases/latest');
+      if (!response.ok) throw new Error('Error fetching latest release');
+      
+      const data = await response.json();
+      const apkAsset = data.assets.find((asset: any) => asset.name.endsWith('.apk'));
+      
+      if (apkAsset) {
+        window.location.href = apkAsset.browser_download_url;
+      } else {
+        alert(this.ts.t('app.error_download') || 'No APK found in the latest release.');
+      }
+    } catch (error) {
+      console.error('Error downloading APK:', error);
+      alert('Error connecting to GitHub Releases.');
+    }
+  }
 }

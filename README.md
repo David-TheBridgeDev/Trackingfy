@@ -123,14 +123,6 @@ To execute unit tests with Vitest, run:
 npm test
 ```
 
-## 🏗 Project Structure
-
-- `src/app/services/tracking.ts`: Core logic for Geolocation and activity state.
-- `src/app/services/database.ts`: Dexie.js configuration and schema.
-- `src/app/components/map/`: Leaflet integration for path rendering.
-- `src/app/components/dashboard/`: Real-time controls and stats.
-- `src/app/components/history/`: List and details of past activities.
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -204,15 +204,15 @@
           </button>
         }
 
-        <a
-          href="https://github.com/David-TheBridgeDev/Trackingfy/releases/latest/download/Trackingfy.apk"
+        <button
+          (click)="downloadLatestApk()"
           class="flex items-center justify-center space-x-2 w-full bg-bg-base text-text-heading border border-gray-200/50 py-3.5 rounded-2xl font-black uppercase text-xs tracking-wider active:scale-95 transition-all hover:bg-gray-50 cursor-pointer text-center shadow-sm"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           <span>{{ ts.t('app.download_apk') }}</span>
-        </a>
+        </button>
 
         <div class="text-center pt-2">
           <span class="text-[10px] font-bold uppercase tracking-wider text-text-primary block mb-1">

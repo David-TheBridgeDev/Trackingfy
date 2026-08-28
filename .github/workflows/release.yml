@@ -50,14 +50,15 @@ jobs:
           sed -i '/org.gradle.java.home/d' ./gradle.properties
           ./gradlew assembleRelease
 
-      - name: Renombrar APK
+      - name: Renombrar APK con la Versión
         run: |
-          mv android/app/build/outputs/apk/release/app-release.apk Trackingfy.apk
+          VERSION=${GITHUB_REF#refs/tags/v}
+          mv android/app/build/outputs/apk/release/app-release.apk Trackingfy-v${VERSION}.apk
 
       - name: Crear Release y Subir APK
         uses: softprops/action-gh-release@v2
         with:
-          files: Trackingfy.apk
+          files: Trackingfy-v*.apk
           draft: false
           prerelease: false
           generate_release_notes: true
