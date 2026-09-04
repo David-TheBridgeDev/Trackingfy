@@ -205,23 +205,29 @@
                 {{ formatSpeed(preview.newAvgSpeed) }}
               </span>
             </div>
-            <div class="flex items-center justify-between text-xs border-t border-gray-100 pt-2">
-              <span class="text-text-primary font-medium">{{ ts.t('detail.edit.segment_speed') }}</span>
-              <span
-                class="font-bold"
-                [class]="preview.implausibleSpeed ? 'text-red-600' : 'text-text-heading'"
-              >
-                {{ formatSpeed(preview.impliedSpeed) }}
-              </span>
-            </div>
-            @if (preview.implausibleSpeed) {
-              <p class="text-[10px] font-bold text-red-600 leading-snug">
-                {{ ts.t('detail.edit.speed_warning') }}
+            @if (preview.clearsOpening) {
+              <p class="text-[10px] font-bold text-orange-600 leading-snug border-t border-gray-100 pt-2">
+                {{ ts.t('detail.edit.clears_opening') }}
+              </p>
+            } @else {
+              <div class="flex items-center justify-between text-xs border-t border-gray-100 pt-2">
+                <span class="text-text-primary font-medium">{{ ts.t('detail.edit.segment_speed') }}</span>
+                <span
+                  class="font-bold"
+                  [class]="preview.implausibleSpeed ? 'text-red-600' : 'text-text-heading'"
+                >
+                  {{ formatSpeed(preview.impliedSpeed) }}
+                </span>
+              </div>
+              @if (preview.implausibleSpeed) {
+                <p class="text-[10px] font-bold text-red-600 leading-snug">
+                  {{ ts.t('detail.edit.speed_warning') }}
+                </p>
+              }
+              <p class="text-[10px] text-text-primary leading-snug border-t border-gray-100 pt-2">
+                {{ ts.t('detail.edit.elevation_note') }}
               </p>
             }
-            <p class="text-[10px] text-text-primary leading-snug border-t border-gray-100 pt-2">
-              {{ ts.t('detail.edit.elevation_note') }}
-            </p>
           </div>
         }
 
@@ -231,8 +237,8 @@
 
         <div class="flex items-center gap-2">
           <button
-            (click)="undoLastPoint()"
-            [disabled]="draftPoints().length === 0 || isSavingEdit()"
+            (click)="undoLastChange()"
+            [disabled]="!canUndo() || isSavingEdit()"
             class="flex-1 py-2 rounded-xl border border-gray-200 text-text-heading font-bold text-xs uppercase tracking-wide active:scale-95 transition-all disabled:opacity-40"
           >
             {{ ts.t('detail.edit.undo') }}
@@ -270,13 +276,15 @@
     >
       <app-map
         class="w-full h-full"
-        [coordinates]="coordinates()"
+        [coordinates]="isEditing() ? gpsCoordinates() : coordinates()"
         [currentPoint]="hoveredCoordinate()"
         [enablePan]="!hoveredCoordinate()"
         [showLocationButton]="false"
         [editMode]="isEditing()"
         [draftPoints]="draftPoints()"
         (mapClick)="onMapClick($event)"
+        (pointMoved)="onPointMoved($event)"
+        (pointRemoved)="onPointRemoved($event)"
       ></app-map>
 
       @if (!isEditing()) {

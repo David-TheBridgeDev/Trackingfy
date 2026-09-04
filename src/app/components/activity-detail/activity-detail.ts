@@ -6,7 +6,14 @@ import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 import { TrackingService } from '../../services/tracking';
 import { TranslationService } from '../../services/translation';
-import { RouteEditorService, DraftPoint, PrependValidation } from '../../services/route-editor';
+import {
+  RouteEditorService,
+  DraftPoint,
+  OpeningSegmentContext,
+  resolveStartTime,
+  splitManualOpening,
+  toLocalInputValue,
+} from '../../services/route-editor';
 import { buildRouteExport } from '../../services/route-export';
 import { App } from '../../app';
 import { Share } from '@capacitor/share';
@@ -58,22 +65,44 @@ export class ActivityDetailComponent implements OnInit {
   startTimeTouched = signal(false);
   editError = signal<string | null>(null);
 
+  /** The exact start time the saved segment carries, before the input rounds it down. */
+  private seededStartTime = signal<number | null>(null);
+
+  /** Snapshots of the draft before each change, so a mistaken tap can be taken back. */
+  private draftHistory = signal<DraftPoint[][]>([]);
+  canUndo = computed(() => this.draftHistory().length > 0);
+
+  /** The saved hand-drawn opening and the recorded track, kept apart. */
+  private segments = computed(() => splitManualOpening(this.coordinates()));
+
+  /**
+   * The recorded track alone. Editing always works against this: the anchor a drawn
+   * segment joins is the first real fix, never a point drawn by a previous edit.
+   */
+  gpsCoordinates = computed(() => this.segments().gps);
+
+  editContext = computed<OpeningSegmentContext | null>(() => {
+    const activity = this.activity();
+    if (!activity) return null;
+
+    const { manual, gps } = this.segments();
+    return { activity, gpsCoords: gps, existingManual: manual };
+  });
+
   /** Distance of the drawn segment, available before a start time has been entered. */
   draftDistance = computed(() =>
-    this.routeEditor.draftDistance(this.draftPoints(), this.coordinates()[0]),
+    this.routeEditor.draftDistance(this.draftPoints(), this.gpsCoordinates()[0]),
   );
 
   /** Projected effect of the edit, recomputed on every change to the draft. */
-  editPreview = computed<PrependValidation | null>(() => {
-    const activity = this.activity();
-    const startTime = this.startTimeMs();
-    if (!activity || this.draftPoints().length === 0 || startTime === null) return null;
+  editPreview = computed(() => {
+    const context = this.editContext();
+    if (!context) return null;
 
-    return this.routeEditor.previewPrepend(
-      activity,
-      this.coordinates(),
+    return this.routeEditor.previewOpeningSegment(
+      context,
       this.draftPoints(),
-      startTime,
+      this.startTimeMs(),
     );
   });
 
@@ -86,15 +115,15 @@ export class ActivityDetailComponent implements OnInit {
   /** Why the draft cannot be saved yet, if it cannot. */
   editValidationError = computed(() => {
     const validation = this.editPreview();
-    return validation && !validation.valid ? validation.reason : null;
+    if (!validation || validation.valid) return null;
+
+    // An empty draft is where every edit starts, not a mistake to complain about.
+    return validation.reason === 'no-points' ? null : validation.reason;
   });
 
-  startTimeMs = computed<number | null>(() => {
-    const value = this.startTimeInput();
-    if (!value) return null;
-    const ms = new Date(value).getTime();
-    return isNaN(ms) ? null : ms;
-  });
+  startTimeMs = computed<number | null>(() =>
+    resolveStartTime(this.startTimeInput(), this.seededStartTime()),
+  );
 
   constructor(
     private route: ActivatedRoute,
@@ -353,13 +382,26 @@ export class ActivityDetailComponent implements OnInit {
   // --- Route editing -------------------------------------------------------
 
   startEdit() {
+    const manual = this.segments().manual;
+
     this.isEditing.set(true);
-    this.draftPoints.set([]);
-    this.startTimeInput.set('');
-    this.startTimeTouched.set(false);
+    this.draftPoints.set(manual.map((c) => ({ lat: c.lat, lng: c.lng })));
+    this.draftHistory.set([]);
     this.editError.set(null);
     this.hoveredCoordinate.set(null);
     this.hoveredPoint.set(null);
+
+    if (manual.length > 0) {
+      // A segment already drawn comes back as it was left, start time included: that is
+      // the user's own answer, not something to propose to them again.
+      this.seededStartTime.set(manual[0].timestamp);
+      this.startTimeInput.set(toLocalInputValue(manual[0].timestamp));
+      this.startTimeTouched.set(true);
+    } else {
+      this.seededStartTime.set(null);
+      this.startTimeInput.set('');
+      this.startTimeTouched.set(false);
+    }
   }
 
   /** The drawing instructions, kept out of the panel so it stays compact. */
@@ -373,25 +415,51 @@ export class ActivityDetailComponent implements OnInit {
   cancelEdit() {
     this.isEditing.set(false);
     this.draftPoints.set([]);
+    this.draftHistory.set([]);
+    this.seededStartTime.set(null);
     this.startTimeInput.set('');
     this.startTimeTouched.set(false);
     this.editError.set(null);
   }
 
-  onMapClick(point: DraftPoint) {
-    if (!this.isEditing()) return;
-    this.draftPoints.update(points => [...points, point]);
+  /** Every change to the draft goes through here, so all of them can be undone. */
+  private mutateDraft(points: DraftPoint[]) {
+    this.draftHistory.update(history => [...history, this.draftPoints()]);
+    this.draftPoints.set(points);
     this.refreshSuggestedStartTime();
   }
 
-  undoLastPoint() {
-    this.draftPoints.update(points => points.slice(0, -1));
+  onMapClick(point: DraftPoint) {
+    if (!this.isEditing()) return;
+    this.mutateDraft([...this.draftPoints(), point]);
+  }
+
+  onPointMoved(move: { index: number; lat: number; lng: number }) {
+    this.mutateDraft(
+      this.draftPoints().map((point, i) =>
+        i === move.index ? { lat: move.lat, lng: move.lng } : point,
+      ),
+    );
+  }
+
+  onPointRemoved(index: number) {
+    this.mutateDraft(this.draftPoints().filter((_, i) => i !== index));
+  }
+
+  undoLastChange() {
+    const history = this.draftHistory();
+    if (history.length === 0) return;
+
+    this.draftPoints.set(history[history.length - 1]);
+    this.draftHistory.set(history.slice(0, -1));
     this.refreshSuggestedStartTime();
   }
 
   clearDraft() {
-    this.draftPoints.set([]);
-    this.refreshSuggestedStartTime();
+    // Starting over means the saved start time no longer describes anything, so the
+    // proposal from the average pace becomes useful again.
+    this.startTimeTouched.set(false);
+    this.mutateDraft([]);
   }
 
   onStartTimeInput(event: Event) {
@@ -411,50 +479,38 @@ export class ActivityDetailComponent implements OnInit {
 
     const suggestion = this.routeEditor.suggestStartTime(
       activity,
-      this.coordinates(),
+      this.gpsCoordinates(),
       this.draftPoints(),
     );
 
-    this.startTimeInput.set(suggestion === null ? '' : this.toLocalInputValue(suggestion));
-  }
-
-  /** Epoch milliseconds as the local `YYYY-MM-DDTHH:mm` a datetime-local input expects. */
-  private toLocalInputValue(ms: number): string {
-    const date = new Date(ms);
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return (
-      `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-      `T${pad(date.getHours())}:${pad(date.getMinutes())}`
-    );
+    this.startTimeInput.set(suggestion === null ? '' : toLocalInputValue(suggestion));
   }
 
   /** The latest start time the input accepts: the first recorded fix, minus a minute. */
   maxStartTimeValue = computed(() => {
-    const anchor = this.coordinates()[0];
+    const anchor = this.gpsCoordinates()[0];
     if (!anchor) return '';
-    return this.toLocalInputValue(anchor.timestamp - 60000);
+    return toLocalInputValue(anchor.timestamp - 60000);
   });
 
   async saveEdit() {
-    const activity = this.activity();
-    const startTime = this.startTimeMs();
+    const context = this.editContext();
     const validation = this.editPreview();
 
-    if (!activity || !activity.id || startTime === null || !validation || !validation.valid) return;
+    if (!context || !context.activity.id || !validation || !validation.valid) return;
 
     this.isSavingEdit.set(true);
     this.editError.set(null);
 
     try {
-      const result = await this.routeEditor.applyPrepend(
-        activity,
-        this.coordinates(),
+      const updated = await this.routeEditor.saveOpeningSegment(
+        context,
         this.draftPoints(),
-        startTime,
+        this.startTimeMs(),
       );
 
-      this.activity.set(result.activity);
-      this.applyCoordinates(await this.db.getCoordinates(activity.id));
+      this.activity.set(updated);
+      this.applyCoordinates(await this.db.getCoordinates(context.activity.id));
       this.cancelEdit();
       this.appComponent.triggerToast(this.ts.t('detail.edit.saved'));
     } catch (e) {

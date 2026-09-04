@@ -47,9 +47,10 @@ export class TranslationService {
       'settings.backup.success': 'Datos restaurados correctamente',
       'settings.backup.error': 'Error al restaurar los datos',
       'settings.backup.import_hint':
-        'Acepta tanto una copia de seguridad completa como una ruta suelta compartida por otro usuario.',
+        'Acepta tanto una copia de seguridad completa como una ruta suelta compartida por otro usuario. En Android también puedes abrir el fichero o compartirlo directamente con Trackingfy.',
       'settings.backup.route_imported': 'Ruta importada a tu historial',
       'settings.backup.route_duplicate': 'Esa ruta ya está en tu historial',
+      'settings.backup.route_invalid': 'Ese fichero no es una ruta de Trackingfy',
       'settings.backup.elevation_note':
         '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenTopoData, un proveedor externo, para obtener la altitud del terreno. El resto de la aplicación sigue funcionando solo en local.',
 
@@ -119,9 +120,11 @@ export class TranslationService {
 
       'detail.edit.title': 'Añadir tramo al inicio',
       'detail.edit.help':
-        'Toca el mapa marcando el recorrido que no se grabó, desde donde saliste de verdad hasta el punto rojo donde arrancó la grabación.',
+        'Toca el mapa marcando el recorrido que no se grabó, desde donde saliste de verdad hasta el punto rojo donde arrancó la grabación. Arrastra un punto para moverlo, o tócalo para quitarlo. Si vuelves a editar la ruta, el tramo que ya añadiste aparece aquí para que lo retoques.',
       'detail.edit.help_button': 'Cómo funciona',
-      'detail.edit.map_hint': 'Toca para añadir puntos',
+      'detail.edit.map_hint': 'Toca para añadir · arrastra o toca un punto',
+      'detail.edit.clears_opening':
+        'Al guardar se quitará el tramo añadido y la actividad volverá a lo que grabó el GPS.',
       'detail.edit.points': 'Puntos',
       'detail.edit.added_distance': 'Distancia +',
       'detail.edit.added_time': 'Tiempo +',
@@ -191,9 +194,10 @@ export class TranslationService {
       'settings.backup.success': 'Data restored successfully',
       'settings.backup.error': 'Error restoring data',
       'settings.backup.import_hint':
-        'Accepts both a full backup and a single route shared by another user.',
+        'Accepts both a full backup and a single route shared by another user. On Android you can also open the file or share it straight to Trackingfy.',
       'settings.backup.route_imported': 'Route imported into your history',
       'settings.backup.route_duplicate': 'That route is already in your history',
+      'settings.backup.route_invalid': 'That file is not a Trackingfy route',
       'settings.backup.elevation_note':
         '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenTopoData, an external provider, to obtain the terrain altitude. Everything else in the app stays local.',
 
@@ -263,9 +267,11 @@ export class TranslationService {
 
       'detail.edit.title': 'Add an opening stretch',
       'detail.edit.help':
-        'Tap the map to trace the stretch that was never recorded, from where you actually set off to the red point where recording began.',
+        'Tap the map to trace the stretch that was never recorded, from where you actually set off to the red point where recording began. Drag a point to move it, or tap it to remove it. Editing the route again brings the stretch you already added back here to be adjusted.',
       'detail.edit.help_button': 'How this works',
-      'detail.edit.map_hint': 'Tap to add points',
+      'detail.edit.map_hint': 'Tap to add · drag or tap a point',
+      'detail.edit.clears_opening':
+        'Saving will remove the added stretch and return the activity to what the GPS recorded.',
       'detail.edit.points': 'Points',
       'detail.edit.added_distance': 'Distance +',
       'detail.edit.added_time': 'Time +',

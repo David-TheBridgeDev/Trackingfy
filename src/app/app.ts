@@ -1,9 +1,10 @@
-import { Component, signal, HostListener, inject, NgZone } from '@angular/core';
+import { Component, effect, signal, untracked, HostListener, inject, NgZone } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { UIService } from './services/ui';
 import { TrackingService } from './services/tracking';
 import { TranslationService } from './services/translation';
+import { RouteLinkService, RouteLinkResult } from './services/route-link';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
@@ -22,6 +23,7 @@ export class App {
   public trackingService = inject(TrackingService);
   public ts = inject(TranslationService);
   private ngZone = inject(NgZone);
+  private routeLink = inject(RouteLinkService);
 
   // Tracks if we are on the dashboard
   isHomePage = toSignal(
@@ -77,6 +79,45 @@ export class App {
     // Request permissions immediately on startup
     this.trackingService.requestPermission();
     this.setupBackButton();
+    this.setupRouteSharing();
+  }
+
+  private setupRouteSharing() {
+    effect(() => {
+      const result = this.routeLink.received();
+      if (!result) return;
+
+      // Everything the announcement reads is deliberately untracked: it consults the
+      // tracking state, and this effect must fire when a route arrives, not every time
+      // the user starts or stops recording.
+      untracked(() => this.announceSharedRoute(result));
+    });
+
+    void this.routeLink.start();
+  }
+
+  private announceSharedRoute(result: RouteLinkResult) {
+    if (result.kind === 'invalid') {
+      this.triggerToast(this.ts.t('settings.backup.route_invalid'));
+      return;
+    }
+
+    if (result.kind === 'backup') {
+      this.triggerToast(this.ts.t('settings.backup.success'));
+      return;
+    }
+
+    this.triggerToast(
+      this.ts.t(
+        result.imported ? 'settings.backup.route_imported' : 'settings.backup.route_duplicate'
+      )
+    );
+
+    // Opening the route is the obvious next step, but not in the middle of an activity:
+    // pulling the screen out from under someone who is recording is worse than a toast.
+    if (result.activityId && this.trackingService.state() === 'idle') {
+      this.router.navigate(['/activity', result.activityId]);
+    }
   }
 
   private setupBackButton() {

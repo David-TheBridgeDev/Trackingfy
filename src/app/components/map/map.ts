@@ -5,6 +5,9 @@ import { Coordinate } from '../../services/database';
 import { UIService } from '../../services/ui';
 import { TrackingService } from '../../services/tracking';
 
+/** Matches the `duration-300` transition on the map container in the detail template. */
+const MAP_RESIZE_TRANSITION_MS = 300;
+
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -48,6 +51,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   draftPoints = input<{ lat: number; lng: number }[]>([]);
 
   mapClick = output<{ lat: number; lng: number }>();
+  pointMoved = output<{ index: number; lat: number; lng: number }>();
+  pointRemoved = output<number>();
 
   isFollowing = signal(true);
 
@@ -61,6 +66,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private marker!: L.Marker;
   private isMapInitialized = signal(false);
   private ignoreInteraction = true;
+  private hasFittedDraft = false;
 
   constructor(public uiService: UIService, public trackingService: TrackingService) {
     // Clear map when tracking stops
@@ -73,6 +79,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     effect(() => {
       this.uiService.isFullScreen();
+      this.editMode();
       if (this.isMapInitialized()) {
         this.ignoreInteraction = true;
         setTimeout(() => {
@@ -115,7 +122,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.polyline.setLatLngs(recorded);
         this.manualPolyline.setLatLngs(manual);
         
-        if (!this.showLocationButton()) {
+        // While editing, framing is owned by the draft effect, which also has to fit the
+        // drawn segment in. Refitting to the recorded track alone here would push it out
+        // of view again every time the coordinate list changes.
+        if (!this.showLocationButton() && !this.editMode()) {
           try {
             this.ignoreInteraction = true;
             this.map.fitBounds(this.polyline.getBounds(), { padding: [20, 20] });
@@ -155,6 +165,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       if (!this.isMapInitialized()) return;
 
+      if (!editing) {
+        this.hasFittedDraft = false;
+      }
+
       if (!editing || draft.length === 0) {
         this.draftPolyline.setLatLngs([]);
         this.draftMarkers.clearLayers();
@@ -167,15 +181,44 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.draftPolyline.setLatLngs(path);
 
         this.draftMarkers.clearLayers();
-        draft.forEach((p, i) => {
-          L.circleMarker([p.lat, p.lng], {
-            radius: 5,
-            color: '#ffffff',
-            weight: 2,
-            fillColor: i === 0 ? '#16a34a' : '#f97316',
-            fillOpacity: 1
-          }).addTo(this.draftMarkers);
+        draft.forEach((point, index) => {
+          const marker = L.marker([point.lat, point.lng], {
+            icon: this.draftIcon(index === 0),
+            draggable: true,
+            autoPan: true,
+            keyboard: false,
+            // A tap on a point must not also count as a tap on the map, which would
+            // delete the point and drop a new one in its place.
+            bubblingMouseEvents: false
+          });
+
+          let lastDragEnd = 0;
+
+          marker.on('dragend', () => {
+            lastDragEnd = Date.now();
+            const position = marker.getLatLng();
+            this.pointMoved.emit({ index, lat: position.lat, lng: position.lng });
+          });
+
+          marker.on('click', (event: L.LeafletMouseEvent) => {
+            L.DomEvent.stop(event.originalEvent);
+            // Releasing a drag can register as a click; deleting the point someone just
+            // spent a moment positioning would be the worst possible response.
+            if (Date.now() - lastDragEnd < 250) return;
+            this.pointRemoved.emit(index);
+          });
+
+          marker.addTo(this.draftMarkers);
         });
+
+        // A segment drawn on a previous visit can sit well outside the recorded track,
+        // and the map is framed on the track alone. Pull back once, on the way in, so the
+        // points that came back to be edited are actually on screen; refitting on every
+        // tap afterwards would fight whoever is drawing.
+        if (!this.hasFittedDraft) {
+          this.hasFittedDraft = true;
+          this.fitEditingBounds();
+        }
       }
 
       const anchor = coords[0];
@@ -185,6 +228,57 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       } else {
         this.anchorMarker.setStyle({ opacity: 0, fillOpacity: 0 });
       }
+    });
+  }
+
+  /**
+   * Frame the recorded track and the drawn segment together.
+   *
+   * Deferred past the container's own height transition, and preceded by invalidateSize,
+   * because opening the editor replaces the stats card with a taller panel and so shortens
+   * the map. Leaflet keeps working from a cached size until it is told the element
+   * changed, and measuring while the height is still animating picks a zoom for a taller
+   * map than the one that ends up on screen, leaving the drawn segment below the fold.
+   */
+  private fitEditingBounds() {
+    setTimeout(() => {
+      if (!this.isMapInitialized()) return;
+
+      this.map.invalidateSize();
+
+      const bounds = L.latLngBounds([]);
+      if ((this.polyline.getLatLngs() as L.LatLng[]).length > 0) {
+        bounds.extend(this.polyline.getBounds());
+      }
+      if ((this.draftPolyline.getLatLngs() as L.LatLng[]).length > 0) {
+        bounds.extend(this.draftPolyline.getBounds());
+      }
+      if (!bounds.isValid()) return;
+
+      this.ignoreInteraction = true;
+      this.map.fitBounds(bounds, { padding: [30, 30] });
+      setTimeout(() => (this.ignoreInteraction = false), 800);
+    }, MAP_RESIZE_TRANSITION_MS + 100);
+  }
+
+  /**
+   * A dot with a touch target far bigger than itself.
+   *
+   * These points are dragged and tapped with a thumb, and a 14 pixel circle is not
+   * something a thumb can hit reliably, so the icon reserves 30 pixels and paints the dot
+   * in the middle of it. The styles are inline because Leaflet builds this element itself,
+   * outside the component's view, where its stylesheet does not reach.
+   */
+  private draftIcon(isFirst: boolean): L.DivIcon {
+    const color = isFirst ? '#16a34a' : '#f97316';
+
+    return L.divIcon({
+      className: '',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+      html:
+        '<span style="display:block;width:14px;height:14px;margin:8px;border-radius:9999px;' +
+        `border:2px solid #ffffff;background:${color};box-shadow:0 1px 4px rgba(0,0,0,.45)"></span>`
     });
   }
 

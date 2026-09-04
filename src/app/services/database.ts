@@ -105,15 +105,22 @@ export class DatabaseService extends Dexie {
   }
 
   /**
-   * Add coordinates to an existing activity and update its stats atomically, so an
-   * interrupted edit can never leave a route whose points and numbers disagree.
+   * Swap an activity's hand-drawn coordinates and update its stats atomically.
+   *
+   * Removal and insertion belong in the same transaction as the new totals: an edit that
+   * half applied would leave a route whose points and numbers disagree, with no way to
+   * tell which of the two was right.
    */
   async applyRouteEdit(
     activityId: number,
+    removedCoordinateIds: number[],
     newCoordinates: Coordinate[],
     changes: Partial<Activity>
   ): Promise<void> {
     await this.transaction('rw', this.activities, this.coordinates, async () => {
+      if (removedCoordinateIds.length > 0) {
+        await this.coordinates.bulkDelete(removedCoordinateIds);
+      }
       if (newCoordinates.length > 0) {
         await this.coordinates.bulkAdd(newCoordinates);
       }
