@@ -46,6 +46,12 @@ export class TranslationService {
       'settings.backup.import': 'Importar datos',
       'settings.backup.success': 'Datos restaurados correctamente',
       'settings.backup.error': 'Error al restaurar los datos',
+      'settings.backup.import_hint':
+        'Acepta tanto una copia de seguridad completa como una ruta suelta compartida por otro usuario.',
+      'settings.backup.route_imported': 'Ruta importada a tu historial',
+      'settings.backup.route_duplicate': 'Esa ruta ya está en tu historial',
+      'settings.backup.elevation_note':
+        '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenTopoData, un proveedor externo, para obtener la altitud del terreno. El resto de la aplicación sigue funcionando solo en local.',
 
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
@@ -56,6 +62,7 @@ export class TranslationService {
       'confirm.message.paused': 'Tu actividad está pausada.',
       'confirm.btn.confirm': 'Confirmar',
       'confirm.btn.cancel': 'Cancelar',
+      'confirm.btn.got_it': 'Entendido',
 
       'confirm.title.delete_single': 'Eliminar actividad',
       'confirm.message.delete_single':
@@ -105,12 +112,47 @@ export class TranslationService {
       'detail.not_found': 'Actividad no encontrada.',
       'detail.back_history': 'Volver al historial',
       'detail.follow_route': 'Seguir esta ruta',
+      'detail.export_route': 'Exportar ruta (JSON)',
+      'detail.export.error': 'No se pudo exportar la ruta',
+      'detail.edit_route': 'Editar ruta',
+      'detail.edited_badge': 'Editada',
+
+      'detail.edit.title': 'Añadir tramo al inicio',
+      'detail.edit.help':
+        'Toca el mapa marcando el recorrido que no se grabó, desde donde saliste de verdad hasta el punto rojo donde arrancó la grabación.',
+      'detail.edit.help_button': 'Cómo funciona',
+      'detail.edit.map_hint': 'Toca para añadir puntos',
+      'detail.edit.points': 'Puntos',
+      'detail.edit.added_distance': 'Distancia +',
+      'detail.edit.added_time': 'Tiempo +',
+      'detail.edit.start_time': 'Hora real de inicio',
+      'detail.edit.start_time_hint':
+        'Proponemos la hora que sale de aplicar tu ritmo medio. Corrígela con la hora a la que saliste de verdad.',
+      'detail.edit.segment_speed': 'Velocidad del tramo',
+      'detail.edit.speed_warning':
+        'Esa velocidad es poco realista para esta actividad. Revisa la hora de inicio o los puntos marcados.',
+      'detail.edit.elevation_note':
+        'El desnivel del tramo se calcula al guardar, consultando el modelo de elevación del terreno.',
+      'detail.edit.undo': 'Deshacer',
+      'detail.edit.clear': 'Borrar',
+      'detail.edit.save': 'Guardar',
+      'detail.edit.saving': 'Guardando...',
+      'detail.edit.saved': 'Ruta actualizada',
+      'detail.edit.error': 'No se pudo guardar el tramo añadido',
+      'detail.edit.invalid.no-points': 'Marca al menos un punto en el mapa.',
+      'detail.edit.invalid.no-anchor': 'Esta actividad no tiene puntos grabados.',
+      'detail.edit.invalid.zero-distance': 'Los puntos marcados están demasiado juntos.',
+      'detail.edit.invalid.start-after-anchor':
+        'La hora de inicio tiene que ser anterior al primer punto grabado.',
 
       'tracking.bg_message': 'Trackingfy está registrando tu actividad.',
       'tracking.bg_title': 'Rastreo en curso',
       'share.title': 'Mi ruta en Trackingfy',
       'share.text': '¡Mira mi ruta en Trackingfy!',
       'share.dialog_title': 'Compartir ruta',
+      'share.route.title': 'Ruta de Trackingfy',
+      'share.route.text': 'Te comparto esta ruta para que la abras en Trackingfy.',
+      'share.route.dialog_title': 'Compartir ruta (JSON)',
     },
     en: {
       'app.title': 'Trackingfy',
@@ -148,6 +190,12 @@ export class TranslationService {
       'settings.backup.import': 'Import Data',
       'settings.backup.success': 'Data restored successfully',
       'settings.backup.error': 'Error restoring data',
+      'settings.backup.import_hint':
+        'Accepts both a full backup and a single route shared by another user.',
+      'settings.backup.route_imported': 'Route imported into your history',
+      'settings.backup.route_duplicate': 'That route is already in your history',
+      'settings.backup.elevation_note':
+        '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenTopoData, an external provider, to obtain the terrain altitude. Everything else in the app stays local.',
 
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
@@ -158,6 +206,7 @@ export class TranslationService {
       'confirm.message.paused': 'Your activity is paused.',
       'confirm.btn.confirm': 'Confirm',
       'confirm.btn.cancel': 'Cancel',
+      'confirm.btn.got_it': 'Got it',
 
       'confirm.title.delete_single': 'Delete Activity',
       'confirm.message.delete_single':
@@ -207,12 +256,47 @@ export class TranslationService {
       'detail.not_found': 'Activity not found.',
       'detail.back_history': 'Back to History',
       'detail.follow_route': 'Follow this route',
+      'detail.export_route': 'Export route (JSON)',
+      'detail.export.error': 'Could not export the route',
+      'detail.edit_route': 'Edit route',
+      'detail.edited_badge': 'Edited',
+
+      'detail.edit.title': 'Add an opening stretch',
+      'detail.edit.help':
+        'Tap the map to trace the stretch that was never recorded, from where you actually set off to the red point where recording began.',
+      'detail.edit.help_button': 'How this works',
+      'detail.edit.map_hint': 'Tap to add points',
+      'detail.edit.points': 'Points',
+      'detail.edit.added_distance': 'Distance +',
+      'detail.edit.added_time': 'Time +',
+      'detail.edit.start_time': 'Actual start time',
+      'detail.edit.start_time_hint':
+        'We propose the time your average pace implies. Correct it with the time you really set off.',
+      'detail.edit.segment_speed': 'Segment speed',
+      'detail.edit.speed_warning':
+        'That speed is unrealistic for this activity. Check the start time or the points you marked.',
+      'detail.edit.elevation_note':
+        'Elevation for this stretch is resolved on save, from a terrain elevation model.',
+      'detail.edit.undo': 'Undo',
+      'detail.edit.clear': 'Clear',
+      'detail.edit.save': 'Save',
+      'detail.edit.saving': 'Saving...',
+      'detail.edit.saved': 'Route updated',
+      'detail.edit.error': 'Could not save the added stretch',
+      'detail.edit.invalid.no-points': 'Mark at least one point on the map.',
+      'detail.edit.invalid.no-anchor': 'This activity has no recorded points.',
+      'detail.edit.invalid.zero-distance': 'The marked points are too close together.',
+      'detail.edit.invalid.start-after-anchor':
+        'The start time must be earlier than the first recorded point.',
 
       'tracking.bg_message': 'Trackingfy is tracking your activity.',
       'tracking.bg_title': 'Tracking in progress',
       'share.title': 'My route on Trackingfy',
       'share.text': 'Check out my route on Trackingfy!',
       'share.dialog_title': 'Share route',
+      'share.route.title': 'Trackingfy route',
+      'share.route.text': 'Here is a route for you to open in Trackingfy.',
+      'share.route.dialog_title': 'Share route (JSON)',
     },
   };
 

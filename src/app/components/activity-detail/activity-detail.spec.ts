@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { DatabaseService } from '../../services/database';
+import { App } from '../../app';
 import { ActivityDetailComponent } from './activity-detail';
 
 describe('ActivityDetailComponent', () => {
@@ -17,7 +18,8 @@ describe('ActivityDetailComponent', () => {
       imports: [ActivityDetailComponent],
       providers: [
         provideRouter([]),
-        { provide: DatabaseService, useValue: mockDatabaseService }
+        { provide: DatabaseService, useValue: mockDatabaseService },
+        { provide: App, useValue: {} }
       ]
     }).compileComponents();
 

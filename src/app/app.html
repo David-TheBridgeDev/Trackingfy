@@ -221,12 +221,14 @@
         </div>
 
         <div class="flex p-4 gap-3 bg-bg-base/50">
-          <button
-            (click)="uiService.resolveConfirm(false)"
-            class="flex-1 px-4 py-3 rounded-xl font-bold text-text-primary hover:text-text-heading hover:bg-bg-base transition-colors uppercase text-sm cursor-pointer"
-          >
-            {{ config.cancelText }}
-          </button>
+          @if (!config.hideCancel) {
+            <button
+              (click)="uiService.resolveConfirm(false)"
+              class="flex-1 px-4 py-3 rounded-xl font-bold text-text-primary hover:text-text-heading hover:bg-bg-base transition-colors uppercase text-sm cursor-pointer"
+            >
+              {{ config.cancelText }}
+            </button>
+          }
           <button
             (click)="uiService.resolveConfirm(true)"
             [class]="

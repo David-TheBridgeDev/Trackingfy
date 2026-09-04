@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
+import { isRouteExport, parseRouteExport } from './route-export';
 
 export interface Split {
   kilometer: number; // e.g., 1, 2, 3...
   time: number; // elapsed time for this split in seconds
   speed: number; // average speed in m/s for this split
 }
+
+/**
+ * Where a coordinate came from. Absent means 'gps': activities recorded before route
+ * editing existed have no source field and are entirely GPS data.
+ */
+export type CoordinateSource = 'gps' | 'manual';
 
 export interface Activity {
   id?: number;
@@ -23,6 +30,8 @@ export interface Activity {
   startTime: number;
   endTime?: number;
   splits?: Split[];
+  editedAt?: number; // set when the route was edited by hand
+  manualDistance?: number; // in meters, of the hand-drawn part
 }
 
 export interface Coordinate {
@@ -33,7 +42,12 @@ export interface Coordinate {
   timestamp: number;
   altitude?: number | null;
   speed?: number | null;
+  source?: CoordinateSource;
 }
+
+export type ImportResult =
+  | { kind: 'backup'; imported: number; skipped: number }
+  | { kind: 'route'; imported: boolean; activityId?: number };
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +58,8 @@ export class DatabaseService extends Dexie {
 
   constructor() {
     super('TrackingfyDB');
+    // The fields added for route editing and route sharing are all optional and
+    // unindexed, so they need no schema version bump.
     this.version(2).stores({
       activities: '++id, date, type',
       coordinates: '++id, activityId, timestamp'
@@ -88,55 +104,115 @@ export class DatabaseService extends Dexie {
     });
   }
 
+  /**
+   * Add coordinates to an existing activity and update its stats atomically, so an
+   * interrupted edit can never leave a route whose points and numbers disagree.
+   */
+  async applyRouteEdit(
+    activityId: number,
+    newCoordinates: Coordinate[],
+    changes: Partial<Activity>
+  ): Promise<void> {
+    await this.transaction('rw', this.activities, this.coordinates, async () => {
+      if (newCoordinates.length > 0) {
+        await this.coordinates.bulkAdd(newCoordinates);
+      }
+      await this.activities.update(activityId, changes);
+    });
+  }
+
+  /**
+   * Insert a route shared by another user as a new activity.
+   *
+   * Deduplication is by startTime, matching the backup importer: re-importing the same
+   * file is a no-op rather than a second copy of the same route.
+   */
+  async importRoute(data: any): Promise<{ imported: boolean; activityId?: number }> {
+    const { activity, coordinates } = parseRouteExport(data);
+
+    return await this.transaction('rw', this.activities, this.coordinates, async () => {
+      const duplicate = await this.activities.filter(a => a.startTime === activity.startTime).first();
+      if (duplicate) {
+        return { imported: false, activityId: duplicate.id };
+      }
+
+      const activityId = await this.activities.add(activity as Activity);
+      await this.coordinates.bulkAdd(
+        coordinates.map(c => ({ ...c, activityId })) as Coordinate[]
+      );
+
+      return { imported: true, activityId };
+    });
+  }
+
   async exportData(): Promise<string> {
     const activities = await this.activities.toArray();
     const coordinates = await this.coordinates.toArray();
     return JSON.stringify({ activities, coordinates });
   }
 
-  async importData(jsonString: string): Promise<void> {
+  /**
+   * Restore a full backup, or a single shared route: both arrive through the same
+   * "import" entry point in Settings, so the payload shape decides which one it is.
+   */
+  async importData(jsonString: string): Promise<ImportResult> {
+    let data: any;
     try {
-      const data = JSON.parse(jsonString);
-      if (data && data.activities && data.coordinates) {
-        await this.transaction('rw', this.activities, this.coordinates, async () => {
-          // Get existing activities to prevent duplicates
-          const existingActivities = await this.activities.toArray();
-          const existingStartTimes = new Set(existingActivities.map(a => a.startTime));
-
-          const newCoordinatesToAdd: Coordinate[] = [];
-
-          for (const activity of data.activities as Activity[]) {
-            // Check if this activity already exists based on startTime
-            if (!existingStartTimes.has(activity.startTime)) {
-              const oldId = activity.id;
-              
-              // Remove original id so Dexie generates a new one
-              delete activity.id;
-              
-              // Insert the activity to get its new ID
-              const newId = await this.activities.add(activity as Activity);
-              
-              // Find and map associated coordinates
-              const activityCoords = (data.coordinates as Coordinate[]).filter(c => c.activityId === oldId);
-              for (const coord of activityCoords) {
-                delete coord.id;
-                coord.activityId = newId as number;
-                newCoordinatesToAdd.push(coord);
-              }
-            }
-          }
-
-          // Insert all newly mapped coordinates
-          if (newCoordinatesToAdd.length > 0) {
-            await this.coordinates.bulkAdd(newCoordinatesToAdd);
-          }
-        });
-      } else {
-        throw new Error('Invalid backup data format');
-      }
+      data = JSON.parse(jsonString);
     } catch (e) {
       console.error('Import error:', e);
-      throw e;
+      throw new Error('Invalid JSON file');
     }
+
+    if (isRouteExport(data)) {
+      return { kind: 'route', ...(await this.importRoute(data)) };
+    }
+
+    if (!data || !data.activities || !data.coordinates) {
+      throw new Error('Invalid backup data format');
+    }
+
+    let imported = 0;
+    let skipped = 0;
+
+    await this.transaction('rw', this.activities, this.coordinates, async () => {
+      // Get existing activities to prevent duplicates
+      const existingActivities = await this.activities.toArray();
+      const existingStartTimes = new Set(existingActivities.map(a => a.startTime));
+
+      const newCoordinatesToAdd: Coordinate[] = [];
+
+      for (const activity of data.activities as Activity[]) {
+        // Check if this activity already exists based on startTime
+        if (existingStartTimes.has(activity.startTime)) {
+          skipped++;
+          continue;
+        }
+
+        const oldId = activity.id;
+
+        // Remove original id so Dexie generates a new one
+        delete activity.id;
+
+        // Insert the activity to get its new ID
+        const newId = await this.activities.add(activity as Activity);
+        imported++;
+
+        // Find and map associated coordinates
+        const activityCoords = (data.coordinates as Coordinate[]).filter(c => c.activityId === oldId);
+        for (const coord of activityCoords) {
+          delete coord.id;
+          coord.activityId = newId as number;
+          newCoordinatesToAdd.push(coord);
+        }
+      }
+
+      // Insert all newly mapped coordinates
+      if (newCoordinatesToAdd.length > 0) {
+        await this.coordinates.bulkAdd(newCoordinatesToAdd);
+      }
+    });
+
+    return { kind: 'backup', imported, skipped };
   }
 }

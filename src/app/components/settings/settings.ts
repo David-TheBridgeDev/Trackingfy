@@ -69,8 +69,21 @@ export class SettingsComponent implements OnInit {
       reader.onload = async (e) => {
         try {
           const text = e.target?.result as string;
-          await this.db.importData(text);
-          this.appComponent.triggerToast(this.ts.t('settings.backup.success'));
+          const result = await this.db.importData(text);
+
+          // The same button takes a full backup and a single shared route, so the
+          // confirmation has to say which one just landed.
+          if (result.kind === 'route') {
+            this.appComponent.triggerToast(
+              this.ts.t(
+                result.imported
+                  ? 'settings.backup.route_imported'
+                  : 'settings.backup.route_duplicate',
+              ),
+            );
+          } else {
+            this.appComponent.triggerToast(this.ts.t('settings.backup.success'));
+          }
         } catch (err) {
           console.error(err);
           this.appComponent.triggerToast(this.ts.t('settings.backup.error'));

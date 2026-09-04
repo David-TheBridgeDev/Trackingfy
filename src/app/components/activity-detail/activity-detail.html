@@ -1,10 +1,29 @@
 @if (activity()) {
   <div class="h-full w-full flex flex-col space-y-4 relative">
     <!-- Header and Stats Controls (Hidden in FS) -->
-    @if (!uiService.isFullScreen()) {
+    @if (!uiService.isFullScreen() && !isEditing()) {
       <div
         class="bg-bg-surface rounded-2xl shadow-sm p-4 border border-gray-100 shrink-0 flex flex-col gap-4"
       >
+        <!-- Edited badge: part of this route was drawn by hand, not recorded -->
+        @if (activity()?.editedAt) {
+          <div class="flex items-center gap-2 -mb-1">
+            <span
+              class="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-orange-600 bg-orange-50 border border-orange-200 rounded-full px-2 py-0.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+              </svg>
+              {{ ts.t('detail.edited_badge') }}
+            </span>
+            @if (activity()?.manualDistance) {
+              <span class="text-[10px] text-text-primary font-medium">
+                +{{ formatDistance(activity()!.manualDistance!) }}
+              </span>
+            }
+          </div>
+        }
+
         <!-- Row 1: Duration, Distance, Avg Speed -->
         <div class="grid grid-cols-3 gap-2 md:gap-4 border-b border-gray-100 pb-4">
           <div>
@@ -67,6 +86,179 @@
       </div>
     }
 
+    @if (isEditing()) {
+      <div
+        class="bg-bg-surface rounded-2xl shadow-sm p-4 border border-orange-200 shrink-0 flex flex-col gap-3"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-1">
+            <p class="text-[10px] uppercase font-bold tracking-widest text-orange-600">
+              {{ ts.t('detail.edit.title') }}
+            </p>
+            <button
+              (click)="showEditHelp()"
+              class="shrink-0 text-orange-600 p-1 -m-1 active:scale-90 transition-all"
+              [title]="ts.t('detail.edit.help_button')"
+              [attr.aria-label]="ts.t('detail.edit.help_button')"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+              </svg>
+            </button>
+          </div>
+          <button
+            (click)="cancelEdit()"
+            [disabled]="isSavingEdit()"
+            class="shrink-0 text-text-primary p-1 active:scale-90 transition-all disabled:opacity-40"
+            [title]="ts.t('confirm.btn.cancel')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- What the drawn segment adds so far -->
+        <div class="grid grid-cols-3 gap-2 border-y border-gray-100 py-3">
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              {{ ts.t('detail.edit.points') }}
+            </p>
+            <p class="font-black text-text-heading text-base">{{ draftPoints().length }}</p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              {{ ts.t('detail.edit.added_distance') }}
+            </p>
+            <p class="font-black text-text-heading text-base">{{ formatDistance(draftDistance()) }}</p>
+          </div>
+          <div>
+            <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+              {{ ts.t('detail.edit.added_time') }}
+            </p>
+            <p class="font-black text-text-heading text-base">
+              @if (editPreviewData(); as preview) {
+                {{ formatTime(preview.addedDuration) }}
+              } @else {
+                &mdash;
+              }
+            </p>
+          </div>
+        </div>
+
+        <!-- The one thing only the user knows -->
+        @if (!uiService.isFullScreen()) {
+        <div>
+          <label
+            for="edit-start-time"
+            class="block text-text-primary text-[10px] uppercase font-bold tracking-widest mb-1"
+          >
+            {{ ts.t('detail.edit.start_time') }}
+          </label>
+          <input
+            id="edit-start-time"
+            type="datetime-local"
+            [value]="startTimeInput()"
+            [max]="maxStartTimeValue()"
+            (input)="onStartTimeInput($event)"
+            [disabled]="draftPoints().length === 0 || isSavingEdit()"
+            class="w-full bg-bg-base border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-text-heading disabled:opacity-40"
+          />
+          <p class="text-[10px] text-text-primary mt-1 leading-snug">
+            {{ ts.t('detail.edit.start_time_hint') }}
+          </p>
+        </div>
+        }
+
+        <!-- Why the draft cannot be saved yet: stays visible in full screen, otherwise a
+             disabled save button has no explanation -->
+        @if (editValidationError(); as reason) {
+          <p class="text-xs font-bold text-red-600">
+            {{ ts.t('detail.edit.invalid.' + reason) }}
+          </p>
+        }
+
+        <!-- Projection of the edit -->
+        @if (!uiService.isFullScreen() && editPreviewData(); as preview) {
+          <div class="bg-bg-base rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-text-primary font-medium">{{ ts.t('dashboard.distance') }}</span>
+              <span class="font-bold text-text-heading">
+                {{ formatDistance(activity()!.totalDistance) }}
+                <span class="text-text-primary mx-1">&rarr;</span>
+                {{ formatDistance(preview.newTotalDistance) }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-text-primary font-medium">{{ ts.t('dashboard.duration') }}</span>
+              <span class="font-bold text-text-heading">
+                {{ formatTime(activity()!.totalTime) }}
+                <span class="text-text-primary mx-1">&rarr;</span>
+                {{ formatTime(preview.newTotalTime) }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-text-primary font-medium">{{ ts.t('dashboard.avg_speed') }}</span>
+              <span class="font-bold text-text-heading">
+                {{ formatSpeed(activity()!.avgSpeed) }}
+                <span class="text-text-primary mx-1">&rarr;</span>
+                {{ formatSpeed(preview.newAvgSpeed) }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs border-t border-gray-100 pt-2">
+              <span class="text-text-primary font-medium">{{ ts.t('detail.edit.segment_speed') }}</span>
+              <span
+                class="font-bold"
+                [class]="preview.implausibleSpeed ? 'text-red-600' : 'text-text-heading'"
+              >
+                {{ formatSpeed(preview.impliedSpeed) }}
+              </span>
+            </div>
+            @if (preview.implausibleSpeed) {
+              <p class="text-[10px] font-bold text-red-600 leading-snug">
+                {{ ts.t('detail.edit.speed_warning') }}
+              </p>
+            }
+            <p class="text-[10px] text-text-primary leading-snug border-t border-gray-100 pt-2">
+              {{ ts.t('detail.edit.elevation_note') }}
+            </p>
+          </div>
+        }
+
+        @if (editError()) {
+          <p class="text-xs font-bold text-red-600">{{ editError() }}</p>
+        }
+
+        <div class="flex items-center gap-2">
+          <button
+            (click)="undoLastPoint()"
+            [disabled]="draftPoints().length === 0 || isSavingEdit()"
+            class="flex-1 py-2 rounded-xl border border-gray-200 text-text-heading font-bold text-xs uppercase tracking-wide active:scale-95 transition-all disabled:opacity-40"
+          >
+            {{ ts.t('detail.edit.undo') }}
+          </button>
+          <button
+            (click)="clearDraft()"
+            [disabled]="draftPoints().length === 0 || isSavingEdit()"
+            class="flex-1 py-2 rounded-xl border border-gray-200 text-text-heading font-bold text-xs uppercase tracking-wide active:scale-95 transition-all disabled:opacity-40"
+          >
+            {{ ts.t('detail.edit.clear') }}
+          </button>
+          <button
+            (click)="saveEdit()"
+            [disabled]="!editPreviewData() || isSavingEdit()"
+            class="flex-1 py-2 rounded-xl bg-accent text-pure-white font-bold text-xs uppercase tracking-wide active:scale-95 transition-all disabled:opacity-40"
+          >
+            @if (isSavingEdit()) {
+              {{ ts.t('detail.edit.saving') }}
+            } @else {
+              {{ ts.t('detail.edit.save') }}
+            }
+          </button>
+        </div>
+      </div>
+    }
+
     <!-- Map Container -->
     <div
       [ngClass]="
@@ -82,8 +274,12 @@
         [currentPoint]="hoveredCoordinate()"
         [enablePan]="!hoveredCoordinate()"
         [showLocationButton]="false"
+        [editMode]="isEditing()"
+        [draftPoints]="draftPoints()"
+        (mapClick)="onMapClick($event)"
       ></app-map>
 
+      @if (!isEditing()) {
       <!-- Follow Route Button -->
       <button
         (click)="followRoute()"
@@ -141,6 +337,46 @@
         }
       </button>
 
+      <!-- Export Route Button: hands the route to another Trackingfy user as JSON -->
+      <button
+        (click)="exportRoute()"
+        [disabled]="isExportingRoute()"
+        class="absolute bottom-6 left-6 bg-white p-3 rounded-2xl shadow-2xl text-text-heading z-[10000] active:scale-95 transition-all border border-gray-200 disabled:opacity-60"
+        [title]="ts.t('detail.export_route')"
+      >
+        @if (isExportingRoute()) {
+          <svg class="animate-spin h-6 w-6 text-text-heading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+        }
+      </button>
+
+      <!-- Edit Route Button: add the stretch that was never recorded -->
+      <button
+        (click)="startEdit()"
+        class="absolute bottom-20 left-6 bg-white p-3 rounded-2xl shadow-2xl text-text-heading z-[10000] active:scale-95 transition-all border border-gray-200"
+        [title]="ts.t('detail.edit_route')"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v4.5A2.25 2.25 0 0 1 17.25 21H5.25A2.25 2.25 0 0 1 3 18.75V6.75A2.25 2.25 0 0 1 5.25 4.5h4.5" />
+        </svg>
+      </button>
+      }
+
+      @if (isEditing()) {
+        <div
+          class="absolute top-4 left-1/2 -translate-x-1/2 z-[10000] bg-orange-500 text-pure-white text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg pointer-events-none"
+        >
+          {{ ts.t('detail.edit.map_hint') }}
+        </div>
+      }
+
       <!-- Full Screen Toggle Button -->
       <button
         (click)="uiService.toggleFullScreen()"
@@ -181,7 +417,7 @@
     </div>
 
     <!-- Chart Container -->
-    @if (!uiService.isFullScreen() && chartPoints().length > 0) {
+    @if (!uiService.isFullScreen() && !isEditing() && chartPoints().length > 0) {
       <div
         class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 flex flex-col shrink-0 overflow-hidden"
         style="height: 180px"

@@ -9,6 +9,8 @@ export interface ConfirmOptions {
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'info';
+  /** Drops the cancel button, for messages that ask nothing of the user. */
+  hideCancel?: boolean;
 }
 
 @Injectable({
@@ -111,6 +113,21 @@ export class UIService {
     });
     return new Promise((resolve) => {
       this.confirmResolver = resolve;
+    });
+  }
+
+  /**
+   * Show an explanation with a single acknowledge button.
+   *
+   * Long help text costs screen space every time a panel is open, so it lives here and
+   * appears only when someone taps the information icon that offers it.
+   */
+  info(options: { title: string; message: string }): Promise<boolean> {
+    return this.confirm({
+      ...options,
+      confirmText: this.ts.t('confirm.btn.got_it'),
+      hideCancel: true,
+      type: 'info',
     });
   }
 
