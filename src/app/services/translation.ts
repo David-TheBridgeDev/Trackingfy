@@ -52,7 +52,7 @@ export class TranslationService {
       'settings.backup.route_duplicate': 'Esa ruta ya está en tu historial',
       'settings.backup.route_invalid': 'Ese fichero no es una ruta de Trackingfy',
       'settings.backup.elevation_note':
-        '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenTopoData, un proveedor externo, para obtener la altitud del terreno. El resto de la aplicación sigue funcionando solo en local.',
+        '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenMeteo, un proveedor externo, para obtener la altitud del terreno. El resto de la aplicación sigue funcionando solo en local.',
 
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
@@ -199,7 +199,7 @@ export class TranslationService {
       'settings.backup.route_duplicate': 'That route is already in your history',
       'settings.backup.route_invalid': 'That file is not a Trackingfy route',
       'settings.backup.elevation_note':
-        '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenTopoData, an external provider, to obtain the terrain altitude. Everything else in the app stays local.',
+        '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenMeteo, an external provider, to obtain the terrain altitude. Everything else in the app stays local.',
 
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
