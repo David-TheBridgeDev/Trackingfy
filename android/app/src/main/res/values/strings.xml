@@ -4,4 +4,14 @@
     <string name="title_activity_main">Trackingfy</string>
     <string name="package_name">com.trackingfy.app</string>
     <string name="custom_url_scheme">com.trackingfy.app</string>
+
+    <!-- Read by @capgo/background-geolocation when it builds the foreground service
+         notification. Without them it falls back to the adaptive launcher icon, which
+         Android flattens into a white square in the status bar. -->
+    <string name="capacitor_background_geolocation_notification_icon" translatable="false">drawable/ic_stat_trackingfy</string>
+    <string name="capacitor_background_geolocation_notification_color" translatable="false">#efbc21</string>
+    <!-- The name the user sees for this channel under Settings > Notifications. It follows
+         the system locale rather than the in-app language, which is the right behaviour for
+         a string rendered by the system rather than by us. -->
+    <string name="capacitor_background_geolocation_notification_channel_name">Activity recording</string>
 </resources>

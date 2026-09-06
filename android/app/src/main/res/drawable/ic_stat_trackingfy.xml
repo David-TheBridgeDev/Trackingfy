@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Small icon for the recording notification. Android reduces small icons to their alpha
+     channel and repaints them, so this is a flat silhouette rather than the colour launcher
+     icon: the pin and trail of the app icon, simplified enough to stay readable at 24dp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M12,2 C9.2385,2 7,4.2385 7,7 C7,10.2 12,15.5 12,15.5 C12,15.5 17,10.2 17,7 C17,4.2385 14.7615,2 12,2 Z M12,4.8 C13.215,4.8 14.2,5.785 14.2,7 C14.2,8.215 13.215,9.2 12,9.2 C10.785,9.2 9.8,8.215 9.8,7 C9.8,5.785 10.785,4.8 12,4.8 Z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M3.5,20.5 C6,20.5 6.5,18 9,18 C12,18 12,21 15,21 C18,21 19,18.5 20.5,18.5" />
+</vector>

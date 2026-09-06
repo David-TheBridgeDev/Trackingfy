@@ -3,10 +3,25 @@ import { DatabaseService, Activity, Coordinate, Split } from './database';
 import { TranslationService } from './translation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
+import { TrackingNotificationService, type TrackingNotificationAction } from './tracking-notification';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export type TrackingState = 'idle' | 'tracking' | 'paused';
+
+// A permission probe that never gets a fix still holds a foreground service, and with it a
+// notification, so it is bounded. Recentering the map is the retry, and starting a recording
+// opens its own session regardless of how the probe ended.
+const PERMISSION_PROBE_TIMEOUT_MS = 20000;
+
+// Matches how the dashboard renders the same value, so the notification and the screen it
+// mirrors never disagree about the elapsed time.
+function formatElapsed(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return [h, m, s].map((v) => (v < 10 ? '0' + v : v)).join(':');
+}
 
 @Injectable({
   providedIn: 'root'
@@ -51,74 +66,107 @@ export class TrackingService {
   permissionDenied = signal(false);
   
   private timerInterval: any;
+  private permissionProbe: { done: Promise<boolean>; cancel: () => void } | null = null;
+  private lastNotificationKey: string | null = null;
 
   constructor(
     private db: DatabaseService,
     private ngZone: NgZone,
-    private ts: TranslationService
-  ) {}
+    private ts: TranslationService,
+    private notification: TrackingNotificationService
+  ) {
+    void this.notification.onAction((action) => this.applyNotificationAction(action));
+  }
 
   async requestPermission(): Promise<boolean> {
+    // The startup probe and the map's recenter retry can both land here at once, and the
+    // native plugin rejects a second session with ALREADY_STARTED. One probe at a time.
+    if (this.permissionProbe) return this.permissionProbe.done;
+
     if (Capacitor.isNativePlatform()) {
-      try {
-        return new Promise((resolve) => {
-          let resolved = false;
-          
-          BackgroundGeolocation.start(
-            { requestPermissions: true, stale: true },
-            async (location, error) => {
-              if (error) {
-                console.error(error);
-                if (!resolved) {
-                  resolved = true;
-                  this.ngZone.run(() => {
-                    this.permissionDenied.set(true);
-                  });
-                  await BackgroundGeolocation.stop();
-                  resolve(false);
-                }
-                return;
-              }
-              
-              if (location && !resolved) {
-                resolved = true;
-                this.ngZone.run(() => {
-                  this.permissionDenied.set(false);
-                  this.lastCoordinate.set({
-                    activityId: 0,
-                    lat: location.latitude,
-                    lng: location.longitude,
-                    timestamp: location.time || Date.now(),
-                    altitude: location.altitude ?? null,
-                    speed: location.speed ?? null
-                  });
-                  this.currentAltitude.set(location.altitude ?? null);
-                });
-                await BackgroundGeolocation.stop();
-                resolve(true);
-              }
-            }
-          ).catch(e => {
-            if (!resolved) {
-              resolved = true;
-              this.ngZone.run(() => {
-                this.permissionDenied.set(true);
-              });
-              resolve(false);
-            }
-          });
-        });
-      } catch (e) {
-        this.ngZone.run(() => {
-          this.permissionDenied.set(true);
-        });
-        return false;
-      }
+      return this.probeNativeLocation();
     }
 
+    return this.probeBrowserLocation();
+  }
+
+  // Asking natively means running a real BackgroundGeolocation session, which means a real
+  // foreground service notification. So every exit path stops it before the caller hears
+  // back, and the probe is cancellable for when the user starts recording mid-probe.
+  private probeNativeLocation(): Promise<boolean> {
+    let settle: ((granted: boolean) => void) | null = null;
+    let timeout: any;
+
+    const finish = async (granted: boolean) => {
+      if (!settle) return;
+      const resolve = settle;
+      settle = null;
+      clearTimeout(timeout);
+      try {
+        await BackgroundGeolocation.stop();
+      } catch {
+        // Nothing was running, which is the state we were trying to reach anyway.
+      }
+      this.permissionProbe = null;
+      resolve(granted);
+    };
+
+    const fail = (e: unknown) => {
+      console.error('Error probing location permission:', e);
+      this.ngZone.run(() => {
+        this.permissionDenied.set(true);
+      });
+      void finish(false);
+    };
+
+    const done = new Promise<boolean>((resolve) => {
+      settle = resolve;
+    });
+    this.permissionProbe = { done, cancel: () => void finish(false) };
+    timeout = setTimeout(() => void finish(false), PERMISSION_PROBE_TIMEOUT_MS);
+
+    try {
+      BackgroundGeolocation.start(
+        {
+          backgroundTitle: this.ts.t('tracking.permission_title'),
+          backgroundMessage: this.ts.t('tracking.permission_message'),
+          requestPermissions: true,
+          stale: true
+        },
+        (location, error) => {
+          if (error) {
+            fail(error);
+            return;
+          }
+
+          if (location) {
+            this.ngZone.run(() => {
+              this.permissionDenied.set(false);
+              this.lastCoordinate.set({
+                activityId: 0,
+                lat: location.latitude,
+                lng: location.longitude,
+                timestamp: location.time || Date.now(),
+                altitude: location.altitude ?? null,
+                speed: location.speed ?? null
+              });
+              this.currentAltitude.set(location.altitude ?? null);
+            });
+            void finish(true);
+          }
+        }
+      ).catch(fail);
+    } catch (e) {
+      fail(e);
+    }
+
+    return done;
+  }
+
+  private probeBrowserLocation(): Promise<boolean> {
     if (!('geolocation' in navigator)) {
       console.error('Geolocation not supported');
-      return false;
+      return Promise.resolve(false);
     }
 
     return new Promise((resolve) => {
@@ -156,6 +204,15 @@ export class TrackingService {
 
   async startTracking() {
     if (this.state() !== 'idle') return;
+
+    // The startup probe holds a BackgroundGeolocation session of its own, and the plugin
+    // would reject the recording session with ALREADY_STARTED while it is still up.
+    const probe = this.permissionProbe;
+    if (probe) {
+      probe.cancel();
+      await probe.done;
+      if (this.state() !== 'idle') return;
+    }
 
     const activity: Activity = {
       date: new Date(),
@@ -195,6 +252,12 @@ export class TrackingService {
 
     this.startTimer();
     await this.startGeolocation();
+    this.syncNotification(true);
+
+    // Asked here rather than at start-up: the notification only becomes true once something
+    // is being recorded, and by this point the location dialog has already been settled, so
+    // the two never stack. Deliberately not awaited - a recording does not wait on a dialog.
+    void this.notification.ensurePermission().then(() => this.syncNotification(true));
   }
 
   pauseTracking() {
@@ -202,12 +265,14 @@ export class TrackingService {
     this.state.set('paused');
     this.stopTimer();
     this.currentSpeed.set(0);
+    this.syncNotification(true);
   }
 
   resumeTracking() {
     if (this.state() !== 'paused') return;
     this.state.set('tracking');
     this.startTimer();
+    this.syncNotification(true);
   }
 
   loadReferenceRoute(coords: Coordinate[], activityId: number) {
@@ -221,6 +286,73 @@ export class TrackingService {
   }
 
 
+
+  private applyNotificationAction(action: TrackingNotificationAction) {
+    if (action === 'pause') {
+      this.pauseTracking();
+    } else if (action === 'resume') {
+      this.resumeTracking();
+    } else {
+      void this.stopTracking();
+    }
+  }
+
+  /**
+   * Redraw the recording notification, but only when what it says would actually change.
+   *
+   * The elapsed time ticks in the system UI on its own from a fixed start instant, so the
+   * only live value left is the distance - and only at the resolution the notification
+   * shows. Bucketing on the rendered strings is what stops a fast descent from reposting
+   * several times a second for digits nobody can read.
+   */
+  private syncNotification(force = false) {
+    if (!this.notification.available) return;
+
+    const state = this.state();
+    if (state === 'idle') {
+      this.lastNotificationKey = null;
+      return;
+    }
+
+    const paused = state === 'paused';
+    const elapsed = this.currentTime();
+    const distance = (Math.round(this.currentDistance() / 100) / 10).toFixed(1);
+    const climb = String(Math.round(this.currentClimb() / 10) * 10);
+
+    const key = `${state}|${distance}|${climb}|${paused ? elapsed : ''}`;
+    if (!force && key === this.lastNotificationKey) return;
+    this.lastNotificationKey = key;
+
+    // Derived from the timer's own bookkeeping rather than from the clock, so repeated
+    // reposts within a segment hand the system the same instant and the seconds do not
+    // jitter. A paused session sends none at all and carries its frozen time in the text.
+    const chronometerBase =
+      !paused && this.startTimeSegment !== null
+        ? this.startTimeSegment - this.accumulatedTime * 1000
+        : undefined;
+
+    void this.notification.update({
+      title: paused
+        ? this.ts.t('tracking.notif_paused_title')
+        : this.ts.t('tracking.bg_title'),
+      text: paused
+        ? this.ts.t('tracking.notif_stats_paused', {
+            distance,
+            climb,
+            time: formatElapsed(elapsed)
+          })
+        : this.ts.t('tracking.notif_stats', { distance, climb }),
+      chipText: `${distance} km`,
+      ongoingSince: chronometerBase,
+      promoted: true,
+      actions: [
+        paused
+          ? { id: 'resume', title: this.ts.t('tracking.notif_action_resume') }
+          : { id: 'pause', title: this.ts.t('tracking.notif_action_pause') },
+        { id: 'finish', title: this.ts.t('tracking.notif_action_finish') }
+      ]
+    });
+  }
 
   private updateCurrentTime() {
     if (this.state() === 'tracking' && this.startTimeSegment !== null) {
@@ -444,6 +576,7 @@ export class TrackingService {
         }
         
         this.updateCurrentTime();
+        this.syncNotification();
       }
 
       this.lastCoordinate.set(newCoord);
@@ -510,6 +643,7 @@ export class TrackingService {
     this.lastAccumulatedAltitude = null;
     this.accumulatedTime = 0;
     this.startTimeSegment = null;
+    this.lastNotificationKey = null;
     this.clearReferenceRoute();
   }
 

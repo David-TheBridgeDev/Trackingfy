@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
         // Must be registered before the bridge starts, so the plugin can read the intent
         // that launched the activity.
         registerPlugin(RouteImportPlugin.class);
+        registerPlugin(TrackingNotificationPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
