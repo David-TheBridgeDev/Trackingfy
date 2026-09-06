@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatabaseService, Activity, Coordinate } from '../../services/database';
@@ -15,11 +15,13 @@ import {
   toLocalInputValue,
 } from '../../services/route-editor';
 import { buildRouteExport } from '../../services/route-export';
+import { fillAltitudeGaps } from '../../services/route-image';
+import { haversine } from '../../services/route-stats';
 import { App } from '../../app';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
-import html2canvas from 'html2canvas';
+import { ShareComposerComponent } from '../share-composer/share-composer';
 
 export interface ChartPoint {
   distance: number; // in km
@@ -34,15 +36,13 @@ export interface ChartPoint {
 
 @Component({
   selector: 'app-activity-detail',
-  imports: [CommonModule, MapComponent, RouterLink],
+  imports: [CommonModule, MapComponent, RouterLink, ShareComposerComponent],
   templateUrl: './activity-detail.html',
 })
 export class ActivityDetailComponent implements OnInit {
-  @ViewChild('exportContainer') exportContainer!: ElementRef;
-
   activity = signal<Activity | null>(null);
   coordinates = signal<Coordinate[]>([]);
-  isGeneratingSticker = signal(false);
+  isSharingImage = signal(false);
   isExportingRoute = signal(false);
 
   svgViewBox = signal<string>('0 0 100 100');
@@ -177,53 +177,34 @@ export class ActivityDetailComponent implements OnInit {
     this.processChartData(coords);
   }
 
-  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3;
-    const p1 = (lat1 * Math.PI) / 180;
-    const p2 = (lat2 * Math.PI) / 180;
-    const dp = ((lat2 - lat1) * Math.PI) / 180;
-    const dl = ((lon2 - lon1) * Math.PI) / 180;
-    const a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-
   private processChartData(coords: Coordinate[]) {
     if (coords.length === 0) return;
 
     let totalDist = 0;
     const points: ChartPoint[] = [];
+    const altitudes = fillAltitudeGaps(coords);
 
     for (let i = 0; i < coords.length; i++) {
       const c = coords[i];
       if (i > 0) {
-        totalDist += this.calculateDistance(coords[i - 1].lat, coords[i - 1].lng, c.lat, c.lng);
-      }
-
-      let alt = c.altitude;
-      if (alt === null || alt === undefined) {
-        let leftAlt = 0, foundLeft = false;
-        for (let j = i - 1; j >= 0; j--) {
-          if (coords[j].altitude != null) { leftAlt = coords[j].altitude!; foundLeft = true; break; }
-        }
-        let rightAlt = 0, foundRight = false;
-        for (let j = i + 1; j < coords.length; j++) {
-          if (coords[j].altitude != null) { rightAlt = coords[j].altitude!; foundRight = true; break; }
-        }
-        if (foundLeft && foundRight) alt = (leftAlt + rightAlt) / 2;
-        else if (foundLeft) alt = leftAlt;
-        else if (foundRight) alt = rightAlt;
-        else alt = 0;
+        totalDist += haversine(coords[i - 1].lat, coords[i - 1].lng, c.lat, c.lng);
       }
 
       const speed = (c.speed || 0) * 3.6;
-      points.push({ distance: totalDist / 1000, altitude: alt, speed, coordinate: c, x: 0, yAlt: 0, ySpeed: 0 });
+      points.push({
+        distance: totalDist / 1000,
+        altitude: altitudes[i],
+        speed,
+        coordinate: c,
+        x: 0,
+        yAlt: 0,
+        ySpeed: 0,
+      });
     }
 
     if (points.length === 0) return;
 
     const maxDist = points[points.length - 1].distance || 1;
-    const altitudes = points.map(p => p.altitude);
     const speeds = points.map(p => p.speed);
     const minAlt = Math.min(...altitudes);
     const maxAlt = Math.max(...altitudes);
@@ -521,49 +502,18 @@ export class ActivityDetailComponent implements OnInit {
     }
   }
 
-  async shareSticker() {
-    if (!this.exportContainer) return;
-    this.isGeneratingSticker.set(true);
+  /** Open the composer, where the picture is built before it is shared. */
+  openShareComposer() {
+    if (this.coordinates().length === 0) return;
+    this.isSharingImage.set(true);
+  }
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100));
+  closeShareComposer() {
+    this.isSharingImage.set(false);
+  }
 
-      const canvas = await html2canvas(this.exportContainer.nativeElement, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null, // Keep transparent or background from css
-        scale: 1 // No need to upscale, we are exporting a 1080x1080 block
-      });
-
-      const dataUrl = canvas.toDataURL('image/png'); // Export as PNG
-      const fileName = `trackingfy-route-${Date.now()}.png`;
-
-      if (Capacitor.getPlatform() === 'web') {
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        const savedFile = await Filesystem.writeFile({
-          path: fileName,
-          data: dataUrl,
-          directory: Directory.Cache
-        });
-
-        await Share.share({
-          title: this.ts.t('share.title'),
-          text: this.ts.t('share.text'),
-          url: savedFile.uri,
-          dialogTitle: this.ts.t('share.dialog_title')
-        });
-      }
-    } catch (e) {
-      console.error('Error generating or sharing sticker', e);
-    } finally {
-      this.isGeneratingSticker.set(false);
-    }
+  onShareFailed(key: string) {
+    this.appComponent.triggerToast(this.ts.t(key));
   }
 
   followRoute() {

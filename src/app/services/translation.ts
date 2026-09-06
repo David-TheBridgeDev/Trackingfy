@@ -52,7 +52,7 @@ export class TranslationService {
       'settings.backup.route_duplicate': 'Esa ruta ya está en tu historial',
       'settings.backup.route_invalid': 'Ese fichero no es una ruta de Trackingfy',
       'settings.backup.elevation_note':
-        '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenMeteo, un proveedor externo, para obtener la altitud del terreno. El resto de la aplicación sigue funcionando solo en local.',
+        '* Al editar una ruta para añadirle un tramo, las coordenadas de ese tramo se envían a OpenMeteo, un proveedor externo, para obtener la altitud del terreno. Al compartir una ruta como imagen con el mapa de fondo activado, se descargan las teselas del mapa desde OpenStreetMap. El resto de la aplicación sigue funcionando solo en local.',
 
       'confirm.title.stop': '¿Detener actividad?',
       'confirm.message.stop': '¿Estás seguro de que deseas detener y guardar esta sesión?',
@@ -156,6 +156,31 @@ export class TranslationService {
       'share.route.title': 'Ruta de Trackingfy',
       'share.route.text': 'Te comparto esta ruta para que la abras en Trackingfy.',
       'share.route.dialog_title': 'Compartir ruta (JSON)',
+
+      'share.error': 'No se pudo generar la imagen',
+      'share.composer.title': 'Compartir imagen',
+      'share.composer.format': 'Formato',
+      'share.composer.theme': 'Estilo',
+      'share.composer.background': 'Fondo',
+      'share.composer.background.solid': 'Sólido',
+      'share.composer.background.transparent': 'Transparente',
+      'share.composer.background.hint':
+        'Transparente genera un PNG tipo pegatina, para superponer sobre otra imagen. Algunas apps lo rellenan de negro al publicarlo.',
+      'share.composer.background.blocked':
+        'El mapa ocupa toda la imagen, así que no queda fondo que dejar transparente. Desactiva el mapa para poder elegirlo.',
+      'share.composer.layers': 'Capas',
+      'share.composer.stats': 'Datos a mostrar',
+      'share.composer.share': 'Compartir',
+      'share.composer.sharing': 'Generando...',
+      'share.composer.reset': 'Restablecer',
+      'share.composer.map_unavailable':
+        'No se pudo cargar el mapa. La imagen se genera igual, sin el mapa de fondo.',
+      'share.layer.map': 'Mapa de fondo',
+      'share.layer.route': 'Trazado',
+      'share.layer.elevation': 'Desnivel',
+      'share.layer.stats': 'Estadísticas',
+      'share.layer.title': 'Título y fecha',
+      'share.layer.branding': 'Logo Trackingfy',
     },
     en: {
       'app.title': 'Trackingfy',
@@ -199,7 +224,7 @@ export class TranslationService {
       'settings.backup.route_duplicate': 'That route is already in your history',
       'settings.backup.route_invalid': 'That file is not a Trackingfy route',
       'settings.backup.elevation_note':
-        '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenMeteo, an external provider, to obtain the terrain altitude. Everything else in the app stays local.',
+        '* When you edit a route to add a stretch, the coordinates of that stretch are sent to OpenMeteo, an external provider, to obtain the terrain altitude. When you share a route as an image with the map background on, the map tiles are downloaded from OpenStreetMap. Everything else in the app stays local.',
 
       'confirm.title.stop': 'Stop Activity?',
       'confirm.message.stop': 'Are you sure you want to end and save this session?',
@@ -303,6 +328,31 @@ export class TranslationService {
       'share.route.title': 'Trackingfy route',
       'share.route.text': 'Here is a route for you to open in Trackingfy.',
       'share.route.dialog_title': 'Share route (JSON)',
+
+      'share.error': 'The image could not be generated',
+      'share.composer.title': 'Share image',
+      'share.composer.format': 'Format',
+      'share.composer.theme': 'Style',
+      'share.composer.background': 'Background',
+      'share.composer.background.solid': 'Solid',
+      'share.composer.background.transparent': 'Transparent',
+      'share.composer.background.hint':
+        'Transparent gives you a sticker-style PNG to lay over another image. Some apps fill it with black when you post it.',
+      'share.composer.background.blocked':
+        'The map fills the whole image, so there is no background left to see through. Turn the map off to choose it.',
+      'share.composer.layers': 'Layers',
+      'share.composer.stats': 'Stats to show',
+      'share.composer.share': 'Share',
+      'share.composer.sharing': 'Generating...',
+      'share.composer.reset': 'Reset',
+      'share.composer.map_unavailable':
+        'The map could not be loaded. The image is still generated, without the map behind it.',
+      'share.layer.map': 'Map background',
+      'share.layer.route': 'Route line',
+      'share.layer.elevation': 'Elevation',
+      'share.layer.stats': 'Stats',
+      'share.layer.title': 'Title and date',
+      'share.layer.branding': 'Trackingfy logo',
     },
   };
 
