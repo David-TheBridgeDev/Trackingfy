@@ -498,7 +498,7 @@ export class RouteImageService {
     }
 
     if (options.elevation && layout.elevationCard) {
-      this.drawElevation(ctx, coordinates, layout.elevationCard, palette, u);
+      this.drawElevation(ctx, activity, coordinates, layout.elevationCard, palette, u);
     }
 
     if (options.stats && layout.statsCard) {
@@ -797,6 +797,7 @@ export class RouteImageService {
 
   private drawElevation(
     ctx: CanvasRenderingContext2D,
+    activity: Activity,
     coordinates: Coordinate[],
     card: Rect,
     palette: Palette,
@@ -864,15 +865,26 @@ export class RouteImageService {
     ctx.lineJoin = 'round';
     ctx.stroke();
 
+    // The horizontal axis is distance, so distance is what its two ends may carry. The
+    // altitude range is a vertical quantity and goes up in the header: printed at the ends
+    // of this axis it read as the altitude the route started and finished at, which is not
+    // what it is — the highest point is usually somewhere in the middle.
     const baseline = card.y + card.h - 12 * u;
     ctx.fillStyle = palette.muted;
     ctx.font = `700 ${20 * u}px ${FONT_STACK}`;
     ctx.textAlign = 'left';
-    ctx.fillText(`${Math.round(minAlt)} m`, plot.x, baseline);
+    ctx.fillText('0 km', plot.x, baseline);
     ctx.textAlign = 'right';
-    ctx.fillText(`${Math.round(maxAlt)} m`, plot.x + plot.w, baseline);
-    ctx.textAlign = 'center';
-    ctx.fillText(`${(totalDistance / 1000).toFixed(2)} km`, plot.x + plot.w / 2, baseline);
+    // The activity's own distance rather than the one summed here, so the picture does not
+    // show two slightly different lengths for the same route.
+    ctx.fillText(`${(activity.totalDistance / 1000).toFixed(2)} km`, plot.x + plot.w, baseline);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(
+      `${Math.round(minAlt)} – ${Math.round(maxAlt)} m`,
+      card.x + card.w - 30 * u,
+      card.y + 32 * u,
+    );
   }
 
   private drawStats(
