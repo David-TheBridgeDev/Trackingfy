@@ -1,0 +1,49 @@
+<footer class="border-t border-line bg-surface">
+  <div class="container-site grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1.2fr_1fr]">
+    <div>
+      <a href="/" class="inline-flex items-center gap-2 rounded-lg" aria-label="Trackingfy, inicio">
+        {{> logo-mark}}
+        <span class="text-xl font-black uppercase tracking-tighter">Trackingfy</span>
+      </a>
+      <p class="mt-4 max-w-xs text-sm leading-relaxed text-muted">
+        Tracker GPS para caminar, correr y montar en bici. Sin cuenta, sin anuncios y con tus rutas guardadas solo en tu
+        dispositivo.
+      </p>
+      <a href="{{appPath}}" class="btn btn-primary btn-sm mt-6">Empezar a grabar</a>
+    </div>
+
+    <nav aria-labelledby="pie-producto">
+      <h2 id="pie-producto" class="footer-title">Producto</h2>
+      <ul class="footer-list">
+        <li><a href="{{appPath}}">Abrir la app</a></li>
+        <li><a href="/#funciones">Funciones</a></li>
+        <li><a href="/#descargar">Descargar para Android</a></li>
+        <li><a href="{{repoUrl}}" rel="noopener">Código fuente</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-labelledby="pie-guias">
+      <h2 id="pie-guias" class="footer-title">Guías</h2>
+      <ul class="footer-list">
+        {{> footer-posts}}
+        <li><a href="/blog">Todas las guías</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-labelledby="pie-legal">
+      <h2 id="pie-legal" class="footer-title">Legal</h2>
+      <ul class="footer-list">
+        <li><a href="/aviso-legal">Aviso legal</a></li>
+        <li><a href="/privacidad">Política de privacidad</a></li>
+        <li><a href="/cookies">Política de cookies</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="border-t border-line">
+    <div class="container-site flex flex-col gap-2 py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© {{year}} Trackingfy · Código abierto con licencia MIT · v{{version}}</p>
+      <p>Un proyecto de <a href="{{creatorUrl}}" class="font-semibold transition hover:text-ink">dramos.dev</a></p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,45 @@
+<header class="sticky top-0 z-50 border-b border-line/70 bg-canvas/85 backdrop-blur-xl">
+  <div class="container-site flex h-16 items-center justify-between gap-6">
+    <a href="/" class="flex items-center gap-2 rounded-lg" aria-label="Trackingfy, inicio">
+      {{> logo-mark}}
+      <span class="text-xl font-black uppercase tracking-tighter">Trackingfy</span>
+    </a>
+
+    <nav aria-label="Principal" class="hidden md:block">
+      <ul class="flex items-center gap-7 text-sm font-semibold text-muted">
+        <li><a class="transition hover:text-ink" href="/#funciones">Funciones</a></li>
+        <li><a class="transition hover:text-ink" href="/#como-funciona">Cómo funciona</a></li>
+        <li><a class="transition hover:text-ink" href="/#privacidad">Privacidad</a></li>
+        <li><a class="transition hover:text-ink" href="/blog">Blog</a></li>
+        <li><a class="transition hover:text-ink" href="/#faq">Preguntas</a></li>
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="{{appPath}}" class="btn btn-primary btn-sm">Abrir la app</a>
+      <button
+        type="button"
+        class="grid size-10 place-items-center rounded-full border border-line bg-surface text-ink md:hidden"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        aria-label="Abrir menú"
+        data-menu-toggle
+      >
+        {{icon menu}}
+      </button>
+    </div>
+  </div>
+
+  <div id="menu-movil" class="border-t border-line bg-canvas md:hidden" hidden>
+    <nav aria-label="Menú móvil">
+      <ul class="container-site divide-y divide-line py-2 text-base font-bold">
+        <li><a class="block py-3.5" href="/#funciones">Funciones</a></li>
+        <li><a class="block py-3.5" href="/#como-funciona">Cómo funciona</a></li>
+        <li><a class="block py-3.5" href="/#privacidad">Privacidad</a></li>
+        <li><a class="block py-3.5" href="/#descargar">Descargar</a></li>
+        <li><a class="block py-3.5" href="/blog">Blog</a></li>
+        <li><a class="block py-3.5" href="/#faq">Preguntas frecuentes</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

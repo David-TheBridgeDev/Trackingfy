@@ -1,0 +1,116 @@
+---
+path: /blog/anadir-tramo-olvidado-ruta
+template: article
+title: Olvidé darle a grabar: cómo añadir el tramo que falta a tu ruta
+heading: Olvidé darle a grabar: cómo añadir el tramo que falta a tu ruta
+short: Añadir el tramo que no grabaste
+description: ¿Empezaste a grabar tarde? Así puedes dibujar el tramo inicial que no se registró, ajustar tu hora real de salida y recuperar distancia, tiempo y desnivel.
+category: Guía
+cover: cover-edit
+date: 2026-09-15
+updated: 2026-09-15
+---
+<p class="lead">
+  Sales de casa, arrancas a buen ritmo y, dos kilómetros después, miras el móvil: no le diste a grabar. Pulsas el
+  botón, pero el daño está hecho. La ruta empieza en mitad de ninguna parte y la distancia, el tiempo y la media ya no
+  cuadran.
+</p>
+
+<p>
+  Le pasa a todo el mundo. Por eso Trackingfy incluye un editor para <strong>añadir el tramo inicial que no se
+  grabó</strong>: lo dibujas sobre el mapa y la app recalcula la actividad completa.
+</p>
+
+<h2 id="que-hace">Qué hace exactamente el editor de rutas</h2>
+
+<p>
+  El editor añade un tramo dibujado a mano <strong>antes del primer punto grabado</strong>. No toca lo que registró el
+  GPS: completa lo que falta al principio. Al guardar:
+</p>
+
+<ul>
+  <li>Se recalculan la distancia, el desnivel positivo y negativo, la velocidad máxima y los parciales.</li>
+  <li>El tiempo total y el tiempo en movimiento suman la duración del tramo añadido.</li>
+  <li>La actividad lleva la etiqueta <strong>«Editada»</strong>, para que sepas que no todo salió del GPS.</li>
+  <li>En el mapa, el tramo añadido se ve <strong>punteado en naranja</strong> y el grabado sigue en rojo.</li>
+</ul>
+
+<figure>
+  <div class="aspect-[16/10]">{{> cover-edit}}</div>
+  <figcaption>El tramo añadido a mano va desde donde saliste de verdad hasta el punto rojo donde arrancó la grabación.</figcaption>
+</figure>
+
+<h2 id="paso-a-paso">Paso a paso</h2>
+
+<ol>
+  <li>
+    <strong>Abre la actividad</strong> desde el Historial y pulsa <strong>«Editar ruta»</strong>.
+  </li>
+  <li>
+    <strong>Marca el recorrido en el mapa.</strong> Toca desde el punto donde saliste de verdad hasta el punto rojo, que
+    es donde empezó la grabación. Si te equivocas, arrastra un punto para moverlo o tócalo para quitarlo. También tienes
+    los botones «Deshacer» y «Borrar».
+  </li>
+  <li>
+    <strong>Revisa la hora real de inicio.</strong> Trackingfy propone la hora que sale de aplicar tu ritmo medio al
+    tramo que has dibujado. Si recuerdas a qué hora saliste, corrígela: es el dato que más influye en el resultado.
+  </li>
+  <li>
+    <strong>Mira la velocidad del tramo.</strong> La app te la muestra y te avisa si es poco realista para el tipo de
+    actividad, por ejemplo, si para una caminata sale una velocidad de bici. Suele indicar que la hora de inicio no
+    encaja con los puntos marcados.
+  </li>
+  <li>
+    <strong>Pulsa «Guardar».</strong> En ese momento se calcula el desnivel del tramo consultando un modelo de elevación
+    del terreno, y la actividad se actualiza.
+  </li>
+</ol>
+
+<h2 id="como-se-recalcula">Cómo se recalculan las estadísticas</h2>
+
+<p>
+  Para el tramo añadido no hay datos de cómo fue tu ritmo, porque no se grabó. Trackingfy reparte su duración como si lo
+  hubieras recorrido a velocidad constante, desde la hora de inicio que indicas hasta el primer punto grabado. Cualquier
+  cosa más fina sería inventarse datos.
+</p>
+
+<p>
+  A partir de ahí, las métricas que dependen de la geometría, como la distancia, el desnivel, la pendiente o los
+  parciales, se recalculan sobre la ruta completa. La velocidad media se obtiene de la nueva distancia y el nuevo tiempo
+  en movimiento. Así, las cifras son coherentes con lo que ves en el mapa.
+</p>
+
+<h2 id="corregir">Si te equivocas, se puede corregir</h2>
+
+<p>
+  Si vuelves a editar la ruta, el tramo que ya añadiste aparece en el mapa para que lo retoques. Y si prefieres volver
+  al principio, quita todos los puntos y guarda: la actividad vuelve a ser exactamente lo que grabó el GPS.
+</p>
+
+<h2 id="privacidad">¿Qué se envía al guardar?</h2>
+
+<p>
+  Para conocer la altitud del terreno, Trackingfy envía <strong>solo las coordenadas del tramo que has dibujado</strong>
+  al servicio de elevación Open-Meteo (y, si no responde, a Open-Elevation). El resto de la ruta, tu historial y tus
+  estadísticas no salen del dispositivo. Por eso esta es una de las pocas funciones que necesitan conexión.
+</p>
+
+<h2 id="consejos">Consejos para que el resultado sea fiel</h2>
+
+<ul>
+  <li><strong>Sigue las calles y caminos reales</strong>, no la línea recta: la distancia saldrá mucho más ajustada.</li>
+  <li><strong>Pon más puntos en las curvas</strong> y menos en las rectas largas.</li>
+  <li><strong>Afina la hora de inicio.</strong> Una foto o un mensaje que enviaste al salir te pueden dar la hora exacta.</li>
+  <li><strong>Hazlo cuanto antes</strong>, mientras recuerdas por dónde pasaste.</li>
+</ul>
+
+<div class="callout">
+  <p><strong>Para la próxima vez:</strong> en Android, la notificación de Trackingfy te deja pausar y finalizar sin
+  abrir la app, y si abres la app nada más salir, el botón amarillo está justo en el centro. Pero si se te olvida, ya
+  sabes que tiene arreglo.</p>
+</div>
+
+<p>
+  ¿Tienes una ruta a medias en tu historial? <a href="{{appPath}}">Abre Trackingfy</a>, ve al Historial y complétala en
+  un par de minutos.
+</p>

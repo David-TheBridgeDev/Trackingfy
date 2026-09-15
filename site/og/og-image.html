@@ -1,0 +1,87 @@
+<!doctype html>
+<!--
+  Source of site/media/og-image.png, the 1200×630 preview shown when a page is shared.
+  Regenerate it with a Chromium-based browser in headless mode, for example:
+    msedge --headless=new --hide-scrollbars --window-size=1200,630 --screenshot=site/media/og-image.png site/og/og-image.html
+-->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * { box-sizing: border-box; margin: 0; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+      body {
+        position: relative;
+        background: #0d0d0e;
+        color: #fff;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      }
+      .glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+      .glow.a { width: 620px; height: 620px; right: -120px; top: -260px; background: rgba(239, 188, 33, 0.28); }
+      .glow.b { width: 420px; height: 420px; left: -160px; bottom: -220px; background: rgba(249, 115, 22, 0.14); }
+      .topo { position: absolute; inset: 0; color: rgba(255, 255, 255, 0.06); }
+      .content { position: absolute; left: 80px; top: 72px; width: 640px; }
+      .brand { display: flex; align-items: center; gap: 14px; }
+      .brand span { font-size: 34px; font-weight: 900; letter-spacing: -0.06em; text-transform: uppercase; }
+      h1 { margin-top: 56px; font-size: 76px; line-height: 0.98; font-weight: 900; letter-spacing: -0.055em; }
+      h1 em { font-style: normal; color: #efbc21; }
+      .chips { display: flex; gap: 12px; margin-top: 44px; }
+      .chip { padding: 12px 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14); font-size: 22px; font-weight: 700; }
+      .url { position: absolute; left: 80px; bottom: 56px; font-size: 22px; font-weight: 700; color: rgba(255, 255, 255, 0.55); }
+      .phone { position: absolute; right: 96px; top: 70px; width: 300px; height: 620px; border-radius: 48px; background: #1b1b1e; padding: 12px; box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6); border: 1px solid #2e2e33; }
+      .screen { position: relative; width: 100%; height: 100%; border-radius: 38px; overflow: hidden; background: #f2efe9; }
+      .pill { position: absolute; left: 12px; right: 12px; top: 22px; height: 48px; border-radius: 999px; background: rgba(255, 255, 255, 0.96); display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: -0.06em; text-transform: uppercase; color: #efbc21; font-size: 22px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12); }
+      .stats { position: absolute; left: 12px; right: 12px; top: 330px; border-radius: 18px; background: rgba(255, 255, 255, 0.94); display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px 6px; text-align: center; box-shadow: 0 16px 30px rgba(0, 0, 0, 0.15); }
+      .stats p { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #777; }
+      .stats b { display: block; margin-top: 2px; font-size: 17px; font-weight: 900; color: #444; }
+    </style>
+  </head>
+  <body>
+    <div class="glow a"></div>
+    <div class="glow b"></div>
+    <svg class="topo" viewBox="0 0 1200 630" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+      <path d="M180 460c130-40 280-10 330 90s-20 200-160 220-300-30-330-140 30-130 160-170Z" />
+      <path d="M190 512c96-30 206-8 244 66s-14 148-118 162-222-22-244-104 22-96 118-124Z" />
+      <path d="M198 564c64-20 138-6 164 44s-10 100-80 110-150-14-164-70 16-64 80-84Z" />
+      <path d="M700 -40c20 90 90 140 180 150s160 60 200 140" />
+      <path d="M640 -40c30 110 110 170 220 180s190 70 240 170" />
+    </svg>
+
+    <div class="content">
+      <div class="brand">
+        <svg width="46" height="46" viewBox="0 0 32 32" fill="none"><path d="M16 2.5c-4.7 0-8.5 3.6-8.5 8.1 0 5.1 5.9 11 7.6 12.6a1.3 1.3 0 0 0 1.8 0c1.7-1.6 7.6-7.5 7.6-12.6 0-4.5-3.8-8.1-8.5-8.1Z" fill="#efbc21"/><circle cx="16" cy="10.6" r="3.1" fill="#fff"/><path d="M11 23.5H6.6a2.3 2.3 0 0 0 0 4.6h18.8a2.3 2.3 0 0 1 0 4.6" stroke="#efbc21" stroke-width="2.4" stroke-linecap="round" transform="translate(0 -1.8)"/></svg>
+        <span>Trackingfy</span>
+      </div>
+      <h1>Graba tus rutas <em>sin regalar tus datos.</em></h1>
+      <div class="chips">
+        <span class="chip">Sin cuenta</span>
+        <span class="chip">Sin anuncios</span>
+        <span class="chip">Código abierto</span>
+      </div>
+    </div>
+    <p class="url">trackingfy.web.app</p>
+
+    <div class="phone">
+      <div class="screen">
+        <svg style="position: absolute; inset: 0" width="276" height="596" viewBox="0 0 300 634" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="634" fill="#f2efe9" />
+          <path d="M158 236c40-16 92-8 142-14v196c-46 12-104 4-136-22-28-22-36-124-6-160Z" fill="#cdeab3" />
+          <path d="M-20 150c60 26 116-32 180-4s96 58 160 22" fill="none" stroke="#aad3df" stroke-width="20" stroke-linecap="round" />
+          <g fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round">
+            <path d="M58-10c4 150 8 310 26 654" /><path d="M-10 226 310 196" /><path d="M228-10c8 160-14 310 18 654" /><path d="M150-10l16 210" />
+          </g>
+          <path d="M-10 336c90-14 134 28 214 16s86-34 106-22" fill="none" stroke="#fcd67a" stroke-width="10" />
+          <path d="M70 424C69 392 68 364 68 340c0-10 10-14 28-10 22 4 36 22 54 20 26-4 38-32 50-58 8-20 12-42 16-70 2-14 8-18 14-26 4-26 4-50 2-74" fill="none" stroke="#ef4444" stroke-opacity=".85" stroke-width="7" stroke-linecap="round" />
+          <circle cx="70" cy="424" r="7" fill="#22c55e" stroke="#fff" stroke-width="3" />
+          <circle cx="232" cy="122" r="8" fill="#3b82f6" stroke="#fff" stroke-width="3" />
+        </svg>
+        <div class="pill">Trackingfy</div>
+        <div class="stats" style="top: 440px">
+          <div><p>Duración</p><b>00:42:18</b></div>
+          <div><p>Distancia</p><b>7.84 km</b></div>
+          <div><p>Desnivel +</p><b style="color: #16a34a">184 m</b></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

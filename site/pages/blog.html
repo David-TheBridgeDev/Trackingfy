@@ -1,0 +1,33 @@
+---
+path: /blog
+title: Blog de Trackingfy · Guías para grabar y compartir tus rutas
+heading: Guías y novedades
+description: Guías prácticas de Trackingfy: grabar rutas GPS sin cuenta, arreglar el tramo que no grabaste y compartir tu ruta como imagen en redes.
+updated: 2026-09-15
+---
+<section class="relative isolate overflow-hidden border-b border-line">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <div class="absolute -top-48 right-[-12%] h-[32rem] w-[32rem] rounded-full bg-accent/20 blur-3xl dark:bg-accent/10"></div>
+    <div class="absolute inset-0 text-ink/[0.06] [mask-image:linear-gradient(to_bottom,black,transparent)]">{{> topo}}</div>
+  </div>
+  <div class="container-site pb-14 pt-10 sm:pb-20 sm:pt-14">
+    <nav aria-label="Migas de pan" class="text-sm font-semibold text-muted">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a class="transition hover:text-ink" href="/">Inicio</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page">Blog</li>
+      </ol>
+    </nav>
+    <p class="eyebrow mt-10">Blog</p>
+    <h1 class="mt-4 max-w-3xl text-5xl font-black leading-[1.02] tracking-tighter text-balance sm:text-7xl">Guías y novedades</h1>
+    <p class="section-lead mt-6 max-w-2xl">
+      Cómo sacar partido a Trackingfy, trucos para tus salidas y por qué tus rutas merecen quedarse en tu móvil.
+    </p>
+  </div>
+</section>
+
+<section class="container-site py-14 sm:py-20" aria-label="Artículos">
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{{> blog-list}}</div>
+</section>
+
+{{> cta-band}}

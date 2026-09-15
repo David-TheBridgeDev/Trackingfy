@@ -1,0 +1,601 @@
+---
+path: /
+title: Trackingfy · App GPS gratis para grabar rutas sin cuenta
+heading: Graba tus rutas sin regalar tus datos
+description: Graba tus rutas a pie, corriendo o en bici: distancia, ritmo, desnivel y mapa en tiempo real. Gratis, sin registro y con tus datos solo en tu móvil.
+updated: 2026-09-15
+---
+<!-- ============================== HERO ============================== -->
+<section class="relative isolate overflow-hidden">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <div class="absolute -top-48 right-[-14%] h-[40rem] w-[40rem] rounded-full bg-accent/25 blur-3xl dark:bg-accent/[0.12]"></div>
+    <div class="absolute bottom-[-16rem] left-[-12rem] h-[30rem] w-[30rem] rounded-full bg-orange-400/10 blur-3xl"></div>
+    <div class="absolute inset-0 text-ink/[0.07] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]">{{> topo}}</div>
+  </div>
+
+  <div class="container-site grid items-center gap-16 pb-20 pt-12 sm:pt-20 lg:grid-cols-[1.12fr_0.88fr] lg:gap-8 lg:pb-28 lg:pt-20">
+    <div class="max-w-2xl">
+      <p class="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/80 px-3.5 py-1.5 text-xs font-bold text-muted shadow-sm backdrop-blur">
+        <span class="relative flex size-2">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-green-500 opacity-60 motion-reduce:animate-none"></span>
+          <span class="relative inline-flex size-2 rounded-full bg-green-500"></span>
+        </span>
+        Gratis · Sin cuenta · Código abierto
+      </p>
+
+      <h1 class="mt-6 text-[2.75rem] font-black leading-[0.98] tracking-tighter text-balance sm:text-6xl lg:text-[4.6rem]">
+        Graba tus rutas
+        <span class="relative whitespace-nowrap">
+          sin regalar
+          <svg class="absolute -bottom-1 left-0 h-3 w-full text-accent sm:-bottom-2 sm:h-4" viewBox="0 0 200 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8c40-6 80-7 120-4s56 2 76-2" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+        </span>
+        tus datos.
+      </h1>
+
+      <p class="mt-7 max-w-xl text-lg leading-relaxed text-muted text-pretty sm:text-xl">
+        Trackingfy es un tracker GPS para caminar, correr y montar en bici. Distancia, ritmo, desnivel y mapa en tiempo
+        real, <strong class="font-semibold text-ink">sin registrarte, sin anuncios y sin subir tu actividad a ningún servidor</strong>.
+      </p>
+
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <a href="{{appPath}}" class="btn btn-primary btn-lg">{{icon play "h-5 w-5"}} Empezar a grabar gratis</a>
+        <a href="{{releasesUrl}}" data-apk class="btn btn-ghost btn-lg ios:hidden">{{icon download}} Descargar para Android</a>
+      </div>
+
+      <p class="mt-4 text-sm text-muted">
+        <span class="android:hidden ios:hidden">Funciona en el navegador, sin instalar nada. Solo te pedirá permiso de ubicación.</span>
+        <span class="hidden android:inline">Con la app de Android sigue grabando con la pantalla apagada. También funciona en el navegador.</span>
+        <span class="hidden ios:inline">En iPhone funciona desde Safari, sin instalar nada. Solo te pedirá permiso de ubicación.</span>
+      </p>
+
+      <dl class="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-line pt-6">
+        <div class="flex flex-col">
+          <dt class="text-xs font-semibold leading-snug text-muted">cuentas que crear</dt>
+          <dd class="order-first text-3xl font-black tracking-tight">0</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-xs font-semibold leading-snug text-muted">anuncios y rastreadores</dt>
+          <dd class="order-first text-3xl font-black tracking-tight">0</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-xs font-semibold leading-snug text-muted">de tus rutas, en tu móvil</dt>
+          <dd class="order-first text-3xl font-black tracking-tight">100%</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Illustrated phone: the live recording screen of the app -->
+    <div class="relative mx-auto w-full max-w-[24rem] lg:max-w-none">
+      <div class="relative mx-auto w-[17.5rem] sm:w-[19.5rem]">
+        <div
+          class="relative aspect-[9/19] rounded-[3rem] bg-[#111] p-2.5 shadow-[0_50px_100px_-30px_rgba(0,0,0,0.5)] ring-1 ring-black/10 dark:ring-white/10"
+          role="img"
+          aria-label="Pantalla de Trackingfy grabando una salida en bici: 7,84 km en 42 minutos, 11,1 km/h de media y 184 m de desnivel positivo"
+        >
+          <div class="relative h-full w-full overflow-hidden rounded-[2.4rem] bg-[#f2efe9]">
+            <svg class="absolute inset-0 h-full w-full" viewBox="0 0 300 634" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect width="300" height="634" fill="#f2efe9"/>
+              <path d="M158 236c40-16 92-8 142-14v196c-46 12-104 4-136-22-28-22-36-124-6-160Z" fill="#cdeab3"/>
+              <path d="M0 470c34-8 72 6 86 38 12 30-6 72-40 96H0Z" fill="#cdeab3"/>
+              <path d="M-20 150c60 26 116-32 180-4s96 58 160 22" fill="none" stroke="#aad3df" stroke-width="20" stroke-linecap="round"/>
+              <g fill="#e6dfd2">
+                <rect x="10" y="30" width="34" height="24" rx="3"/><rect x="92" y="34" width="40" height="26" rx="3"/><rect x="174" y="24" width="36" height="40" rx="3"/><rect x="250" y="40" width="40" height="22" rx="3"/>
+                <rect x="96" y="196" width="40" height="18" rx="3"/><rect x="8" y="250" width="40" height="30" rx="3"/><rect x="92" y="380" width="30" height="36" rx="3"/><rect x="250" y="450" width="40" height="26" rx="3"/>
+                <rect x="150" y="450" width="56" height="24" rx="3"/><rect x="120" y="560" width="50" height="30" rx="3"/><rect x="240" y="540" width="44" height="40" rx="3"/>
+              </g>
+              <g fill="none" stroke-linecap="round">
+                <g stroke="#ddd6c8" stroke-width="10">
+                  <path d="M58-10c4 150 8 310 26 654"/><path d="M-10 226 310 196"/><path d="M228-10c8 160-14 310 18 654"/><path d="M-10 540 310 486"/><path d="M132 356 112 644"/><path d="M150-10l16 210"/><path d="M84 432c66-6 126 2 226-14"/>
+                </g>
+                <g stroke="#fff" stroke-width="7">
+                  <path d="M58-10c4 150 8 310 26 654"/><path d="M-10 226 310 196"/><path d="M228-10c8 160-14 310 18 654"/><path d="M-10 540 310 486"/><path d="M132 356 112 644"/><path d="M150-10l16 210"/><path d="M84 432c66-6 126 2 226-14"/>
+                </g>
+                <path d="M-10 336c90-14 134 28 214 16s86-34 106-22" stroke="#e9c46a" stroke-width="13"/>
+                <path d="M-10 336c90-14 134 28 214 16s86-34 106-22" stroke="#fcd67a" stroke-width="9"/>
+              </g>
+              <path class="route-draw" pathLength="1" d="M70 424C69 392 68 364 68 340c0-10 10-14 28-10 22 4 36 22 54 20 26-4 38-32 50-58 8-20 12-42 16-70 2-14 8-18 14-26 4-26 4-50 2-74" fill="none" stroke="#ef4444" stroke-opacity=".85" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="70" cy="424" r="6.5" fill="#22c55e" stroke="#fff" stroke-width="3"/>
+              <circle class="pulse-dot" cx="232" cy="122" r="12" fill="#3b82f6"/>
+              <circle cx="232" cy="122" r="7" fill="#3b82f6" stroke="#fff" stroke-width="3"/>
+            </svg>
+
+            <div class="absolute left-1/2 top-2.5 h-5 w-20 -translate-x-1/2 rounded-full bg-[#111]"></div>
+
+            <div class="absolute inset-x-3 top-11 flex items-center justify-between rounded-full border border-white/60 bg-white/95 p-1 shadow-lg">
+              <span class="grid size-9 place-items-center rounded-full bg-gray-50 text-[#444]">{{icon clock "h-5 w-5"}}</span>
+              <span class="text-lg font-black uppercase tracking-tighter text-accent">Trackingfy</span>
+              <span class="grid size-9 place-items-center rounded-full bg-accent/10 text-accent">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
+              </span>
+            </div>
+
+            <div class="absolute inset-x-3 bottom-5 space-y-3">
+              <div class="grid grid-cols-3 gap-y-2.5 rounded-2xl border border-white/40 bg-white/90 px-1.5 py-3 text-center shadow-xl backdrop-blur-md">
+                <div><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">Duración</p><p class="text-[13px] font-black tabular-nums text-[#444]" data-live-time="2538">00:42:18</p></div>
+                <div class="border-x border-black/5"><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">Distancia</p><p class="text-[13px] font-black tabular-nums text-[#444]" data-live-distance="7840">7.84 km</p></div>
+                <div><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">Vel. media</p><p class="text-[13px] font-black tabular-nums text-[#444]">11.1 km/h</p></div>
+                <div><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">T. movimiento</p><p class="text-[13px] font-black tabular-nums text-[#444]">00:40:02</p></div>
+                <div class="border-x border-black/5"><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">Vel. máx</p><p class="text-[13px] font-black tabular-nums text-[#444]">24.3 km/h</p></div>
+                <div><p class="text-[7px] font-bold uppercase tracking-wider text-[#777]">Altitud</p><p class="text-[13px] font-black tabular-nums text-blue-600">212 m</p></div>
+              </div>
+              <div class="flex items-center justify-center gap-4">
+                <div class="rounded-xl bg-white/90 px-3 py-1.5 text-center shadow-lg"><p class="text-[6px] font-bold uppercase text-[#777]">Desnivel +</p><p class="text-[11px] font-black text-green-600">184 m</p></div>
+                <div class="grid size-[4.25rem] place-items-center rounded-full border-4 border-white bg-accent text-white shadow-[0_16px_40px_rgba(239,188,33,0.5)]">
+                  <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M10 9v6m4-6v6"/></svg>
+                </div>
+                <div class="rounded-xl bg-white/90 px-3 py-1.5 text-center shadow-lg"><p class="text-[6px] font-bold uppercase text-[#777]">Desnivel -</p><p class="text-[11px] font-black text-red-600">121 m</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="float absolute -left-5 top-28 z-10 flex items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 pr-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] backdrop-blur sm:-left-14 xl:-left-24" aria-hidden="true">
+          <span class="grid size-9 place-items-center rounded-xl bg-green-500/15 text-green-600 dark:text-green-400">{{icon user-minus}}</span>
+          <span><span class="block text-sm font-black leading-tight">Sin cuenta</span><span class="block text-xs text-muted">Ni email ni contraseña</span></span>
+        </div>
+        <div class="float-late absolute -right-5 top-[46%] z-10 flex items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 pr-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] backdrop-blur sm:-right-8 xl:-right-20" aria-hidden="true">
+          <span class="grid size-9 place-items-center rounded-xl bg-accent/20 text-accent-ink">{{icon lock}}</span>
+          <span><span class="block text-sm font-black leading-tight">Solo en tu móvil</span><span class="block text-xs text-muted">Sin nube ni servidores</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PROBLEM ============================== -->
+<section id="problema" class="border-y border-line bg-surface py-20 sm:py-28" aria-labelledby="problema-titulo">
+  <div class="container-site">
+    <div class="reveal max-w-3xl">
+      <p class="eyebrow">El problema</p>
+      <h2 id="problema-titulo" class="section-title mt-4">Para salir a andar no deberías tener que darte de alta en nada.</h2>
+      <p class="section-lead mt-6">
+        Muchas apps de actividad te piden una cuenta antes de enseñarte el mapa, suben cada ruta a sus servidores y
+        guardan funciones básicas detrás de una suscripción. Y tus rutas cuentan mucho de ti: dónde vives, a qué hora
+        sales y por dónde pasas cada día.
+      </p>
+    </div>
+
+    <ul class="mt-14 grid gap-5 md:grid-cols-3">
+      <li class="reveal card bg-canvas p-7">
+        <span class="grid size-11 place-items-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">{{icon user-minus}}</span>
+        <h3 class="mt-5 text-lg font-black tracking-tight">Registro antes del primer paso</h3>
+        <p class="mt-2 leading-relaxed text-muted">Email, contraseña, perfil y ajustes de privacidad. Todo eso antes de grabar un solo metro.</p>
+      </li>
+      <li class="reveal card bg-canvas p-7">
+        <span class="grid size-11 place-items-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">{{icon cloud}}</span>
+        <h3 class="mt-5 text-lg font-black tracking-tight">Tus rutas, en servidores ajenos</h3>
+        <p class="mt-2 leading-relaxed text-muted">Casi todas tus rutas empiezan y acaban en tu puerta. Subirlas a la nube es contar dónde vives y cuándo no estás.</p>
+      </li>
+      <li class="reveal card bg-canvas p-7">
+        <span class="grid size-11 place-items-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">{{icon credit-card}}</span>
+        <h3 class="mt-5 text-lg font-black tracking-tight">Lo básico, de pago</h3>
+        <p class="mt-2 leading-relaxed text-muted">Estadísticas, rutas o exportaciones que deberían ser estándar, reservadas para quien paga la suscripción.</p>
+      </li>
+    </ul>
+
+    <div class="reveal mt-10 flex flex-col items-start gap-6 rounded-[28px] bg-night p-8 text-white sm:flex-row sm:items-center sm:justify-between sm:p-10">
+      <p class="max-w-2xl text-2xl font-black leading-tight tracking-tight sm:text-3xl">
+        Trackingfy hace lo esencial. <span class="text-accent">Y lo hace en tu dispositivo.</span>
+      </p>
+      <a href="#funciones" class="btn btn-light shrink-0">Ver funciones {{icon arrow-right "h-4 w-4"}}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FEATURES ============================== -->
+<section id="funciones" class="py-20 sm:py-28" aria-labelledby="funciones-titulo">
+  <div class="container-site">
+    <div class="reveal mx-auto max-w-3xl text-center">
+      <p class="eyebrow">Funciones</p>
+      <h2 id="funciones-titulo" class="section-title mt-4">Todo lo que necesitas para registrar tu actividad. Nada que no.</h2>
+      <p class="section-lead mx-auto mt-6 max-w-2xl">
+        Pensada para abrirla, darle a grabar y olvidarte. Con los detalles que marcan la diferencia cuando vuelves a casa.
+      </p>
+    </div>
+
+    <div class="mt-16 grid gap-5 md:grid-cols-6">
+      <article class="reveal card relative overflow-hidden p-7 sm:p-9 md:col-span-6 lg:col-span-4">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon chart}}</span><p class="eyebrow">En directo</p></div>
+        <h3 class="mt-5 text-2xl font-black tracking-tight sm:text-3xl">Diez métricas mientras te mueves</h3>
+        <p class="mt-3 max-w-xl leading-relaxed text-muted">
+          Duración, tiempo en movimiento, distancia, ritmo, velocidad media y máxima, desnivel positivo y negativo, altitud
+          y pendiente. Todo en pantalla desde el primer metro, sobre el mapa.
+        </p>
+        <ul class="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-5" aria-label="Ejemplo de métricas de una salida en bici">
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Duración</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">00:42:18</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Movimiento</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">00:40:02</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Distancia</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">7.84 km</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Ritmo</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">5:24 /km</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Vel. media</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">11.1 km/h</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Vel. máx</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">24.3 km/h</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Desnivel +</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums text-green-600 dark:text-green-400">184 m</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Desnivel -</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums text-red-600 dark:text-red-400">121 m</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Altitud</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums text-blue-600 dark:text-blue-400">212 m</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Pendiente</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">4.2%</p></li>
+        </ul>
+      </article>
+
+      <article class="reveal relative overflow-hidden rounded-[28px] bg-night p-7 text-white ring-1 ring-white/5 sm:p-9 md:col-span-6 lg:col-span-2">
+        <div class="flex items-center gap-3">
+          <span class="grid size-11 place-items-center rounded-2xl bg-white/10 text-accent">{{icon bell}}</span>
+          <p class="text-xs font-black uppercase tracking-[0.18em] text-accent">Android</p>
+        </div>
+        <h3 class="mt-5 text-2xl font-black tracking-tight">Sigue grabando con la pantalla apagada</h3>
+        <p class="mt-3 leading-relaxed text-white/70">Guarda el móvil en el bolsillo: la app de Android graba en segundo plano y te deja los controles en una notificación.</p>
+        <div class="mt-7 max-w-md rounded-2xl bg-white/[0.07] p-4 ring-1 ring-white/10" aria-hidden="true">
+          <div class="flex items-center justify-between text-[11px] text-white/50">
+            <span class="flex items-center gap-1.5"><span class="size-3 rounded-full bg-accent"></span>Trackingfy</span>
+            <span class="tabular-nums">42:18</span>
+          </div>
+          <p class="mt-2 text-sm font-bold">Rastreo en curso</p>
+          <p class="text-sm tabular-nums text-white/65">7.84 km · +184 m</p>
+          <div class="mt-3 flex gap-5 text-xs font-black uppercase tracking-wide text-accent"><span>Pausar</span><span>Finalizar</span></div>
+        </div>
+        <p class="mt-4 text-xs leading-relaxed text-white/50">En Android 16 también aparece en la barra de estado y en la pantalla de bloqueo.</p>
+      </article>
+
+      <article class="reveal card flex flex-col p-7 md:col-span-2">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon pencil}}</span><p class="eyebrow">Editor de rutas</p></div>
+        <h3 class="mt-5 text-xl font-black tracking-tight">Arregla el tramo que no grabaste</h3>
+        <p class="mt-2 leading-relaxed text-muted">¿Le diste a grabar tarde? Dibuja lo que falta. Trackingfy propone tu hora real de salida y calcula el desnivel del terreno.</p>
+        <div class="mt-6 overflow-hidden rounded-2xl border border-line" aria-hidden="true">
+          <svg class="block h-auto w-full" viewBox="0 0 320 170">
+            <rect width="320" height="170" fill="#f2efe9"/>
+            <path d="M226 0h94v70c-30 10-70 4-86-20-8-14-10-30-8-50Z" fill="#cdeab3"/>
+            <g stroke="#fff" stroke-width="8" stroke-linecap="round"><path d="M-5 60 325 42"/><path d="M-5 130 325 112"/><path d="M96-5l8 180"/><path d="M216-5c6 60-4 120 8 180"/></g>
+            <path d="M38 142c18-8 30-34 58-38s44 8 64-10" fill="none" stroke="#f97316" stroke-width="5" stroke-dasharray="1.5 10" stroke-linecap="round"/>
+            <path d="M160 94c22-18 38-38 66-42s48-10 70-34" fill="none" stroke="#ef4444" stroke-opacity=".85" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="160" cy="94" r="6.5" fill="#ef4444" stroke="#fff" stroke-width="3"/>
+            <g transform="translate(38 142)"><circle r="12" fill="#151515"/><path d="M-5 1v5h10V1M-7 2l7-6 7 6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+          </svg>
+        </div>
+        <a href="/blog/anadir-tramo-olvidado-ruta" class="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-black text-ink hover:underline decoration-accent decoration-2 underline-offset-4">Cómo funciona {{icon arrow-right "h-4 w-4"}}</a>
+      </article>
+
+      <article class="reveal card flex flex-col p-7 md:col-span-2">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon photo}}</span><p class="eyebrow">Compartir</p></div>
+        <h3 class="mt-5 text-xl font-black tracking-tight">Tu ruta, lista para stories</h3>
+        <p class="mt-2 leading-relaxed text-muted">Imagen con mapa, trazado, desnivel y hasta 6 datos. Cuadrada, vertical o de historia. Y en PNG transparente, como pegatina.</p>
+        <div class="mt-6 flex items-end justify-center gap-3 rounded-2xl bg-raised px-4 pb-4 pt-6" aria-hidden="true">
+          <div class="flex aspect-square w-[30%] flex-col justify-between rounded-xl bg-[#151515] p-2">
+            <span class="h-1.5 w-2/3 rounded-full bg-white/80"></span>
+            <svg viewBox="0 0 40 30" class="w-full"><path d="M4 26c6-10 4-16 12-18s10 8 20-6" fill="none" stroke="#efbc21" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="flex aspect-[3/4] w-[28%] flex-col justify-between rounded-xl bg-white p-2 ring-1 ring-black/10">
+            <span class="h-1.5 w-2/3 rounded-full bg-[#151515]/80"></span>
+            <svg viewBox="0 0 40 40" class="w-full"><path d="M5 34c6-14 12-18 18-16s8-14 14-16" fill="none" stroke="#151515" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="flex aspect-[9/16] w-[24%] flex-col justify-end rounded-xl bg-[conic-gradient(#e7e5e4_25%,#fff_0_50%,#e7e5e4_0_75%,#fff_0)] bg-[length:10px_10px] p-2 ring-1 ring-black/10">
+            <svg viewBox="0 0 40 60" class="w-full"><path d="M8 54c4-16 16-20 16-32s10-14 10-18" fill="none" stroke="#151515" stroke-width="3.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <a href="/blog/compartir-ruta-imagen-instagram-stories" class="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-black text-ink hover:underline decoration-accent decoration-2 underline-offset-4">Ver la guía {{icon arrow-right "h-4 w-4"}}</a>
+      </article>
+
+      <article class="reveal card flex flex-col p-7 md:col-span-2">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon map}}</span><p class="eyebrow">Navegación</p></div>
+        <h3 class="mt-5 text-xl font-black tracking-tight">Repite una ruta sin perderte</h3>
+        <p class="mt-2 leading-relaxed text-muted">Carga cualquier actividad de tu historial como línea de referencia en el mapa y síguela mientras grabas la nueva.</p>
+        <div class="mt-6 overflow-hidden rounded-2xl border border-line" aria-hidden="true">
+          <svg class="block h-auto w-full" viewBox="0 0 320 170">
+            <rect width="320" height="170" fill="#f2efe9"/>
+            <path d="M0 110c40-8 70 10 80 40l6 20H0Z" fill="#cdeab3"/>
+            <path d="M-10 70c70 20 120-20 190 0s110 30 150 10" fill="none" stroke="#aad3df" stroke-width="12" stroke-linecap="round"/>
+            <g stroke="#fff" stroke-width="7" stroke-linecap="round"><path d="M-5 128 325 104"/><path d="M130-5c6 70-2 120 6 180"/><path d="M250-5l-10 180"/></g>
+            <path d="M30 150c30-20 60-26 90-40s40-50 80-56 60 20 100-10" fill="none" stroke="#3b82f6" stroke-opacity=".6" stroke-width="4" stroke-dasharray="5 10" stroke-linecap="round"/>
+            <path d="M30 150c30-20 60-26 90-40s36-40 64-50" fill="none" stroke="#ef4444" stroke-opacity=".85" stroke-width="5" stroke-linecap="round"/>
+            <circle class="pulse-dot" cx="184" cy="60" r="10" fill="#3b82f6"/>
+            <circle cx="184" cy="60" r="5.5" fill="#3b82f6" stroke="#fff" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <p class="mt-auto pt-5 text-xs font-semibold text-muted"><span class="text-blue-600 dark:text-blue-400">— —</span> Ruta de referencia · <span class="text-red-600 dark:text-red-400">——</span> Lo que llevas grabado</p>
+      </article>
+    </div>
+
+    <ul class="mt-16 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon list}}</span>
+        <div><h3 class="font-black tracking-tight">Historial ordenado</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Agrupado por días y ordenable por fecha, distancia, duración o desnivel. Selecciona varias actividades y bórralas de una vez.</p></div>
+      </li>
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon swap}}</span>
+        <div><h3 class="font-black tracking-tight">Pásale una ruta a quien quieras</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Exporta una actividad como archivo de ruta. En Android se abre directamente con Trackingfy y los duplicados se detectan solos.</p></div>
+      </li>
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon archive}}</span>
+        <div><h3 class="font-black tracking-tight">Copia de seguridad en un archivo</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Exporta todo tu historial a un único archivo y restáuralo en otro móvil u otro navegador cuando quieras.</p></div>
+      </li>
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon offline}}</span>
+        <div><h3 class="font-black tracking-tight">Funciona sin conexión</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">La app queda guardada en tu dispositivo y el GPS no necesita internet. Las zonas del mapa que ya has visto siguen disponibles.</p></div>
+      </li>
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon moon}}</span>
+        <div><h3 class="font-black tracking-tight">Tema claro u oscuro, en tu idioma</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Interfaz en español o inglés, detectada automáticamente, y tema claro u oscuro según prefieras.</p></div>
+      </li>
+      <li class="reveal flex gap-4">
+        <span class="icon-tile">{{icon phone}}</span>
+        <div><h3 class="font-black tracking-tight">Instálala, o no</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Úsala en el navegador, añádela a tu pantalla de inicio como app o descarga el APK de Android.</p></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== HOW IT WORKS ============================== -->
+<section id="como-funciona" class="border-y border-line bg-surface py-20 sm:py-28" aria-labelledby="como-titulo">
+  <div class="container-site">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="eyebrow">Cómo funciona</p>
+      <h2 id="como-titulo" class="section-title mt-4">De cero a grabando en menos de un minuto</h2>
+      <p class="section-lead mt-6">Sin formularios ni tutoriales. Tres pasos y estás en la calle.</p>
+    </div>
+
+    <ol class="mt-16 grid gap-5 md:grid-cols-3">
+      <li class="reveal card relative overflow-hidden bg-canvas p-8">
+        <span class="text-6xl font-black tracking-tighter text-accent" aria-hidden="true">01</span>
+        <h3 class="mt-4 text-xl font-black tracking-tight">Abre Trackingfy</h3>
+        <p class="mt-2 leading-relaxed text-muted">En el navegador del móvil o del ordenador. Si te convence, instálala como app o descarga el APK de Android.</p>
+      </li>
+      <li class="reveal card relative overflow-hidden bg-canvas p-8">
+        <span class="text-6xl font-black tracking-tighter text-accent" aria-hidden="true">02</span>
+        <h3 class="mt-4 text-xl font-black tracking-tight">Pulsa el botón amarillo</h3>
+        <p class="mt-2 leading-relaxed text-muted">Concede el permiso de ubicación y empieza a grabar. Pausa, reanuda y termina cuando quieras.</p>
+      </li>
+      <li class="reveal card relative overflow-hidden bg-canvas p-8">
+        <span class="text-6xl font-black tracking-tighter text-accent" aria-hidden="true">03</span>
+        <h3 class="mt-4 text-xl font-black tracking-tight">Revive y comparte tu ruta</h3>
+        <p class="mt-2 leading-relaxed text-muted">La actividad queda en tu historial con el mapa y todas sus estadísticas. Compártela como imagen o como archivo.</p>
+      </li>
+    </ol>
+
+    <div class="reveal mt-12 text-center">
+      <a href="{{appPath}}" class="btn btn-primary btn-lg">Probar ahora, sin registro {{icon arrow-right}}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PRIVACY ============================== -->
+<section id="privacidad" class="relative isolate overflow-hidden bg-night py-20 text-white sm:py-28 dark:border-y dark:border-white/10" aria-labelledby="privacidad-titulo">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <div class="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-accent/15 blur-3xl"></div>
+    <div class="absolute inset-0 text-white/[0.05]">{{> topo}}</div>
+  </div>
+
+  <div class="container-site grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+    <div class="reveal">
+      <p class="text-xs font-black uppercase tracking-[0.18em] text-accent">Privacidad por diseño</p>
+      <h2 id="privacidad-titulo" class="section-title mt-4">Tu actividad no sale de tu dispositivo. Y te enseñamos cómo.</h2>
+      <p class="mt-6 text-lg leading-relaxed text-white/70 text-pretty">
+        Trackingfy no tiene cuentas ni un servidor donde guardar tus rutas: viven en el almacenamiento de tu navegador o
+        de la app de Android. Nadie más puede verlas, tampoco quien la ha creado.
+      </p>
+      <ul class="mt-8 space-y-4">
+        <li class="flex gap-3"><span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-accent text-[#151515]">{{icon check "h-4 w-4"}}</span><span class="text-white/85">Sin registro ni datos personales</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-accent text-[#151515]">{{icon check "h-4 w-4"}}</span><span class="text-white/85">Sin analítica, sin anuncios y sin cookies de seguimiento</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-accent text-[#151515]">{{icon check "h-4 w-4"}}</span><span class="text-white/85">Código abierto con licencia MIT: puedes comprobar cada línea</span></li>
+      </ul>
+      <a href="{{repoUrl}}" rel="noopener" class="mt-9 inline-flex items-center gap-2 text-sm font-black text-accent hover:underline underline-offset-4">
+        {{icon code "h-4 w-4"}} Ver el código en GitHub {{icon arrow-up-right "h-4 w-4"}}
+      </a>
+    </div>
+
+    <div class="reveal rounded-[28px] bg-white/[0.04] p-6 ring-1 ring-white/10 sm:p-9">
+      <h3 class="text-xl font-black tracking-tight">Todo lo que sale de tu dispositivo</h3>
+      <p class="mt-1 text-sm text-white/55">La lista completa, sin letra pequeña.</p>
+      <dl class="mt-6 divide-y divide-white/10">
+        <div class="grid gap-1 py-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
+          <dt class="text-sm font-black">Al ver el mapa</dt>
+          <dd class="text-sm leading-relaxed text-white/70">Las imágenes del mapa que tienes en pantalla se piden a <strong class="text-white">OpenStreetMap</strong>.</dd>
+        </div>
+        <div class="grid gap-1 py-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
+          <dt class="text-sm font-black">Al añadir un tramo a mano</dt>
+          <dd class="text-sm leading-relaxed text-white/70">Solo las coordenadas de ese tramo van a <strong class="text-white">Open-Meteo</strong> (o a Open-Elevation si falla) para calcular la altitud del terreno.</dd>
+        </div>
+        <div class="grid gap-1 py-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
+          <dt class="text-sm font-black">Al compartir una imagen con mapa</dt>
+          <dd class="text-sm leading-relaxed text-white/70">Las imágenes del mapa que cubren tu ruta, de nuevo a <strong class="text-white">OpenStreetMap</strong>.</dd>
+        </div>
+        <div class="grid gap-1 py-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
+          <dt class="text-sm font-black">Al descargar el APK</dt>
+          <dd class="text-sm leading-relaxed text-white/70">Una petición a <strong class="text-white">GitHub</strong> para encontrar la última versión.</dd>
+        </div>
+      </dl>
+      <p class="mt-6 rounded-2xl bg-accent/10 p-4 text-sm font-semibold leading-relaxed text-accent ring-1 ring-accent/20">
+        Tus rutas completas, tu historial y tus estadísticas no se envían a ningún sitio. Salvo que tú decidas compartirlas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== COMPARISON ============================== -->
+<section class="py-20 sm:py-28" aria-labelledby="comparativa-titulo">
+  <div class="container-site">
+    <div class="reveal mx-auto max-w-3xl text-center">
+      <p class="eyebrow">Comparativa</p>
+      <h2 id="comparativa-titulo" class="section-title mt-4">¿Qué cambia frente a una app de tracking con cuenta?</h2>
+      <p class="section-lead mx-auto mt-6 max-w-2xl">Lo esencial es lo mismo: grabar tu ruta y ver tus datos. Cambia todo lo demás.</p>
+    </div>
+
+    <div class="reveal mt-14 overflow-x-auto rounded-[28px] border border-line bg-surface">
+      <table class="w-full min-w-[38rem] text-left text-sm sm:text-base">
+        <caption class="sr-only">Comparativa entre una app de tracking típica con cuenta y Trackingfy</caption>
+        <thead>
+          <tr class="border-b border-line">
+            <th scope="col" class="w-[38%] p-5 text-xs font-black uppercase tracking-wider text-muted sm:p-6"><span class="sr-only">Aspecto</span></th>
+            <th scope="col" class="p-5 text-xs font-black uppercase tracking-wider text-muted sm:p-6">App típica con cuenta</th>
+            <th scope="col" class="bg-accent/10 p-5 sm:p-6"><span class="text-base font-black uppercase tracking-tighter">Trackingfy</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Crear una cuenta</th>
+            <td class="p-5 text-muted sm:px-6"><span class="inline-flex items-center gap-2">{{icon x "h-4 w-4 shrink-0 text-red-500"}} Obligatorio</span></td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6"><span class="inline-flex items-center gap-2">{{icon check "h-4 w-4 shrink-0 text-green-600 dark:text-green-400"}} No hace falta</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Dónde se guardan tus rutas</th>
+            <td class="p-5 text-muted sm:px-6"><span class="inline-flex items-center gap-2">{{icon x "h-4 w-4 shrink-0 text-red-500"}} En sus servidores</span></td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6"><span class="inline-flex items-center gap-2">{{icon check "h-4 w-4 shrink-0 text-green-600 dark:text-green-400"}} En tu dispositivo</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Anuncios y rastreadores</th>
+            <td class="p-5 text-muted sm:px-6"><span class="inline-flex items-center gap-2">{{icon x "h-4 w-4 shrink-0 text-red-500"}} Habituales</span></td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6"><span class="inline-flex items-center gap-2">{{icon check "h-4 w-4 shrink-0 text-green-600 dark:text-green-400"}} Ninguno</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Precio</th>
+            <td class="p-5 text-muted sm:px-6"><span class="inline-flex items-center gap-2">{{icon x "h-4 w-4 shrink-0 text-red-500"}} Gratis con límites o suscripción</span></td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6"><span class="inline-flex items-center gap-2">{{icon check "h-4 w-4 shrink-0 text-green-600 dark:text-green-400"}} Gratis, sin compras</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Código fuente</th>
+            <td class="p-5 text-muted sm:px-6"><span class="inline-flex items-center gap-2">{{icon x "h-4 w-4 shrink-0 text-red-500"}} Cerrado</span></td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6"><span class="inline-flex items-center gap-2">{{icon check "h-4 w-4 shrink-0 text-green-600 dark:text-green-400"}} Abierto (MIT)</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="p-5 font-bold sm:px-6">Red social, likes y clasificaciones</th>
+            <td class="p-5 text-muted sm:px-6">Sí</td>
+            <td class="bg-accent/10 p-5 font-semibold sm:px-6">No, a propósito</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-10 grid gap-5 md:grid-cols-2">
+      <div class="reveal card p-8">
+        <h3 class="text-xl font-black tracking-tight">Trackingfy es para ti si…</h3>
+        <ul class="mt-5 space-y-3.5">
+          <li class="flex gap-3">{{icon check "mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400"}}<span class="text-muted">Quieres grabar tus paseos, carreras o salidas en bici sin crear otra cuenta.</span></li>
+          <li class="flex gap-3">{{icon check "mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400"}}<span class="text-muted">Te importa dónde acaban los datos de tu ubicación.</span></li>
+          <li class="flex gap-3">{{icon check "mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400"}}<span class="text-muted">Buscas algo sencillo que se abra y funcione, también sin cobertura.</span></li>
+          <li class="flex gap-3">{{icon check "mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400"}}<span class="text-muted">Quieres compartir tus rutas como imagen sin darte de alta en nada.</span></li>
+        </ul>
+      </div>
+      <div class="reveal card p-8">
+        <h3 class="text-xl font-black tracking-tight">Quizá no lo sea si…</h3>
+        <ul class="mt-5 space-y-3.5">
+          <li class="flex gap-3">{{icon no-symbol "mt-0.5 h-5 w-5 shrink-0 text-muted"}}<span class="text-muted">Buscas una red social con seguidores, likes y clasificaciones.</span></li>
+          <li class="flex gap-3">{{icon no-symbol "mt-0.5 h-5 w-5 shrink-0 text-muted"}}<span class="text-muted">Necesitas conectar un pulsómetro, un potenciómetro o un reloj GPS.</span></li>
+          <li class="flex gap-3">{{icon no-symbol "mt-0.5 h-5 w-5 shrink-0 text-muted"}}<span class="text-muted">Quieres que tus actividades se sincronicen solas entre varios dispositivos.</span></li>
+          <li class="flex gap-3">{{icon no-symbol "mt-0.5 h-5 w-5 shrink-0 text-muted"}}<span class="text-muted">Usas iPhone y necesitas grabar con la pantalla apagada (allí funciona como web).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PLATFORMS ============================== -->
+<section id="descargar" class="border-y border-line bg-surface py-20 sm:py-28" aria-labelledby="descargar-titulo">
+  <div class="container-site">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="eyebrow">Descargar</p>
+      <h2 id="descargar-titulo" class="section-title mt-4">Úsala donde quieras</h2>
+      <p class="section-lead mt-6">La misma app en el navegador y en Android. Las mejoras llegan solas, sin actualizar nada.</p>
+    </div>
+
+    <div class="mt-14 grid gap-5 lg:grid-cols-3">
+      <article class="reveal card flex flex-col bg-canvas p-8">
+        <span class="icon-tile">{{icon globe}}</span>
+        <h3 class="mt-5 text-xl font-black tracking-tight">En el navegador</h3>
+        <p class="mt-2 leading-relaxed text-muted">En cualquier móvil u ordenador, sin instalar nada. Mientras grabas, mantén la pestaña abierta.</p>
+        <ul class="mt-5 space-y-2 text-sm text-muted">
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} Instalable como app desde el navegador</li>
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} Funciona sin conexión una vez abierta</li>
+        </ul>
+        <div class="mt-auto pt-8"><a href="{{appPath}}" class="btn btn-primary w-full">Abrir en el navegador</a></div>
+      </article>
+
+      <article class="reveal relative flex flex-col rounded-[28px] border-2 border-accent bg-canvas p-8 shadow-[0_30px_70px_-40px_rgba(239,188,33,0.8)]">
+        <span class="absolute -top-3.5 left-8 rounded-full bg-accent px-3 py-1 text-[11px] font-black uppercase tracking-wider text-[#151515]">La más completa</span>
+        <span class="icon-tile">{{icon phone}}</span>
+        <h3 class="mt-5 text-xl font-black tracking-tight">App para Android</h3>
+        <p class="mt-2 leading-relaxed text-muted">Graba en segundo plano con la pantalla apagada y abre las rutas que te compartan desde otras apps.</p>
+        <ul class="mt-5 space-y-2 text-sm text-muted">
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} Notificación con pausar, reanudar y finalizar</li>
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} APK firmado y publicado en GitHub · v{{version}}</li>
+        </ul>
+        <div class="mt-auto pt-8">
+          <a href="{{releasesUrl}}" data-apk class="btn btn-dark w-full dark:bg-white dark:text-[#151515] dark:hover:bg-white/90">{{icon download}} Descargar APK</a>
+          <p class="mt-3 text-center text-xs text-muted">La primera vez, Android te pedirá permiso para instalar apps desde tu navegador.</p>
+        </div>
+      </article>
+
+      <article class="reveal card flex flex-col bg-canvas p-8">
+        <span class="icon-tile">{{icon plus}}</span>
+        <h3 class="mt-5 text-xl font-black tracking-tight">iPhone y iPad</h3>
+        <p class="mt-2 leading-relaxed text-muted">Abre Trackingfy en Safari, toca <strong class="text-ink">Compartir</strong> y después <strong class="text-ink">Añadir a pantalla de inicio</strong>. Se abrirá como una app más.</p>
+        <ul class="mt-5 space-y-2 text-sm text-muted">
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} Sin App Store y sin cuenta</li>
+          <li class="flex gap-2">{{icon check "h-4 w-4 shrink-0 text-accent-ink mt-0.5"}} Mantén la app abierta mientras grabas</li>
+        </ul>
+        <div class="mt-auto pt-8"><a href="{{appPath}}" class="btn btn-ghost w-full">Abrir en Safari</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== BLOG ============================== -->
+<section class="py-20 sm:py-28" aria-labelledby="guias-titulo">
+  <div class="container-site">
+    <div class="reveal flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      <div class="max-w-2xl">
+        <p class="eyebrow">Guías</p>
+        <h2 id="guias-titulo" class="section-title mt-4">Saca todo el partido a tus rutas</h2>
+      </div>
+      <a href="/blog" class="btn btn-ghost shrink-0">Ver todas las guías {{icon arrow-right "h-4 w-4"}}</a>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{{> blog-cards}}</div>
+  </div>
+</section>
+
+<!-- ============================== FAQ ============================== -->
+<section id="faq" class="border-t border-line bg-surface py-20 sm:py-28" aria-labelledby="faq-titulo">
+  <div class="container-site grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+    <div class="reveal lg:sticky lg:top-28 lg:self-start">
+      <p class="eyebrow">Preguntas frecuentes</p>
+      <h2 id="faq-titulo" class="section-title mt-4">Lo que sueles preguntar antes de empezar</h2>
+      <p class="section-lead mt-6">¿Te queda alguna duda? El código y las incidencias están abiertos en <a class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4" href="{{repoUrl}}" rel="noopener">GitHub</a>.</p>
+    </div>
+
+    <div class="divide-y divide-line border-y border-line">
+      <details class="group py-2" name="faq" data-faq open>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Trackingfy es gratis?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Sí. Sin suscripción, sin compras dentro de la app y sin anuncios. Además es código abierto, con licencia MIT.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Necesito crear una cuenta?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>No. Abres la app y empiezas a grabar. No hay email, contraseña ni perfil. Lo único que te pedirá es permiso para usar tu ubicación.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Dónde se guardan mis rutas?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>En tu dispositivo: en el almacenamiento del navegador o de la app de Android. Trackingfy no tiene un servidor donde guardarlas, así que nadie más puede verlas.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Qué pasa si cambio de móvil o borro la app?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Como todo es local, al borrar la app o los datos del navegador se borra tu historial. Exporta una copia de seguridad desde Ajustes: es un archivo que puedes importar en el móvil nuevo en un par de toques.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Funciona sin conexión a internet?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Sí. La app queda guardada en el dispositivo y el GPS no necesita internet para grabar. Las zonas del mapa que ya has visto se guardan en caché durante 30 días; las nuevas se cargan cuando vuelve la conexión.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Sigue grabando con la pantalla apagada?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>En la app de Android, sí: graba en segundo plano y muestra una notificación con los datos y los controles. En el navegador, y por tanto en iPhone, la página tiene que seguir abierta mientras grabas.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Cómo instalo la app de Android?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Descarga el APK desde esta web o desde los Ajustes de la app. Cada versión se compila y se firma automáticamente en GitHub. La primera vez, Android te pedirá permiso para instalar apps desde tu navegador. Después, las mejoras de la app llegan solas.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Qué actividades puedo registrar?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Caminar, correr y ciclismo. Cada actividad guarda su tipo, y puedes filtrar tu historial por él.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Puedo compartir una ruta con otra persona?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Sí, de dos formas: como imagen, para redes sociales, o como archivo de ruta, que la otra persona importa en su Trackingfy y queda en su historial.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="bg-surface pt-4">{{> cta-band}}</div>

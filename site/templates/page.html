@@ -1,0 +1,28 @@
+<article>
+  <header class="relative isolate overflow-hidden border-b border-line">
+    <div aria-hidden="true" class="absolute -top-48 right-[-15%] -z-10 h-[26rem] w-[26rem] rounded-full bg-accent/15 blur-3xl dark:bg-accent/10"></div>
+    <div class="container-site max-w-3xl pb-12 pt-10 sm:pt-14">
+      <nav aria-label="Migas de pan" class="text-sm font-semibold text-muted">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a class="transition hover:text-ink" href="/">Inicio</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{{heading}}</li>
+        </ol>
+      </nav>
+      <h1 class="mt-8 text-4xl font-black tracking-tighter text-balance sm:text-5xl">{{heading}}</h1>
+      <p class="mt-4 text-sm font-semibold text-muted">
+        Última actualización: <time datetime="{{updated}}">{{updatedHuman}}</time>
+      </p>
+    </div>
+  </header>
+
+  <div class="container-site max-w-3xl py-12 sm:py-16">
+    <div class="prose">{{content}}</div>
+    <p class="mt-16 border-t border-line pt-6 text-sm text-muted">
+      Otras páginas legales:
+      <a class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4" href="/aviso-legal">Aviso legal</a> ·
+      <a class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4" href="/privacidad">Privacidad</a> ·
+      <a class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4" href="/cookies">Cookies</a>
+    </p>
+  </div>
+</article>

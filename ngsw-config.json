@@ -1,6 +1,18 @@
 {
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
-  "index": "/index.html",
+  "index": "/app.html",
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*",
+    "!/**/*__*/**",
+    "!/",
+    "!/blog",
+    "!/blog/**",
+    "!/aviso-legal",
+    "!/privacidad",
+    "!/cookies"
+  ],
   "assetGroups": [
     {
       "name": "app",
@@ -11,7 +23,7 @@
           "/icons/favicon-96x96.png",
           "/icons/apple-touch-icon.png",
           "/index.csr.html",
-          "/index.html",
+          "/app.html",
           "/manifest.webmanifest",
           "/*.css",
           "/*.js"

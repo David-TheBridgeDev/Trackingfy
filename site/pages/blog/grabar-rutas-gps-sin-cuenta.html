@@ -1,0 +1,144 @@
+---
+path: /blog/grabar-rutas-gps-sin-cuenta
+template: article
+title: Cómo grabar rutas GPS sin crear una cuenta ni subirlas a la nube
+heading: Cómo grabar tus rutas GPS sin crear una cuenta (ni subirlas a la nube)
+short: Grabar rutas GPS sin cuenta
+description: Por qué tus rutas revelan más de lo que crees, qué significa que una app sea «local-first» y cómo grabar tu primera ruta con Trackingfy sin registrarte.
+category: Privacidad
+cover: cover-privacy
+date: 2026-09-15
+updated: 2026-09-15
+---
+<p class="lead">
+  Quieres saber cuántos kilómetros has andado esta tarde. Descargas una app, la abres y lo primero que ves es un
+  formulario: email, contraseña, fecha de nacimiento, peso. Y luego, casi sin darte cuenta, cada ruta que grabes
+  acabará en un servidor que no controlas.
+</p>
+
+<p>
+  No tiene por qué ser así. Grabar una ruta con GPS no necesita internet ni una cuenta: el móvil ya sabe dónde estás.
+  En esta guía verás por qué merece la pena que tus rutas no salgan de tu dispositivo y cómo grabar la primera en menos
+  de un minuto, sin registrarte.
+</p>
+
+<h2 id="tus-rutas-dicen-mucho">Tus rutas dicen más de lo que parece</h2>
+
+<p>Una ruta no es solo una línea en un mapa. Si juntas unas cuantas, cuentan una historia bastante precisa sobre ti:</p>
+
+<ul>
+  <li><strong>Dónde vives y dónde trabajas.</strong> Casi todas las salidas empiezan y terminan en el mismo portal.</li>
+  <li><strong>Tu rutina.</strong> Sales a correr los martes y jueves a las siete; el domingo, en bici, toda la mañana.</li>
+  <li><strong>Cuándo no hay nadie en casa.</strong> La consecuencia directa de las dos anteriores.</li>
+</ul>
+
+<p>
+  No es una hipótesis. En 2018, el mapa de calor público de Strava, que agregaba millones de actividades, dejó ver la
+  ubicación y el perímetro de bases militares en varios países a partir de las rutas de los soldados que salían a correr.
+  Nadie había publicado nada secreto: bastó con juntar rutas normales.
+</p>
+
+<p>
+  Las apps con cuenta ofrecen herramientas para mitigarlo, como ocultar el inicio y el final de la ruta o hacer privado
+  el perfil. Ayudan, pero parten de la misma base: tus datos ya están en su servidor. El dato más seguro es el que nunca
+  se sube.
+</p>
+
+<h2 id="que-es-local-first">Qué significa que una app sea «local-first»</h2>
+
+<p>
+  Una aplicación <em>local-first</em> guarda tus datos en tu dispositivo y funciona sin depender de un servidor. La red,
+  si se usa, es un complemento, no un requisito. Así funciona Trackingfy:
+</p>
+
+<ul>
+  <li>
+    <strong>No hay cuentas.</strong> No existe un usuario ni un perfil al que asociar tus actividades.
+  </li>
+  <li>
+    <strong>Tus rutas viven en tu dispositivo</strong>, en el almacenamiento del navegador (IndexedDB) o en el de la app
+    de Android. Trackingfy no tiene un servidor donde guardarlas.
+  </li>
+  <li>
+    <strong>Funciona sin conexión.</strong> La app queda guardada en el dispositivo y el GPS no necesita internet para
+    grabar.
+  </li>
+</ul>
+
+<p>
+  ¿Sale algo del dispositivo? Solo lo imprescindible, y la lista es corta: las imágenes del mapa (de OpenStreetMap), la
+  altitud del terreno cuando dibujas a mano un tramo que no grabaste y la consulta a GitHub al descargar el APK. La tienes
+  completa, con lo que se envía en cada caso, en la <a href="/#privacidad">sección de privacidad</a>.
+</p>
+
+<h2 id="primera-ruta">Cómo grabar tu primera ruta sin registrarte</h2>
+
+<ol>
+  <li>
+    <strong>Abre Trackingfy.</strong> Entra en <a href="{{appPath}}">trackingfy.web.app</a> desde el navegador del
+    móvil. No hace falta instalar nada.
+  </li>
+  <li>
+    <strong>Elige idioma y pulsa «Comenzar».</strong> Es la única pantalla de bienvenida. No hay formularios.
+  </li>
+  <li>
+    <strong>Concede el permiso de ubicación.</strong> Es lo único que la app necesita. Verás tu posición en el mapa.
+  </li>
+  <li>
+    <strong>Pulsa el botón amarillo.</strong> Empieza la grabación: duración, distancia, velocidad, desnivel y altitud
+    se actualizan en pantalla mientras te mueves.
+  </li>
+  <li>
+    <strong>Termina cuando quieras.</strong> Vuelve a tocar el botón para pausar, reanudar o detener y guardar.
+  </li>
+  <li>
+    <strong>Revisa tu actividad.</strong> Queda en el historial, con el mapa completo y todas las estadísticas.
+  </li>
+</ol>
+
+<div class="callout">
+  <p><strong>Consejo para Android.</strong> En el navegador, la pestaña tiene que seguir abierta mientras grabas. Si
+  instalas la <a href="/#descargar">app de Android</a>, Trackingfy sigue grabando con la pantalla apagada y te deja una
+  notificación con la distancia, el desnivel, el tiempo y botones para pausar o terminar.</p>
+</div>
+
+<h2 id="tu-propia-nube">La contrapartida: tú eres tu propia nube</h2>
+
+<p>
+  Guardar los datos en local tiene una consecuencia que conviene tener clara: si borras la app o los datos del
+  navegador, tu historial se borra con ellos. No hay una copia en ningún servidor desde la que recuperarlo.
+</p>
+
+<p>La solución es sencilla y está en <strong>Ajustes → Copia de seguridad</strong>:</p>
+
+<ul>
+  <li><strong>Exportar datos</strong> genera un único archivo con todas tus actividades.</li>
+  <li><strong>Importar datos</strong> lo restaura en otro móvil, otro navegador o tras reinstalar la app.</li>
+</ul>
+
+<p>
+  Un buen hábito es exportar después de una ruta importante o una vez al mes, y guardar el archivo donde prefieras: tu
+  ordenador, un disco externo o tu nube de confianza. La diferencia es que decides tú.
+</p>
+
+<h2 id="compartir">¿Y si quiero compartir una ruta?</h2>
+
+<p>
+  Que tus rutas sean privadas por defecto no significa que no puedas enseñarlas. Trackingfy te deja compartir cada
+  actividad de dos formas, y siempre por decisión tuya:
+</p>
+
+<ul>
+  <li>
+    <strong>Como imagen</strong>, con el mapa, el trazado, el perfil de desnivel y los datos que elijas. Tienes todos
+    los detalles en la guía para <a href="/blog/compartir-ruta-imagen-instagram-stories">compartir tu ruta en Instagram Stories</a>.
+  </li>
+  <li>
+    <strong>Como archivo de ruta</strong>, para que otra persona la importe en su Trackingfy y la siga desde el mapa.
+  </li>
+</ul>
+
+<p>
+  Grabar tus salidas no debería costarte tu privacidad. <a href="{{appPath}}">Abre Trackingfy</a> y graba tu próxima
+  ruta: sin cuenta, sin anuncios y con tus datos donde deben estar.
+</p>

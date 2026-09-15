@@ -1,0 +1,289 @@
+/*
+ * Styles for the public site (landing, blog, legal pages). site/build.js compiles this
+ * file with the same Tailwind version as the app, scanning only the site/ folder.
+ */
+@import 'tailwindcss' source('./');
+
+@custom-variant dark (&:where(.dark, .dark *));
+/* Set on <html> by the inline head script, to show the download option that fits. */
+@custom-variant android (&:where(.is-android, .is-android *));
+@custom-variant ios (&:where(.is-ios, .is-ios *));
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  --color-accent: #efbc21;
+  --color-accent-hover: #f6c93c;
+  --color-night: #0d0d0e;
+
+  --color-canvas: var(--site-canvas);
+  --color-surface: var(--site-surface);
+  --color-raised: var(--site-raised);
+  --color-ink: var(--site-ink);
+  --color-muted: var(--site-muted);
+  --color-line: var(--site-line);
+  /* Accent for text: the brand yellow is too light to read on a light background. */
+  --color-accent-ink: var(--site-accent-ink);
+}
+
+:root {
+  --site-canvas: #f7f6f2;
+  --site-surface: #ffffff;
+  --site-raised: #efede6;
+  --site-ink: #151515;
+  --site-muted: #5c5c5c;
+  --site-line: #e6e3db;
+  --site-accent-ink: #875f00;
+  color-scheme: light;
+}
+
+:root.dark {
+  --site-canvas: #0d0d0e;
+  --site-surface: #161618;
+  --site-raised: #202023;
+  --site-ink: #f4f4f5;
+  --site-muted: #a3a3ab;
+  --site-line: #2a2a2e;
+  --site-accent-ink: #efbc21;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-5 focus:py-3 focus:text-sm focus:font-black focus:text-[#151515];
+  }
+
+  .eyebrow {
+    @apply text-xs font-black uppercase tracking-[0.18em] text-accent-ink;
+  }
+
+  .section-title {
+    @apply text-3xl font-black leading-[1.08] tracking-tighter text-balance sm:text-5xl;
+  }
+
+  .section-lead {
+    @apply text-lg leading-relaxed text-muted text-pretty;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black tracking-wide whitespace-nowrap transition duration-200 select-none active:scale-[0.98];
+  }
+  .btn[aria-busy='true'] {
+    @apply cursor-progress opacity-70;
+  }
+  .btn-lg {
+    @apply px-7 py-4 text-base;
+  }
+  .btn-sm {
+    @apply px-4 py-2.5 text-xs sm:text-sm;
+  }
+  .btn-primary {
+    @apply bg-accent text-[#151515] shadow-[0_14px_34px_-12px_rgba(239,188,33,0.75)] hover:bg-accent-hover hover:shadow-[0_18px_40px_-12px_rgba(239,188,33,0.85)];
+  }
+  .btn-ghost {
+    @apply border border-line bg-surface text-ink shadow-sm hover:border-ink/25;
+  }
+  .btn-dark {
+    @apply bg-[#151515] text-white hover:bg-black;
+  }
+  .btn-light {
+    @apply bg-white text-[#151515] hover:bg-white/90;
+  }
+
+  .icon-tile {
+    @apply grid size-11 shrink-0 place-items-center rounded-2xl bg-accent/15 text-accent-ink ring-1 ring-accent/25;
+  }
+
+  .card {
+    @apply rounded-[28px] border border-line bg-surface;
+  }
+
+  .footer-title {
+    @apply text-xs font-black uppercase tracking-[0.18em] text-ink;
+  }
+  .footer-list {
+    @apply mt-5 space-y-3 text-sm text-muted;
+  }
+  .footer-list a {
+    @apply transition hover:text-ink;
+  }
+
+  /* Long-form text: blog posts and legal pages. */
+  .prose {
+    @apply text-[1.0625rem] leading-[1.75] text-ink/85;
+  }
+  .prose > * + * {
+    margin-top: 1.25em;
+  }
+  .prose h2 {
+    @apply mt-14 text-2xl font-black leading-tight tracking-tight text-ink sm:text-[1.9rem];
+    scroll-margin-top: 6rem;
+  }
+  .prose h3 {
+    @apply mt-9 text-xl font-black tracking-tight text-ink;
+  }
+  .prose h2 + *,
+  .prose h3 + * {
+    margin-top: 0.75em;
+  }
+  .prose a {
+    @apply font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4 transition-all hover:decoration-[3px];
+  }
+  .prose strong {
+    @apply font-bold text-ink;
+  }
+  .prose ul {
+    @apply list-disc space-y-2 pl-6 marker:text-accent;
+  }
+  .prose ol {
+    @apply list-decimal space-y-3 pl-6 marker:font-black marker:text-accent-ink;
+  }
+  .prose li > p {
+    margin-top: 0.25em;
+  }
+  .prose blockquote {
+    @apply border-l-4 border-accent pl-5 text-muted italic;
+  }
+  .prose code {
+    @apply rounded-md bg-raised px-1.5 py-0.5 text-[0.88em];
+  }
+  .prose .lead {
+    @apply text-xl leading-relaxed text-ink;
+  }
+  .prose .table-wrap {
+    @apply overflow-x-auto rounded-2xl border border-line bg-surface;
+  }
+  .prose table {
+    @apply w-full text-left text-[0.95rem] leading-normal;
+  }
+  .prose th {
+    @apply border-b border-line px-4 py-3 align-top font-black text-ink;
+  }
+  .prose td {
+    @apply border-b border-line px-4 py-3 align-top;
+  }
+  .prose tr:last-child > * {
+    @apply border-b-0;
+  }
+  .prose tbody th {
+    @apply w-40 font-bold;
+  }
+  .prose figure {
+    @apply my-10;
+  }
+  .prose figure > div {
+    @apply overflow-hidden rounded-[24px] border border-line;
+  }
+  .prose figcaption {
+    @apply mt-3 text-center text-sm text-muted;
+  }
+  .prose .callout {
+    @apply rounded-[24px] border border-accent/30 bg-accent/10 p-6 text-ink;
+  }
+  .prose .callout > * + * {
+    margin-top: 0.75em;
+  }
+}
+
+/* The recorded track drawing itself on the hero phone. */
+.route-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: route-draw 2.8s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+}
+@keyframes route-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The "you are here" halo on the illustrated maps. */
+.pulse-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-dot 2.4s ease-out infinite;
+}
+@keyframes pulse-dot {
+  from {
+    scale: 0.6;
+    opacity: 0.55;
+  }
+  to {
+    scale: 1.8;
+    opacity: 0;
+  }
+}
+
+.float {
+  animation: float 7s ease-in-out infinite;
+}
+.float-late {
+  animation: float 7s ease-in-out 1.8s infinite;
+}
+@keyframes float {
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+/* Content fades in as it scrolls into view, only where the browser drives it natively. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal both cubic-bezier(0.2, 0.7, 0.2, 1);
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .route-draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .float,
+  .float-late,
+  .pulse-dot {
+    animation: none;
+  }
+}

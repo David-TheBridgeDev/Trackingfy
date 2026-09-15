@@ -1,0 +1,48 @@
+<article>
+  <header class="relative isolate overflow-hidden border-b border-line">
+    <div aria-hidden="true" class="absolute -top-40 right-[-12%] -z-10 h-[30rem] w-[30rem] rounded-full bg-accent/20 blur-3xl dark:bg-accent/10"></div>
+    <div class="container-site grid gap-10 pb-14 pt-10 sm:pt-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-14">
+      <div>
+        <nav aria-label="Migas de pan" class="text-sm font-semibold text-muted">
+          <ol class="flex flex-wrap items-center gap-2">
+            <li><a class="transition hover:text-ink" href="/">Inicio</a></li>
+            <li aria-hidden="true">/</li>
+            <li><a class="transition hover:text-ink" href="/blog">Blog</a></li>
+          </ol>
+        </nav>
+        <p class="eyebrow mt-8">{{category}}</p>
+        <h1 class="mt-4 text-4xl font-black leading-[1.05] tracking-tighter text-balance sm:text-5xl">{{heading}}</h1>
+        <p class="mt-6 text-lg leading-relaxed text-muted text-pretty">{{description}}</p>
+        <p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-semibold text-muted">
+          <time datetime="{{date}}">{{dateHuman}}</time>
+          <span aria-hidden="true">·</span>
+          <span>{{readingTime}} min de lectura</span>
+        </p>
+      </div>
+      <div class="aspect-[16/10] overflow-hidden rounded-[28px] border border-line shadow-[0_30px_80px_-40px_rgba(0,0,0,0.45)]">{{cover}}</div>
+    </div>
+  </header>
+
+  <div class="container-site grid gap-12 py-14 sm:py-16 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
+    <div class="prose max-w-[42rem]">{{content}}</div>
+
+    <aside class="hidden lg:block" aria-label="Probar Trackingfy">
+      <div class="sticky top-24 rounded-[24px] border border-line bg-surface p-6">
+        {{> logo-mark}}
+        <p class="mt-4 text-lg font-black leading-tight tracking-tight">Graba tu próxima ruta sin darte de alta</p>
+        <p class="mt-2 text-sm leading-relaxed text-muted">Gratis, sin anuncios y con tus datos solo en tu móvil.</p>
+        <a href="{{appPath}}" class="btn btn-primary btn-sm mt-5 w-full">Abrir Trackingfy</a>
+        <a href="{{releasesUrl}}" data-apk class="btn btn-ghost btn-sm mt-2 w-full ios:hidden">{{icon download "h-4 w-4"}} APK para Android</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="border-t border-line bg-surface py-16 sm:py-20" aria-labelledby="sigue-leyendo">
+    <div class="container-site">
+      <h2 id="sigue-leyendo" class="text-2xl font-black tracking-tight sm:text-3xl">Sigue leyendo</h2>
+      <div class="mt-8 grid gap-6 md:grid-cols-2">{{related}}</div>
+    </div>
+  </section>
+</article>
+
+<div class="pt-20 sm:pt-28">{{> cta-band}}</div>

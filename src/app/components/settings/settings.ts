@@ -24,6 +24,10 @@ export class SettingsComponent implements OnInit {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  // The legal pages open in a new tab on the web. The Android app would load them in its
+  // own WebView instead, replacing the app mid-recording, so it does not show the links.
+  readonly showLegalLinks = !Capacitor.isNativePlatform();
+
   ngOnInit() {
     this.uiService.setFullScreen(false);
   }

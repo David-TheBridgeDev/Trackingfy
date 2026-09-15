@@ -1,0 +1,25 @@
+---
+path: /404
+title: Página no encontrada · Trackingfy
+heading: Esta ruta no está en el mapa
+description: La página que buscas no existe o ha cambiado de sitio.
+updated: 2026-09-15
+noindex: true
+---
+<section class="relative isolate overflow-hidden">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <div class="absolute -top-48 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-accent/20 blur-3xl dark:bg-accent/10"></div>
+    <div class="absolute inset-0 text-ink/[0.06]">{{> topo}}</div>
+  </div>
+  <div class="container-site grid min-h-[65vh] place-items-center py-24 text-center">
+    <div>
+      <p class="eyebrow">Error 404</p>
+      <h1 class="mx-auto mt-5 max-w-3xl text-5xl font-black leading-[1.02] tracking-tighter text-balance sm:text-7xl">Esta ruta no está en el mapa</h1>
+      <p class="section-lead mx-auto mt-6 max-w-md">La página que buscas no existe o ha cambiado de sitio.</p>
+      <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+        <a href="/" class="btn btn-primary btn-lg">Volver al inicio</a>
+        <a href="{{appPath}}" class="btn btn-ghost btn-lg">Abrir la app</a>
+      </div>
+    </div>
+  </div>
+</section>

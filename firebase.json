@@ -7,10 +7,25 @@
       "**/node_modules/**",
       "**/apk/**"
     ],
+    "cleanUrls": true,
+    "trailingSlash": false,
     "rewrites": [
+      { "source": "/dashboard", "destination": "/app.html" },
+      { "source": "/history", "destination": "/app.html" },
+      { "source": "/settings", "destination": "/app.html" },
+      { "source": "/activity/**", "destination": "/app.html" }
+    ],
+    "headers": [
+      {
+        "source": "/site/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      },
       {
         "source": "**",
-        "destination": "/index.html"
+        "headers": [
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        ]
       }
     ]
   }

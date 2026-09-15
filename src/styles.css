@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* The public site (landing, blog, legal) compiles its own stylesheet: see site/build.js. */
+@source not "../site";
 
 @theme {
   --color-accent: #efbc21;

@@ -241,6 +241,24 @@
             <span>{{ ts.t('settings.made_by') }}</span>
           </a>
         </div>
+
+        @if (showLegalLinks) {
+          <nav
+            class="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-wider text-text-primary"
+          >
+            <a href="/privacidad" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
+              ts.t('settings.legal.privacy')
+            }}</a>
+            <span aria-hidden="true">·</span>
+            <a href="/aviso-legal" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
+              ts.t('settings.legal.notice')
+            }}</a>
+            <span aria-hidden="true">·</span>
+            <a href="/cookies" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
+              ts.t('settings.legal.cookies')
+            }}</a>
+          </nav>
+        }
       </div>
     </div>
   </div>
