@@ -234,6 +234,83 @@ updated: 2026-09-15
         <p class="mt-4 text-xs leading-relaxed text-white/50">En Android 16 también aparece en la barra de estado y en la pantalla de bloqueo.</p>
       </article>
 
+      <article class="reveal card relative overflow-hidden p-7 sm:p-9 md:col-span-6 lg:col-span-4">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon trend}}</span><p class="eyebrow">Estadísticas</p></div>
+        <h3 class="mt-5 text-2xl font-black tracking-tight sm:text-3xl">Mira lo que llevas hecho, semana a semana</h3>
+        <p class="mt-3 max-w-xl leading-relaxed text-muted">
+          Tus rutas sumadas por semanas, meses o años: distancia, tiempo, desnivel o número de salidas. Toca una barra y
+          tienes ese periodo con lo que cambió respecto al anterior. Los meses en blanco siguen ahí, porque un parón
+          también es parte de la historia.
+        </p>
+        <div class="mt-8 rounded-2xl bg-raised p-4 sm:p-5" aria-hidden="true">
+          <div class="flex items-baseline justify-between gap-3">
+            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Distancia</p>
+            <p class="text-xs font-black text-green-600 dark:text-green-400">+18% vs mayo</p>
+          </div>
+          <div class="mt-4 flex h-24 items-end gap-1.5 sm:gap-2.5">
+            <span class="h-[34%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[58%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[46%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[2%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[71%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[63%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[80%] flex-1 rounded-t-md bg-accent/25"></span>
+            <span class="h-[95%] flex-1 rounded-t-md bg-accent"></span>
+          </div>
+          <div class="mt-2 flex gap-1.5 text-[9px] font-black uppercase tracking-wide text-muted sm:gap-2.5">
+            <span class="flex-1 text-center">Nov</span>
+            <span class="flex-1 text-center">Dic</span>
+            <span class="flex-1 text-center">Ene</span>
+            <span class="flex-1 text-center">Feb</span>
+            <span class="flex-1 text-center">Mar</span>
+            <span class="flex-1 text-center">Abr</span>
+            <span class="flex-1 text-center">May</span>
+            <span class="flex-1 text-center text-accent-ink">Jun</span>
+          </div>
+        </div>
+        <ul class="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4" aria-label="Totales de ejemplo">
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Rutas</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">128</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Distancia</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">1.482 km</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Tiempo</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums">96h 12m</p></li>
+          <li class="rounded-2xl bg-raised px-3 py-3"><p class="text-[9.5px] font-black uppercase tracking-wide text-muted">Desnivel +</p><p class="mt-1 whitespace-nowrap text-[15px] font-black tabular-nums text-green-600 dark:text-green-400">24.480 m</p></li>
+        </ul>
+        <p class="mt-5 text-sm leading-relaxed text-muted">
+          Y con colecciones, cada una con sus propios números: el monte por un lado y los entrenos por otro, sin que unos
+          aplasten a los otros. Abajo del todo, tus récords: la más larga, la de más desnivel y la más rápida.
+        </p>
+      </article>
+
+      <article class="reveal card flex flex-col p-7 md:col-span-6 lg:col-span-2">
+        <div class="flex items-center gap-3"><span class="icon-tile">{{icon gesture}}</span><p class="eyebrow">Gestos</p></div>
+        <h3 class="mt-5 text-xl font-black tracking-tight">Pasa de una ruta a otra como pasas fotos</h3>
+        <p class="mt-2 leading-relaxed text-muted">Desliza sobre los datos de una ruta y llega la siguiente de la lista que estabas mirando: esa colección, esa búsqueda, ese orden.</p>
+        <div class="mt-6 rounded-2xl bg-raised p-4" aria-hidden="true">
+          <div class="flex items-center justify-between rounded-xl border border-line bg-surface px-3 py-2">
+            <span class="grid size-6 place-items-center rounded-lg bg-raised text-muted">{{icon chevron "h-3 w-3 rotate-90"}}</span>
+            <span class="text-[11px] font-black uppercase tracking-[0.18em]">3 de 45</span>
+            <span class="grid size-6 place-items-center rounded-lg bg-raised text-ink">{{icon chevron "h-3 w-3 -rotate-90"}}</span>
+          </div>
+          <div class="relative mt-3 h-28 overflow-hidden">
+            <div class="absolute inset-y-0 -left-[16%] flex w-[74%] flex-col justify-between rounded-xl border border-line bg-surface p-3 opacity-30">
+              <div>
+                <p class="text-[11px] font-black uppercase tracking-tight">Subida al puerto</p>
+                <p class="mt-1 text-[11px] font-bold tabular-nums text-muted">18,4 km · 1h 12m</p>
+              </div>
+              <svg viewBox="0 0 120 24" class="w-full"><path d="M3 21c16-1 20-15 34-15s18 13 32 11 26-13 48-15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="absolute inset-y-0 right-0 flex w-[74%] flex-col justify-between rounded-xl border border-line bg-surface p-3 shadow-sm">
+              <div>
+                <p class="text-[11px] font-black uppercase tracking-tight">Vuelta al lago</p>
+                <p class="mt-1 text-[11px] font-bold tabular-nums text-muted">12,1 km · 48m · +420 m</p>
+              </div>
+              <svg viewBox="0 0 120 24" class="w-full text-accent"><path d="M3 18c18 3 22-14 38-13s20 16 36 12 20-14 40-13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <p class="mt-5 leading-relaxed text-muted">Las flechas de la cabecera y las teclas ← → hacen lo mismo. El mapa y el perfil de desnivel se quedan como están, para arrastrarlos tú.</p>
+        <p class="mt-auto pt-5 text-xs font-semibold text-muted">Y «Atrás» te devuelve al historial, no a las rutas que acabas de pasar.</p>
+      </article>
+
       <article class="reveal card flex flex-col p-7 md:col-span-2">
         <div class="flex items-center gap-3"><span class="icon-tile">{{icon pencil}}</span><p class="eyebrow">Editor de rutas</p></div>
         <h3 class="mt-5 text-xl font-black tracking-tight">Arregla el tramo que no grabaste</h3>
@@ -295,7 +372,7 @@ updated: 2026-09-15
     <ul class="mt-16 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
       <li class="reveal flex gap-4">
         <span class="icon-tile">{{icon list}}</span>
-        <div><h3 class="font-black tracking-tight">Historial ordenado</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Agrupado por días y ordenable por fecha, distancia, duración o desnivel. Selecciona varias actividades y bórralas de una vez.</p></div>
+        <div><h3 class="font-black tracking-tight">Historial ordenado</h3><p class="mt-1.5 text-sm leading-relaxed text-muted">Colecciones que creas tú, búsqueda por nombre, tipo o fecha, y orden por fecha, distancia, duración o desnivel. Selecciona varias rutas para moverlas o borrarlas de una vez.</p></div>
       </li>
       <li class="reveal flex gap-4">
         <span class="icon-tile">{{icon swap}}</span>
@@ -344,7 +421,7 @@ updated: 2026-09-15
       <li class="reveal card relative overflow-hidden bg-canvas p-8">
         <span class="text-6xl font-black tracking-tighter text-accent" aria-hidden="true">03</span>
         <h3 class="mt-4 text-xl font-black tracking-tight">Revive y comparte tu ruta</h3>
-        <p class="mt-2 leading-relaxed text-muted">La actividad queda en tu historial con el mapa y todas sus estadísticas. Compártela como imagen o como archivo.</p>
+        <p class="mt-2 leading-relaxed text-muted">La actividad queda en tu historial con el mapa y todas sus estadísticas. Desliza para ver la siguiente, o compártela como imagen o como archivo.</p>
       </li>
     </ol>
 
@@ -589,6 +666,10 @@ updated: 2026-09-15
       <details class="group py-2" name="faq" data-faq>
         <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Qué actividades puedo registrar?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
         <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Caminar, correr y ciclismo. Cada actividad guarda su tipo, y puedes filtrar tu historial por él.</p></div>
+      </details>
+      <details class="group py-2" name="faq" data-faq>
+        <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Puedo ver cuántos kilómetros llevo este mes?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>
+        <div class="pb-5 pr-12 leading-relaxed text-muted"><p>Sí, en el apartado de estadísticas. Suma tus rutas por semanas, meses o años y te enseña distancia, tiempo, desnivel y número de salidas, con la comparación respecto al periodo anterior. Si organizas tus rutas en colecciones, cada una tiene sus propios números y sus propios récords.</p></div>
       </details>
       <details class="group py-2" name="faq" data-faq>
         <summary class="flex cursor-pointer items-center justify-between gap-6 py-4 text-lg font-black tracking-tight">¿Puedo compartir una ruta con otra persona?<span class="grid size-8 shrink-0 place-items-center rounded-full bg-raised transition group-open:rotate-45">{{icon plus "h-4 w-4"}}</span></summary>

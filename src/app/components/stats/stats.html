@@ -1,0 +1,466 @@
+<div class="space-y-4 pb-24">
+  <!--
+    The two choices every number below obeys: which collection, and how the calendar is
+    cut up. They stay under the thumb while the rest of the screen scrolls, the same way
+    the history keeps its tabs in reach.
+  -->
+  <div
+    class="sticky top-0 z-40 -mx-4 px-4 md:-mx-6 md:px-6 pt-1 pb-2 bg-bg-base/95 backdrop-blur-sm space-y-2"
+  >
+    <div class="flex items-center gap-2">
+      <div class="flex-1 min-w-0 overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-2 w-max py-0.5">
+          @for (tab of tabs(); track tab.key) {
+            <button
+              (click)="setTab(tab.key)"
+              class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-2xl text-[11px] font-black uppercase tracking-wide border transition-all active:scale-95 cursor-pointer"
+              [ngClass]="
+                isActiveTab(tab.key)
+                  ? 'bg-accent text-pure-white border-accent shadow-sm shadow-accent/20'
+                  : 'bg-bg-surface text-text-primary border-gray-100'
+              "
+            >
+              @if (tab.color) {
+                <span
+                  class="w-2 h-2 rounded-full shrink-0"
+                  [style.background-color]="isActiveTab(tab.key) ? '#ffffff' : tab.color"
+                ></span>
+              }
+              <span class="max-w-[9rem] truncate">{{ tab.label }}</span>
+              <span class="opacity-70 font-bold">{{ tab.count }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <button
+        (click)="goToHistory()"
+        class="shrink-0 bg-bg-surface border border-gray-100 p-2.5 rounded-2xl text-text-primary active:scale-95 transition-transform cursor-pointer"
+        [title]="ts.t('app.history')"
+        [attr.aria-label]="ts.t('app.history')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2.2"
+          stroke="currentColor"
+          class="w-4 h-4"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1 p-1 bg-bg-surface border border-gray-100 rounded-2xl">
+      @for (option of periods; track option) {
+        <button
+          (click)="setPeriod(option)"
+          class="py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+          [ngClass]="
+            period() === option
+              ? 'bg-accent text-pure-white shadow-sm shadow-accent/20'
+              : 'text-text-primary'
+          "
+        >
+          {{ periodLabel(option) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (!hasActivities()) {
+    <div
+      class="bg-bg-surface p-12 rounded-2xl shadow-sm text-center border border-gray-100 border-dashed"
+    >
+      <div class="w-16 h-16 bg-bg-base rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8 text-text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+          />
+        </svg>
+      </div>
+      <p class="text-text-heading font-black uppercase tracking-tight">{{ ts.t('stats.empty') }}</p>
+      <p class="text-text-primary text-sm font-semibold mb-6">{{ ts.t('stats.empty_hint') }}</p>
+      <button
+        (click)="goToDashboard()"
+        class="bg-accent text-pure-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform cursor-pointer"
+      >
+        {{ ts.t('history.start_first') }}
+      </button>
+    </div>
+  } @else if (selection().length === 0) {
+    <div class="py-12 px-6 text-center bg-bg-surface rounded-3xl border border-gray-100 shadow-sm">
+      <p class="text-text-heading font-black uppercase tracking-tight">
+        {{ ts.t('history.empty_collection') }}
+      </p>
+      <p class="text-text-primary text-sm font-semibold">
+        {{ ts.t('history.empty_collection_hint') }}
+      </p>
+    </div>
+  } @else {
+    <!-- What the whole selection adds up to, all-time -->
+    <div class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+      <div class="flex items-baseline justify-between gap-2">
+        <p class="text-[10px] font-black uppercase tracking-widest text-text-primary">
+          {{ ts.t('stats.totals') }}
+        </p>
+        @if (summary().firstDate; as first) {
+          <p class="text-[10px] font-semibold text-text-primary truncate">
+            {{ ts.t('stats.since') }} {{ first | date: 'MMM y' }}
+          </p>
+        }
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('stats.routes') }}
+          </p>
+          <p class="font-black text-text-heading text-lg">{{ summary().count }}</p>
+        </div>
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('dashboard.distance') }}
+          </p>
+          <p class="font-black text-text-heading text-lg">
+            {{ summary().distance / 1000 | number: '1.0-1' }}
+            <span class="text-xs">km</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('dashboard.moving_time') }}
+          </p>
+          <p class="font-black text-text-heading text-lg">
+            {{ formatDuration(summary().movingTime) }}
+          </p>
+        </div>
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('dashboard.climb') }}
+          </p>
+          <p class="font-black text-green-600 text-lg">
+            {{ summary().climb | number: '1.0-0' }} <span class="text-xs">m</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('dashboard.avg_speed') }}
+          </p>
+          <p class="font-black text-text-heading text-lg">
+            {{ summary().avgSpeed * 3.6 | number: '1.1-1' }}
+            <span class="text-xs">km/h</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-text-primary text-[10px] uppercase font-bold tracking-widest mb-0.5">
+            {{ ts.t('stats.active_days') }}
+          </p>
+          <p class="font-black text-text-heading text-lg">{{ summary().activeDays }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- The calendar itself: one bar per week, month or year -->
+    <div class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+      <div class="flex items-center gap-1 overflow-x-auto no-scrollbar -mx-1 px-1">
+        @for (option of metrics; track option) {
+          <button
+            (click)="setMetric(option)"
+            class="shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wide border transition-colors active:scale-95 cursor-pointer"
+            [ngClass]="
+              metric() === option
+                ? 'bg-accent text-pure-white border-accent'
+                : 'bg-bg-base text-text-primary border-transparent'
+            "
+          >
+            {{ metricLabel(option) }}
+          </button>
+        }
+      </div>
+
+      @if (selectedBucket(); as bucket) {
+        <div class="bg-bg-base rounded-2xl p-3">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p
+                class="text-[10px] font-black uppercase tracking-widest text-text-primary truncate"
+              >
+                {{ bucketRange(bucket) }}
+              </p>
+              <p class="font-black text-text-heading text-2xl tracking-tighter leading-tight">
+                {{ metricAmount(bucket) }}
+              </p>
+            </div>
+
+            @if (change() !== null) {
+              <div class="text-right shrink-0">
+                <p
+                  class="font-black text-sm"
+                  [ngClass]="change()! >= 0 ? 'text-green-600' : 'text-red-600'"
+                >
+                  {{ formatChange(change()!) }}
+                </p>
+                <p class="text-[9px] font-bold uppercase tracking-wider text-text-primary">
+                  {{ ts.t('stats.vs_previous') }}
+                </p>
+              </div>
+            }
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-2 border-t border-gray-100 mt-3 pt-2">
+            <div>
+              <p class="text-text-primary text-[9px] uppercase font-bold tracking-widest">
+                {{ ts.t('stats.routes') }}
+              </p>
+              <p class="font-black text-text-heading text-sm">{{ bucket.count }}</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-[9px] uppercase font-bold tracking-widest">
+                {{ ts.t('dashboard.distance') }}
+              </p>
+              <p class="font-black text-text-heading text-sm">
+                {{ bucket.distance / 1000 | number: '1.0-1' }} km
+              </p>
+            </div>
+            <div>
+              <p class="text-text-primary text-[9px] uppercase font-bold tracking-widest">
+                {{ ts.t('dashboard.moving_time') }}
+              </p>
+              <p class="font-black text-text-heading text-sm">
+                {{ formatDuration(bucket.movingTime) }}
+              </p>
+            </div>
+            <div>
+              <p class="text-text-primary text-[9px] uppercase font-bold tracking-widest">
+                {{ ts.t('dashboard.climb') }}
+              </p>
+              <p class="font-black text-text-heading text-sm">
+                {{ bucket.climb | number: '1.0-0' }} m
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div #chartScroll class="overflow-x-auto no-scrollbar -mx-1 px-1">
+        <div class="flex items-stretch justify-end gap-1.5 w-max min-w-full h-44 pt-1">
+          @for (bucket of buckets(); track bucket.start) {
+            <button
+              (click)="selectBucket(bucket)"
+              class="shrink-0 w-9 flex flex-col items-center gap-1.5 cursor-pointer"
+              [attr.aria-label]="bucketRange(bucket) + ': ' + metricAmount(bucket)"
+              [attr.aria-pressed]="isSelected(bucket)"
+            >
+              <span class="relative flex-1 w-full">
+                <span
+                  class="absolute bottom-0 left-0 right-0 rounded-t-lg transition-all duration-300"
+                  [style.height.%]="barHeight(bucket)"
+                  [ngClass]="isSelected(bucket) ? 'bg-accent' : 'bg-accent/25'"
+                ></span>
+              </span>
+              <span
+                class="w-full text-center leading-tight"
+                [ngClass]="isSelected(bucket) ? 'text-accent' : 'text-text-primary'"
+              >
+                <span class="block text-[9px] font-black uppercase tracking-wide truncate">
+                  {{ bucketLabel(bucket) }}
+                </span>
+                @if (bucketYear(bucket); as year) {
+                  <span class="block text-[8px] font-bold opacity-70">{{ year }}</span>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Where the kilometres went: by activity, and by collection -->
+    <div class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+      <p class="text-[10px] font-black uppercase tracking-widest text-text-primary">
+        {{ ts.t('stats.by_type') }}
+      </p>
+
+      <div class="space-y-2">
+        @for (entry of typeBreakdown(); track entry.key) {
+          <div class="relative overflow-hidden rounded-xl bg-bg-base p-3">
+            <div
+              class="absolute inset-y-0 left-0 bg-accent/15"
+              [style.width.%]="entry.share * 100"
+            ></div>
+            <div class="relative flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 min-w-0">
+                <span
+                  class="h-5 w-5 bg-accent shrink-0"
+                  [style.mask-image]="'url(' + typeIcon(entry.key) + ')'"
+                  [style.-webkit-mask-image]="'url(' + typeIcon(entry.key) + ')'"
+                  style="
+                    mask-size: contain;
+                    mask-repeat: no-repeat;
+                    mask-position: center;
+                    -webkit-mask-size: contain;
+                    -webkit-mask-repeat: no-repeat;
+                    -webkit-mask-position: center;
+                  "
+                ></span>
+                <span class="font-bold text-sm text-text-heading truncate">
+                  {{ entryLabel(entry, 'type') }}
+                </span>
+                <span class="text-[10px] font-bold uppercase text-text-primary shrink-0">
+                  · {{ entry.count }}
+                </span>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-black text-text-heading text-sm">
+                  {{ formatDistance(entry.distance) }}
+                </p>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-text-primary">
+                  {{ entry.share * 100 | number: '1.0-0' }}%
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (showCollectionBreakdown()) {
+      <div class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-text-primary">
+          {{ ts.t('stats.by_collection') }}
+        </p>
+
+        <div class="space-y-2">
+          @for (entry of collectionBreakdown(); track entry.key) {
+            <div class="relative overflow-hidden rounded-xl bg-bg-base p-3">
+              <div
+                class="absolute inset-y-0 left-0 opacity-15"
+                [style.width.%]="entry.share * 100"
+                [style.background-color]="entryColor(entry)"
+              ></div>
+              <div class="relative flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span
+                    class="w-3 h-3 rounded-full shrink-0"
+                    [style.background-color]="entryColor(entry)"
+                  ></span>
+                  <span class="font-bold text-sm text-text-heading truncate">
+                    {{ entryLabel(entry, 'collection') }}
+                  </span>
+                  <span class="text-[10px] font-bold uppercase text-text-primary shrink-0">
+                    · {{ entry.count }}
+                  </span>
+                </div>
+                <div class="text-right shrink-0">
+                  <p class="font-black text-text-heading text-sm">
+                    {{ formatDistance(entry.distance) }}
+                  </p>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-text-primary">
+                    {{ entry.share * 100 | number: '1.0-0' }}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- The best route of the selection for each metric, one tap from being opened -->
+    @if (records().length > 0) {
+      <div class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-text-primary">
+          {{ ts.t('stats.records') }}
+        </p>
+
+        <div class="space-y-2">
+          @for (record of records(); track record.kind) {
+            <button
+              (click)="openActivity(record.activity)"
+              class="w-full flex items-center gap-3 p-3 rounded-xl bg-bg-base text-left active:scale-[0.98] transition-transform cursor-pointer"
+            >
+              <span
+                class="w-9 h-9 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2.2"
+                  stroke="currentColor"
+                  class="w-4 h-4"
+                >
+                  @switch (record.kind) {
+                    @case ('distance') {
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+                      />
+                    }
+                    @case ('climb') {
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 19V5M5 12l7-7 7 7"
+                      />
+                    }
+                    @case ('duration') {
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      />
+                    }
+                    @case ('speed') {
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"
+                      />
+                    }
+                  }
+                </svg>
+              </span>
+
+              <span class="min-w-0 flex-1">
+                <span
+                  class="block text-[9px] font-black uppercase tracking-widest text-text-primary"
+                >
+                  {{ recordLabel(record.kind) }}
+                </span>
+                <span class="block font-bold text-sm text-text-heading truncate">
+                  {{ routeName(record.activity) }}
+                </span>
+              </span>
+
+              <span class="text-right shrink-0">
+                <span class="block font-black text-text-heading text-sm">
+                  {{ recordValue(record.kind, record.value) }}
+                </span>
+                <span class="block text-[10px] font-semibold text-text-primary">
+                  {{ record.activity.date | date: 'shortDate' }}
+                </span>
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

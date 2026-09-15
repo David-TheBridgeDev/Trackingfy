@@ -8,14 +8,16 @@ import { Activity, Collection, Coordinate, DatabaseService } from '../../service
 import {
   COLLECTION_COLORS,
   COLLECTION_NAME_MAX,
+  CollectionFilter,
   CollectionsService,
+  parseCollectionFilter,
 } from '../../services/collections';
+import { RouteNavigationService } from '../../services/route-navigation';
 import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
 import { CollectionPickerComponent } from '../collection-picker/collection-picker';
 
-/** Which tab of the history is on screen: everything, one collection, or the leftovers. */
-export type CollectionFilter = 'all' | 'none' | number;
+export type { CollectionFilter };
 
 export type SortField = 'date' | 'distance' | 'duration' | 'climb' | 'descent' | 'name';
 
@@ -23,13 +25,6 @@ interface DayGroup {
   /** The day these activities share, or null when the list is not grouped by day. */
   date: string | null;
   activities: Activity[];
-}
-
-interface HistoryTab {
-  key: CollectionFilter;
-  label: string;
-  color: string | null;
-  count: number;
 }
 
 /** An activity with the text a search is matched against, built once per list change. */
@@ -80,6 +75,7 @@ export class HistoryComponent implements OnInit {
   private db = inject(DatabaseService);
   private router = inject(Router);
   private collectionsService = inject(CollectionsService);
+  private routeNavigation = inject(RouteNavigationService);
   public uiService = inject(UIService);
   public ts = inject(TranslationService);
 
@@ -112,60 +108,14 @@ export class HistoryComponent implements OnInit {
   /** Until when a long press keeps the click it produces from opening the route. */
   private suppressClickUntil = 0;
 
-  /** How each activity is filed, treating an unknown collection as no collection. */
-  private collectionKeyOf(activity: Activity): number | 'none' {
-    const id = activity.collectionId;
-    return id !== undefined && this.collectionsService.byId().has(id) ? id : 'none';
-  }
+  readonly tabCounts = computed(() => this.collectionsService.countRoutes(this.activities()));
 
-  readonly tabCounts = computed(() => {
-    const counts = new Map<number, number>();
-    let ungrouped = 0;
-
-    for (const activity of this.activities()) {
-      const key = this.collectionKeyOf(activity);
-      if (key === 'none') ungrouped++;
-      else counts.set(key, (counts.get(key) ?? 0) + 1);
-    }
-
-    return { counts, ungrouped, total: this.activities().length };
-  });
-
-  readonly tabs = computed<HistoryTab[]>(() => {
-    const { counts, ungrouped, total } = this.tabCounts();
-
-    const tabs: HistoryTab[] = [
-      {
-        key: 'all',
-        label: this.ts.t('collections.all'),
-        color: null,
-        count: total,
-      },
-    ];
-
-    for (const collection of this.collections()) {
-      if (collection.id === undefined) continue;
-      tabs.push({
-        key: collection.id,
-        label: collection.name,
-        color: collection.color,
-        count: counts.get(collection.id) ?? 0,
-      });
-    }
-
-    // The leftovers only deserve a tab once something has been filed away: before that,
-    // "no collection" and "all" would be the same list under two names.
-    if (this.collections().length > 0 && ungrouped > 0) {
-      tabs.push({
-        key: 'none',
-        label: this.ts.t('collections.none'),
-        color: null,
-        count: ungrouped,
-      });
-    }
-
-    return tabs;
-  });
+  readonly tabs = computed(() =>
+    this.collectionsService.buildTabs(this.activities(), {
+      all: this.ts.t('collections.all'),
+      none: this.ts.t('collections.none'),
+    }),
+  );
 
   /** The activity types actually present, so the filter never offers an empty one. */
   readonly typeOptions = computed(() => {
@@ -220,7 +170,7 @@ export class HistoryComponent implements OnInit {
     const tokens = normalizeForSearch(this.search().trim()).split(/\s+/).filter(Boolean);
 
     const result = this.searchIndex()
-      .filter(({ activity }) => tab === 'all' || this.collectionKeyOf(activity) === tab)
+      .filter(({ activity }) => this.collectionsService.matches(activity, tab))
       .filter(({ activity }) => type === 'all' || activity.type === type)
       // Every word has to match somewhere, so "monte 2025" narrows instead of widening.
       .filter(({ haystack }) => tokens.every((token) => haystack.includes(token)))
@@ -309,7 +259,7 @@ export class HistoryComponent implements OnInit {
     const keys = new Set(
       this.activities()
         .filter((a) => a.id !== undefined && selected.has(a.id))
-        .map((a) => this.collectionKeyOf(a)),
+        .map((a) => this.collectionsService.keyOf(a)),
     );
 
     if (keys.size !== 1) return null;
@@ -569,7 +519,18 @@ export class HistoryComponent implements OnInit {
       this.uiService.historyScrollTop = container.scrollTop;
     }
 
+    // The detail view walks between routes with a swipe, and the order it walks is the
+    // one on screen right now: this tab, this search, this sort. Handing it over on the
+    // way out is what makes "the next route" mean the next one in the list.
+    this.routeNavigation.setSequence(this.visibleIds(), this.activeTabLabel());
+
     this.router.navigate(['/activity', id]);
+  }
+
+  /** The name of the open tab, which is what the detail view calls the sequence. */
+  private activeTabLabel(): string | null {
+    const active = this.activeTab();
+    return this.tabs().find((tab) => tab.key === active)?.label ?? null;
   }
 
   // --- Moving between collections ------------------------------------------
@@ -790,12 +751,16 @@ export class HistoryComponent implements OnInit {
   }
 
   collectionOf(activity: Activity): Collection | null {
-    const key = this.collectionKeyOf(activity);
+    const key = this.collectionsService.keyOf(activity);
     return key === 'none' ? null : (this.collectionsService.get(key) ?? null);
   }
 
   goToDashboard() {
     this.router.navigate(['/dashboard']);
+  }
+
+  goToStats() {
+    this.router.navigate(['/stats']);
   }
 
   formatTime(seconds: number): string {
@@ -809,16 +774,10 @@ export class HistoryComponent implements OnInit {
 
 /** The tab the user left the history on, so the app opens where they were. */
 function readStoredTab(): CollectionFilter {
-  let stored: string | null = null;
   try {
-    stored = localStorage.getItem(TAB_STORAGE_KEY);
+    return parseCollectionFilter(localStorage.getItem(TAB_STORAGE_KEY));
   } catch {
-    stored = null;
+    // Private browsing can refuse storage; the history simply opens on "all".
+    return 'all';
   }
-
-  if (stored === null || stored === 'all') return 'all';
-  if (stored === 'none') return 'none';
-
-  const id = Number(stored);
-  return Number.isFinite(id) && id > 0 ? id : 'all';
 }

@@ -1,8 +1,10 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, HostListener, OnInit, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatabaseService, Activity, Coordinate } from '../../services/database';
 import { CollectionsService } from '../../services/collections';
+import { RouteNavigationService } from '../../services/route-navigation';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 import { TrackingService } from '../../services/tracking';
@@ -25,6 +27,20 @@ import { Capacitor } from '@capacitor/core';
 import { ShareComposerComponent } from '../share-composer/share-composer';
 import { CollectionPickerComponent } from '../collection-picker/collection-picker';
 
+/** A drag has to travel this far before it is a swipe rather than a tap. */
+const SWIPE_INTENT_PX = 12;
+/** And this far before letting go of it changes route. */
+const SWIPE_COMMIT_PX = 60;
+/** How much more horizontal than vertical a drag must be to count as a swipe. */
+const SWIPE_DIRECTION_RATIO = 1.4;
+/** How far the card can follow the finger. */
+const SWIPE_MAX_PX = 110;
+/** How far it slides out, and how long that takes, before the next route arrives. */
+const SWIPE_EXIT_PX = 70;
+const SWIPE_EXIT_MS = 140;
+/** What is left of a route pulled towards an end of the list, where there is no next. */
+const SWIPE_RESISTANCE = 0.25;
+
 export interface ChartPoint {
   distance: number; // in km
   altitude: number;
@@ -46,6 +62,7 @@ export interface ChartPoint {
     CollectionPickerComponent,
   ],
   templateUrl: './activity-detail.html',
+  styleUrl: './activity-detail.css',
 })
 export class ActivityDetailComponent implements OnInit {
   activity = signal<Activity | null>(null);
@@ -140,22 +157,259 @@ export class ActivityDetailComponent implements OnInit {
     private db: DatabaseService,
     private routeEditor: RouteEditorService,
     private collections: CollectionsService,
+    private routeNavigation: RouteNavigationService,
     private appComponent: App,
     public uiService: UIService,
     public trackingService: TrackingService,
     public ts: TranslationService
-  ) {}
+  ) {
+    // Walking to the next route reuses this screen rather than building a new one, so the
+    // id has to be followed instead of read once on the way in.
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      void this.open(Number(params.get('id')));
+    });
+  }
 
   async ngOnInit() {
     this.uiService.setFullScreen(false); // Reset FS when entering
     await this.collections.load();
+  }
 
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      const act = await this.db.getActivity(id);
-      this.activity.set(act || null);
-      const coords = await this.db.getCoordinates(id);
-      this.applyCoordinates(coords);
+  /** The route whose load is in flight, if any. */
+  private openingId?: number;
+
+  /**
+   * Show a route, from scratch: nothing of the previous one may survive the change.
+   *
+   * The id being loaded is remembered because walking quickly through a list starts a
+   * read before the previous one has come back, and the slower answer must not be the
+   * one that lands: a route's stats with another route's track would be worse than a
+   * moment of the old one.
+   */
+  private async open(id: number) {
+    this.openingId = id;
+    this.resetView();
+
+    if (!id) {
+      this.activity.set(null);
+      this.applyCoordinates([]);
+      return;
+    }
+
+    const activity = await this.db.getActivity(id);
+    const coordinates = activity ? await this.db.getCoordinates(id) : [];
+    if (this.openingId !== id) return;
+
+    this.activity.set(activity ?? null);
+    this.applyCoordinates(coordinates);
+
+    // Reached from somewhere that left no list behind -- a shared route, a reopened tab
+    // -- the gallery falls back to the whole history rather than to nothing.
+    if (activity) await this.routeNavigation.ensureContains(id, this.ts.t('app.history'));
+  }
+
+
+  /** Drop everything that belonged to the route being left behind. */
+  private resetView() {
+    this.cancelEdit();
+    this.hoveredPoint.set(null);
+    this.hoveredCoordinate.set(null);
+    this.isSharingImage.set(false);
+    this.isChoosingCollection.set(false);
+    this.isExportingRoute.set(false);
+  }
+
+  // --- Walking between routes ----------------------------------------------
+
+  /** Where this route sits in the list it was opened from. */
+  position = computed(() => this.routeNavigation.neighbours(this.activity()?.id));
+
+  /** The bar only earns its space once there is somewhere to walk to. */
+  hasGallery = computed(() => this.position().index !== -1 && this.position().total > 1);
+
+  positionLabel = computed(() =>
+    this.ts.t('detail.gallery.position', {
+      index: this.position().index + 1,
+      total: this.position().total,
+    }),
+  );
+
+  /** What the list being walked is called: the tab it came from, or the history. */
+  sequenceLabel = computed(() => this.routeNavigation.label() ?? this.ts.t('app.history'));
+
+  /** How far the card has been dragged sideways, in pixels. */
+  swipeOffset = signal(0);
+
+  /** Whether that offset is being animated rather than following a finger. */
+  swipeSettling = signal(false);
+
+  swipeTransform = computed(() => `translateX(${this.swipeOffset()}px)`);
+
+  /** The card fades as it leaves, which is what makes the next one feel like a page. */
+  swipeOpacity = computed(() =>
+    Math.max(0.35, 1 - Math.abs(this.swipeOffset()) / (SWIPE_EXIT_PX * 2)),
+  );
+
+  private swipeStart: { x: number; y: number; pointerId: number } | null = null;
+  /** Set once a drag has proved to be horizontal, so vertical scrolling is left alone. */
+  private swipeLocked = false;
+  /** While a change of route is playing, further gestures would fight the animation. */
+  private isSliding = false;
+
+  /**
+   * Start following a drag across the route's header.
+   *
+   * Drags that begin on a button are left alone: a swipe that started on "delete" and
+   * ended on another route would be a very expensive gesture to get wrong. The map and
+   * the elevation chart are outside this surface entirely -- both already answer to
+   * horizontal dragging, and taking that over would cost more than it gives.
+   */
+  onSwipeStart(event: PointerEvent) {
+    if (!this.hasGallery() || this.isEditing() || this.isSliding) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, a, input, select, textarea')) return;
+
+    this.swipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    this.swipeLocked = false;
+    this.swipeSettling.set(false);
+
+    // Hold on to the pointer: a finger that wanders off the card mid-swipe would
+    // otherwise stop reporting, leaving the card halfway to nowhere.
+    const surface = event.currentTarget as HTMLElement | null;
+    surface?.setPointerCapture?.(event.pointerId);
+  }
+
+  onSwipeMove(event: PointerEvent) {
+    const start = this.swipeStart;
+    if (!start || event.pointerId !== start.pointerId) return;
+
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+
+    if (!this.swipeLocked) {
+      if (Math.abs(dx) < SWIPE_INTENT_PX) return;
+
+      // A drag that is mostly vertical is someone scrolling the page; let go of it for
+      // good rather than stealing the rest of the movement.
+      if (Math.abs(dx) < Math.abs(dy) * SWIPE_DIRECTION_RATIO) {
+        this.swipeStart = null;
+        this.settle(0);
+        return;
+      }
+
+      this.swipeLocked = true;
+    }
+
+    this.swipeOffset.set(this.resist(dx));
+  }
+
+  onSwipeEnd(event: PointerEvent) {
+    const start = this.swipeStart;
+    if (!start || event.pointerId !== start.pointerId) return;
+
+    const dx = event.clientX - start.x;
+    const locked = this.swipeLocked;
+
+    this.swipeStart = null;
+    this.swipeLocked = false;
+    this.releasePointer(event);
+
+    const direction: 1 | -1 = dx < 0 ? 1 : -1;
+    if (locked && Math.abs(dx) >= SWIPE_COMMIT_PX && this.targetOf(direction) !== null) {
+      void this.slide(direction);
+    } else {
+      this.settle(0);
+    }
+  }
+
+  onSwipeCancel(event?: PointerEvent) {
+    this.swipeStart = null;
+    this.swipeLocked = false;
+    if (event) this.releasePointer(event);
+    this.settle(0);
+  }
+
+  private releasePointer(event: PointerEvent) {
+    const surface = event.currentTarget as HTMLElement | null;
+    if (surface?.hasPointerCapture?.(event.pointerId)) {
+      surface.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  goToPrevious() {
+    void this.slide(-1);
+  }
+
+  goToNext() {
+    void this.slide(1);
+  }
+
+  /** Arrow keys are the same gesture for anyone holding a keyboard instead of a phone. */
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (this.isEditing() || this.isSharingImage() || this.isChoosingCollection()) return;
+    if (this.uiService.promptRequest() || this.uiService.confirmation()) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, select, textarea')) return;
+
+    const direction: 1 | -1 = event.key === 'ArrowRight' ? 1 : -1;
+    if (this.targetOf(direction) === null) return;
+
+    event.preventDefault();
+    void this.slide(direction);
+  }
+
+  /** The route a move in this direction lands on: forward is 1, back is -1. */
+  private targetOf(direction: 1 | -1): number | null {
+    const { previousId, nextId } = this.position();
+    return direction === 1 ? nextId : previousId;
+  }
+
+  /** Follow the finger, unless there is nothing that way: then barely move at all. */
+  private resist(dx: number): number {
+    const capped = Math.max(-SWIPE_MAX_PX, Math.min(SWIPE_MAX_PX, dx));
+    const target = this.targetOf(dx < 0 ? 1 : -1);
+    return target === null ? capped * SWIPE_RESISTANCE : capped;
+  }
+
+  private settle(offset: number) {
+    this.swipeSettling.set(true);
+    this.swipeOffset.set(offset);
+  }
+
+  /**
+   * Change route the way a gallery changes photo: the card leaves the way the finger
+   * went, and the next one comes in from the other side.
+   *
+   * The navigation replaces the entry in the URL history instead of stacking onto it, so
+   * back still means "out of the route", not "twelve routes back".
+   */
+  private async slide(direction: 1 | -1) {
+    const id = this.targetOf(direction);
+    if (id === null || this.isSliding) return;
+
+    this.isSliding = true;
+
+    try {
+      if (!prefersReducedMotion()) {
+        this.settle(-direction * SWIPE_EXIT_PX);
+        await delay(SWIPE_EXIT_MS);
+
+        // Put the card down on the far side without animating the jump, so the arrival
+        // reads as a new card rather than as the old one sliding back.
+        this.swipeSettling.set(false);
+        this.swipeOffset.set(direction * SWIPE_EXIT_PX);
+      }
+
+      await this.router.navigate(['/activity', id], { replaceUrl: true });
+
+      requestAnimationFrame(() => this.settle(0));
+    } finally {
+      this.isSliding = false;
     }
   }
 
@@ -233,6 +487,7 @@ export class ActivityDetailComponent implements OnInit {
 
     const coordinates = this.coordinates();
     await this.db.deleteActivity(activity.id);
+    this.routeNavigation.remove(activity.id);
 
     this.uiService.showToast(this.ts.t('detail.deleted'), {
       label: this.ts.t('history.undo'),
@@ -250,7 +505,17 @@ export class ActivityDetailComponent implements OnInit {
   /** Store a coordinate list and rebuild every visual derived from it. */
   private applyCoordinates(coords: Coordinate[]) {
     this.coordinates.set(coords);
-    if (coords.length === 0) return;
+
+    if (coords.length === 0) {
+      // Walking to a route with no points must not leave the previous route's chart on
+      // screen under its name.
+      this.chartPoints.set([]);
+      this.svgPath.set('');
+      this.elevationPathChart.set('');
+      this.elevationAreaPathChart.set('');
+      this.speedPathChart.set('');
+      return;
+    }
 
     const lats = coords.map(c => c.lat);
     const lngs = coords.map(c => c.lng);
@@ -624,4 +889,11 @@ export class ActivityDetailComponent implements OnInit {
       this.router.navigate(['/']);
     }
   }
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Someone who has asked the system for less movement should not be handed a slide. */
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }

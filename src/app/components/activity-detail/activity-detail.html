@@ -2,6 +2,75 @@
   <div class="h-full w-full flex flex-col space-y-4 relative">
     <!-- Header and Stats Controls (Hidden in FS) -->
     @if (!uiService.isFullScreen() && !isEditing()) {
+      <!--
+        The gallery surface: everything above the map moves with the finger, and a swipe
+        that crosses the threshold walks to the next route of the list this one was
+        opened from. The map and the elevation chart are left out on purpose -- both
+        already answer to a horizontal drag of their own.
+      -->
+      <div
+        class="shrink-0 flex flex-col gap-2 route-swipe touch-pan-y select-none"
+        [class.route-swipe--settling]="swipeSettling()"
+        [style.transform]="swipeTransform()"
+        [style.opacity]="swipeOpacity()"
+        (pointerdown)="onSwipeStart($event)"
+        (pointermove)="onSwipeMove($event)"
+        (pointerup)="onSwipeEnd($event)"
+        (pointercancel)="onSwipeCancel($event)"
+      >
+      @if (hasGallery()) {
+        <div
+          class="bg-bg-surface rounded-2xl shadow-sm border border-gray-100 px-2 py-1.5 flex items-center gap-2"
+        >
+          <button
+            (click)="goToPrevious()"
+            [disabled]="!position().previousId"
+            class="shrink-0 p-2 rounded-xl text-text-heading bg-bg-base active:scale-90 transition-transform cursor-pointer disabled:opacity-30 disabled:active:scale-100"
+            [title]="ts.t('detail.gallery.previous')"
+            [attr.aria-label]="ts.t('detail.gallery.previous')"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <div class="flex-1 min-w-0 text-center">
+            <p class="text-[11px] font-black uppercase tracking-widest text-text-heading truncate">
+              {{ positionLabel() }}
+            </p>
+            <p class="text-[9px] font-bold uppercase tracking-wider text-text-primary truncate">
+              {{ ts.t('detail.gallery.swipe') }} · {{ sequenceLabel() }}
+            </p>
+          </div>
+
+          <button
+            (click)="goToNext()"
+            [disabled]="!position().nextId"
+            class="shrink-0 p-2 rounded-xl text-text-heading bg-bg-base active:scale-90 transition-transform cursor-pointer disabled:opacity-30 disabled:active:scale-100"
+            [title]="ts.t('detail.gallery.next')"
+            [attr.aria-label]="ts.t('detail.gallery.next')"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      }
+
       <div
         class="bg-bg-surface rounded-2xl shadow-sm p-4 border border-gray-100 shrink-0 flex flex-col gap-4"
       >
@@ -154,6 +223,7 @@
             </p>
           </div>
         </div>
+      </div>
       </div>
     }
 
