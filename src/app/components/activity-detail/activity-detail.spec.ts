@@ -10,7 +10,8 @@ describe('ActivityDetailComponent', () => {
 
   const mockDatabaseService = {
     getActivity: vi.fn().mockReturnValue(Promise.resolve(undefined)),
-    getCoordinates: vi.fn().mockReturnValue(Promise.resolve([]))
+    getCoordinates: vi.fn().mockReturnValue(Promise.resolve([])),
+    getCollections: vi.fn().mockReturnValue(Promise.resolve([]))
   };
 
   beforeEach(async () => {

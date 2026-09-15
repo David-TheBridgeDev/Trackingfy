@@ -15,8 +15,13 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Follow a route:** load any past activity as a reference line on the live map.
 
 ### History & activity detail
-- History grouped by day, sortable by date, distance, duration, climb or descent, with multi-select deletion.
-- Activity detail with the full track on the map and all the recorded stats.
+- **Collections:** file your routes under tabs you create yourself — trail, hiking, training, whatever you ride or walk. The tab bar shows how many routes each one holds, and collections can be renamed, recoloured, reordered and deleted (deleting one never deletes the routes in it: they go back to being ungrouped).
+- **Search** across route names, activity type, collection and date, ignoring case and accents; every word has to match, so `monte 2025` narrows the list.
+- **Filters:** activity type, plus sorting by date, name, distance, duration, climb or descent. Day separators appear while the list runs in date order.
+- **Name your routes:** any route can be given a title, which is what the list, the search and the detail screen show.
+- **Selection mode** from a long press or the button in the toolbar: select all the routes the current tab and filters show, then move them into a collection, rename a single one, or delete them.
+- **Deleting is undoable:** the toast that confirms a deletion offers to put the routes and their points back, from the history and from the detail screen alike.
+- Activity detail with the full track on the map and all the recorded stats, plus its name, its collection and its delete button in the header.
 - **Route editing:** trace the opening stretch that was never recorded (e.g. you started the recording late). Trackingfy proposes a start time from your average pace, warns about unrealistic speeds, and fills in the terrain elevation of the added stretch. Edited activities are marked with an *Edited* badge.
 
 ### Sharing
@@ -30,7 +35,7 @@ There is no account and no server-side storage: every activity lives in the brow
 
 ### Data & settings
 - **Local-first storage** in IndexedDB via Dexie.js.
-- **Backup & restore:** export all your data to a JSON file and import it back. The same import button also accepts a single shared route.
+- **Backup & restore:** export all your data — routes, points and collections — to a JSON file and import it back. Collections are matched by name on import, so restoring onto a device that already has them refills the tabs instead of duplicating them. The same import button also accepts a single shared route, which lands ungrouped.
 - **Offline capable:** the app shell is cached by the service worker, and map tiles you have viewed stay cached (up to 500 tiles, 30 days).
 - **Installable PWA** on mobile and desktop.
 - **Direct APK download** from the Settings page, which fetches the latest release from GitHub.
@@ -67,7 +72,8 @@ src/app/
 ├── components/
 │   ├── dashboard/         # Live tracking screen and stats
 │   ├── map/               # Leaflet map (live, history and route-editing modes)
-│   ├── history/           # Activity list, sorting and bulk deletion
+│   ├── history/           # Route list: collections, search, filters, bulk actions
+│   ├── collection-picker/ # Sheet that files routes under a collection
 │   ├── activity-detail/   # Activity view, route editor, export and follow
 │   ├── share-composer/    # Share-as-image composer UI
 │   └── settings/          # Preferences, backup/restore, APK download
@@ -75,6 +81,7 @@ src/app/
     ├── tracking.ts               # Recording engine (GPS stream, pause/resume, live stats)
     ├── tracking-notification.ts  # Bridge to the Android recording notification
     ├── database.ts               # Dexie schema, backup export/import, route import
+    ├── collections.ts            # The history's collections, shared by the screens that use them
     ├── route-stats.ts            # Recomputes stats from stored coordinates (mirrors tracking.ts)
     ├── route-editor.ts           # Logic for adding a hand-drawn opening stretch
     ├── elevation.ts              # Terrain elevation lookup (Open-Meteo + fallback)
