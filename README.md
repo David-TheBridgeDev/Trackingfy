@@ -22,7 +22,15 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Selection mode** from a long press or the button in the toolbar: select all the routes the current tab and filters show, then move them into a collection, rename a single one, or delete them.
 - **Deleting is undoable:** the toast that confirms a deletion offers to put the routes and their points back, from the history and from the detail screen alike.
 - Activity detail with the full track on the map and all the recorded stats, plus its name, its collection and its delete button in the header.
+- **Walk between routes like a gallery:** from a route's detail, swipe the header sideways — or use the arrows, or the left/right keys — to move to the next and previous route of the list you opened it from (that tab, that search, that sort). A bar above the stats says where you are in it (`3 of 48`) and what list it is. The map and the elevation chart keep their own horizontal gestures, and Back still returns to the history rather than retracing every route you walked.
 - **Route editing:** trace the opening stretch that was never recorded (e.g. you started the recording late). Trackingfy proposes a start time from your average pace, warns about unrealistic speeds, and fills in the terrain elevation of the added stretch. Edited activities are marked with an *Edited* badge.
+
+### Statistics
+- **A statistics screen** (`/stats`, reachable from the history's toolbar) that reads the same routes as a training record instead of a list.
+- **By week, by month or by year:** a bar chart of distance, time, climb or number of routes, one bar per period, with the empty periods kept in place so a gap in training is visible. Tapping a bar shows that period's routes, distance, moving time and climb, and how it compares with the period before it.
+- **Per collection:** every number obeys the collection tab on top, so a collection of hikes can be read without the rides flattening its chart.
+- **Totals and splits:** all-time routes, distance, moving time, climb, average speed and active days, plus how the distance splits by activity type and by collection.
+- **Records:** longest route, most climb, longest time and fastest average, each one tap away from the route itself — which then walks the same selection with the gallery gesture.
 
 ### Sharing
 - **Share as image:** a composer that renders the route as a picture for social networks.
@@ -73,6 +81,7 @@ src/app/
 │   ├── dashboard/         # Live tracking screen and stats
 │   ├── map/               # Leaflet map (live, history and route-editing modes)
 │   ├── history/           # Route list: collections, search, filters, bulk actions
+│   ├── stats/             # Statistics screen: periods, totals, breakdowns, records
 │   ├── collection-picker/ # Sheet that files routes under a collection
 │   ├── activity-detail/   # Activity view, route editor, export and follow
 │   ├── share-composer/    # Share-as-image composer UI
@@ -82,6 +91,8 @@ src/app/
     ├── tracking-notification.ts  # Bridge to the Android recording notification
     ├── database.ts               # Dexie schema, backup export/import, route import
     ├── collections.ts            # The history's collections, shared by the screens that use them
+    ├── statistics.ts             # Aggregates routes into periods, totals, breakdowns and records
+    ├── route-navigation.ts       # The list a route was opened from, walked by the detail view
     ├── route-stats.ts            # Recomputes stats from stored coordinates (mirrors tracking.ts)
     ├── route-editor.ts           # Logic for adding a hand-drawn opening stretch
     ├── elevation.ts              # Terrain elevation lookup (Open-Meteo + fallback)
@@ -198,6 +209,12 @@ To execute the unit tests with Vitest, run:
 ```bash
 npm test
 ```
+
+`vitest.config.ts` turns per-file isolation back on (the Angular builder defaults to
+`isolate: false`). Without it, spec files in the same worker share one module graph, so a
+spec that mocks a package with `vi.mock` only gets its mock when it happens to be the
+first file to load that package — which depends on the order Vitest picks, and therefore
+on bundle sizes that change whenever the app grows.
 
 ## 🤖 Android App
 

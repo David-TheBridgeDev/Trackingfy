@@ -1,10 +1,34 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import {
+  Activity,
   Collection,
   DatabaseService,
   DEFAULT_COLLECTION_COLOR,
   normalizeCollectionName,
 } from './database';
+
+/** Which routes a screen is showing: every one, one collection, or the leftovers. */
+export type CollectionFilter = 'all' | 'none' | number;
+
+/** How a screen is filed under a collection: the id, or 'none' for the leftovers. */
+export type CollectionKey = number | 'none';
+
+/** One entry of a collection tab bar, shared by the history and the statistics. */
+export interface CollectionTab {
+  key: CollectionFilter;
+  label: string;
+  color: string | null;
+  count: number;
+}
+
+/** Read back a filter stored between visits, falling back to "all" for anything odd. */
+export function parseCollectionFilter(stored: string | null): CollectionFilter {
+  if (stored === null || stored === 'all') return 'all';
+  if (stored === 'none') return 'none';
+
+  const id = Number(stored);
+  return Number.isFinite(id) && id > 0 ? id : 'all';
+}
 
 /**
  * The palette a collection can be painted with.
@@ -73,6 +97,72 @@ export class CollectionsService {
 
   colorOf(id: number | undefined): string {
     return this.get(id)?.color ?? DEFAULT_COLLECTION_COLOR;
+  }
+
+  /**
+   * How an activity is filed, treating a collection that is no longer there as none.
+   *
+   * A route keeps the id of a collection that was deleted from another screen, so the
+   * lists have to agree on reading that as "ungrouped" instead of hiding the route in a
+   * tab nobody can open.
+   */
+  keyOf(activity: Activity): CollectionKey {
+    const id = activity.collectionId;
+    return id !== undefined && this.byId().has(id) ? id : 'none';
+  }
+
+  /** Whether an activity belongs in the tab currently open. */
+  matches(activity: Activity, filter: CollectionFilter): boolean {
+    return filter === 'all' || this.keyOf(activity) === filter;
+  }
+
+  /** How many routes each collection holds, plus the ungrouped ones and the total. */
+  countRoutes(activities: Activity[]): {
+    counts: Map<number, number>;
+    ungrouped: number;
+    total: number;
+  } {
+    const counts = new Map<number, number>();
+    let ungrouped = 0;
+
+    for (const activity of activities) {
+      const key = this.keyOf(activity);
+      if (key === 'none') ungrouped++;
+      else counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+
+    return { counts, ungrouped, total: activities.length };
+  }
+
+  /**
+   * The tab bar for a list of routes: everything, then each collection, then the
+   * leftovers.
+   *
+   * The two labels that are not a collection's name are passed in rather than translated
+   * here, so this stays a list-shaping helper and the screens keep their own wording.
+   */
+  buildTabs(activities: Activity[], labels: { all: string; none: string }): CollectionTab[] {
+    const { counts, ungrouped, total } = this.countRoutes(activities);
+
+    const tabs: CollectionTab[] = [{ key: 'all', label: labels.all, color: null, count: total }];
+
+    for (const collection of this.collections()) {
+      if (collection.id === undefined) continue;
+      tabs.push({
+        key: collection.id,
+        label: collection.name,
+        color: collection.color,
+        count: counts.get(collection.id) ?? 0,
+      });
+    }
+
+    // The leftovers only deserve a tab once something has been filed away: before that,
+    // "no collection" and "all" would be the same list under two names.
+    if (this.collections().length > 0 && ungrouped > 0) {
+      tabs.push({ key: 'none', label: labels.none, color: null, count: ungrouped });
+    }
+
+    return tabs;
   }
 
   /**

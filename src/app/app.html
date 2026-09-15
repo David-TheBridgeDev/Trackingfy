@@ -54,6 +54,11 @@
             {{ ts.t('app.history') }}
           </span>
         }
+        @if (isStatsPage()) {
+          <span class="text-accent cursor-default font-black uppercase text-xs tracking-wider">
+            {{ ts.t('stats.title') }}
+          </span>
+        }
         @if (isSettingsPage()) {
           <span class="text-accent cursor-default font-black uppercase text-xs tracking-wider">
             {{ ts.t('settings.title') }}

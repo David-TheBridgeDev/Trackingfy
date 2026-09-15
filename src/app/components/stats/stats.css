@@ -1,0 +1,9 @@
+/* The chart scrolls sideways; a scrollbar across it would eat into the bars' height. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

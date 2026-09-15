@@ -28,7 +28,7 @@ const SITE_URL = 'https://trackingfy.web.app';
 const OG_IMAGE = '/media/og-image.png';
 
 /** Paths served by the Angular app. Keep in sync with app.routes.ts and firebase.json. */
-const APP_ROUTES = ['/dashboard', '/history', '/settings', '/activity/'];
+const APP_ROUTES = ['/dashboard', '/history', '/stats', '/settings', '/activity/'];
 
 /** Values any page or partial can print with {{name}}. */
 const VARS = {

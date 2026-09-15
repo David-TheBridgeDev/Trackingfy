@@ -43,6 +43,15 @@ export class App {
     { initialValue: false }
   );
 
+  // Tracks if we are on the statistics page
+  isStatsPage = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.url === '/stats')
+    ),
+    { initialValue: false }
+  );
+
   // Tracks if we are on the settings page
   isSettingsPage = toSignal(
     this.router.events.pipe(

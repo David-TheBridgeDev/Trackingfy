@@ -1,0 +1,23 @@
+/*
+ * The card that walks between routes.
+ *
+ * While a finger is on it the transform follows the finger with no transition, so the
+ * card tracks the gesture exactly; the settling class is added for the two moments that
+ * are animations rather than gestures: springing back from a swipe that did not commit,
+ * and sliding out of the way of the next route.
+ */
+.route-swipe {
+  will-change: transform, opacity;
+}
+
+.route-swipe--settling {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-swipe--settling {
+    transition: none;
+  }
+}
