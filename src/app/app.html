@@ -244,12 +244,72 @@
     </div>
   }
 
+  <!-- Text Prompt Modal: naming a route or a collection -->
+  @if (uiService.promptRequest(); as config) {
+    <div class="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        (click)="uiService.resolvePrompt(null)"
+      ></div>
+
+      <!-- Modal Content -->
+      <div
+        class="relative bg-bg-surface rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border border-gray-100/20"
+      >
+        <div class="p-6">
+          <h3 class="text-xl font-black text-text-heading mb-2 uppercase tracking-tight">
+            {{ config.title }}
+          </h3>
+          @if (config.message) {
+            <p class="text-text-primary text-sm leading-relaxed mb-4">{{ config.message }}</p>
+          }
+          <input
+            id="prompt-input"
+            type="text"
+            autocomplete="off"
+            [value]="uiService.promptValue()"
+            [attr.maxlength]="config.maxLength"
+            [attr.placeholder]="config.placeholder || ''"
+            (input)="uiService.promptValue.set($any($event.target).value)"
+            (keyup.enter)="uiService.resolvePrompt(uiService.promptValue())"
+            class="w-full bg-bg-base border-2 border-transparent focus:border-accent rounded-xl px-4 py-3 text-text-heading font-bold outline-none transition-colors"
+          />
+        </div>
+
+        <div class="flex p-4 gap-3 bg-bg-base/50">
+          <button
+            (click)="uiService.resolvePrompt(null)"
+            class="flex-1 px-4 py-3 rounded-xl font-bold text-text-primary hover:text-text-heading hover:bg-bg-base transition-colors uppercase text-sm cursor-pointer"
+          >
+            {{ config.cancelText }}
+          </button>
+          <button
+            (click)="uiService.resolvePrompt(uiService.promptValue())"
+            [disabled]="!uiService.promptValue().trim()"
+            class="flex-1 px-4 py-3 rounded-xl font-bold bg-accent text-pure-white hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all uppercase text-sm cursor-pointer disabled:opacity-40 disabled:shadow-none"
+          >
+            {{ config.confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Toast Notification -->
-  @if (showToast()) {
+  @if (uiService.toast(); as toast) {
     <div
-      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-pure-white px-6 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300"
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300000] bg-gray-900/90 text-pure-white px-5 py-3 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm animate-in fade-in slide-in-from-bottom-5 duration-300 flex items-center gap-4 max-w-[92vw]"
     >
-      {{ toastMessage() }}
+      <span class="truncate">{{ toast.text }}</span>
+      @if (toast.action; as action) {
+        <button
+          (click)="uiService.runToastAction()"
+          class="shrink-0 text-accent uppercase text-xs font-black tracking-wider active:scale-95 transition-transform cursor-pointer"
+        >
+          {{ action.label }}
+        </button>
+      }
     </div>
   }
 </div>

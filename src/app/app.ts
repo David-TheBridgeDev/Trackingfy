@@ -52,10 +52,7 @@ export class App {
     { initialValue: false }
   );
 
-  showToast = signal(false);
-  toastMessage = signal('');
   private lastBackPress = 0;
-  private toastTimeout: any;
 
   onMainScroll(event: Event) {
     const target = event.target as HTMLElement;
@@ -64,15 +61,9 @@ export class App {
     }
   }
 
+  /** Kept as the components' way in; the message itself now lives in the UI service. */
   public triggerToast(message: string) {
-    if (this.toastTimeout) {
-      clearTimeout(this.toastTimeout);
-    }
-    this.toastMessage.set(message);
-    this.showToast.set(true);
-    this.toastTimeout = setTimeout(() => {
-      this.showToast.set(false);
-    }, 2000);
+    this.uiService.showToast(message);
   }
 
   constructor() {
@@ -80,6 +71,25 @@ export class App {
     this.trackingService.requestPermission();
     this.setupBackButton();
     this.setupRouteSharing();
+    this.setupPromptFocus();
+  }
+
+  /**
+   * Put the caret in the prompt's field as soon as it opens.
+   *
+   * Every prompt exists to take a name, so the keyboard should already be up when it
+   * appears rather than after one more tap.
+   */
+  private setupPromptFocus() {
+    effect(() => {
+      if (!this.uiService.promptRequest()) return;
+
+      requestAnimationFrame(() => {
+        const input = document.getElementById('prompt-input') as HTMLInputElement | null;
+        input?.focus();
+        input?.select();
+      });
+    });
   }
 
   private setupRouteSharing() {
@@ -124,7 +134,9 @@ export class App {
     if (Capacitor.isNativePlatform()) {
       CapApp.addListener('backButton', () => {
         this.ngZone.run(() => {
-          if (this.uiService.confirmation()) {
+          if (this.uiService.promptRequest()) {
+            this.uiService.resolvePrompt(null);
+          } else if (this.uiService.confirmation()) {
             this.uiService.resolveConfirm(false);
           } else if (this.uiService.showOnboarding()) {
             CapApp.exitApp();

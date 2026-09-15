@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatabaseService, Activity, Coordinate } from '../../services/database';
+import { CollectionsService } from '../../services/collections';
 import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 import { TrackingService } from '../../services/tracking';
@@ -22,6 +23,7 @@ import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import { ShareComposerComponent } from '../share-composer/share-composer';
+import { CollectionPickerComponent } from '../collection-picker/collection-picker';
 
 export interface ChartPoint {
   distance: number; // in km
@@ -36,7 +38,13 @@ export interface ChartPoint {
 
 @Component({
   selector: 'app-activity-detail',
-  imports: [CommonModule, MapComponent, RouterLink, ShareComposerComponent],
+  imports: [
+    CommonModule,
+    MapComponent,
+    RouterLink,
+    ShareComposerComponent,
+    CollectionPickerComponent,
+  ],
   templateUrl: './activity-detail.html',
 })
 export class ActivityDetailComponent implements OnInit {
@@ -44,6 +52,7 @@ export class ActivityDetailComponent implements OnInit {
   coordinates = signal<Coordinate[]>([]);
   isSharingImage = signal(false);
   isExportingRoute = signal(false);
+  isChoosingCollection = signal(false);
 
   svgViewBox = signal<string>('0 0 100 100');
   svgPath = signal<string>('');
@@ -130,6 +139,7 @@ export class ActivityDetailComponent implements OnInit {
     private router: Router,
     private db: DatabaseService,
     private routeEditor: RouteEditorService,
+    private collections: CollectionsService,
     private appComponent: App,
     public uiService: UIService,
     public trackingService: TrackingService,
@@ -138,6 +148,8 @@ export class ActivityDetailComponent implements OnInit {
 
   async ngOnInit() {
     this.uiService.setFullScreen(false); // Reset FS when entering
+    await this.collections.load();
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       const act = await this.db.getActivity(id);
@@ -145,6 +157,94 @@ export class ActivityDetailComponent implements OnInit {
       const coords = await this.db.getCoordinates(id);
       this.applyCoordinates(coords);
     }
+  }
+
+  // --- Name and collection -------------------------------------------------
+
+  /** The route's own name, or the activity it was when it has none. */
+  displayName = computed(() => {
+    const activity = this.activity();
+    if (!activity) return '';
+
+    const label = this.ts.t(`activity.${activity.type}`);
+    return activity.name?.trim() || (label === `activity.${activity.type}` ? activity.type : label);
+  });
+
+  collection = computed(() => this.collections.get(this.activity()?.collectionId ?? undefined) ?? null);
+
+  async renameActivity() {
+    const activity = this.activity();
+    if (!activity?.id) return;
+
+    const name = await this.uiService.prompt({
+      title: this.ts.t('activity.rename.title'),
+      message: this.ts.t('activity.rename.message'),
+      placeholder: this.ts.t('activity.rename.placeholder'),
+      value: activity.name ?? '',
+      maxLength: 40,
+    });
+    if (!name) return;
+
+    await this.db.updateActivity(activity.id, { name });
+    this.activity.set({ ...activity, name });
+    this.appComponent.triggerToast(this.ts.t('history.renamed'));
+  }
+
+  async changeCollection(collectionId: number | null) {
+    const activity = this.activity();
+    this.isChoosingCollection.set(false);
+    if (!activity?.id) return;
+
+    await this.collections.assign([activity.id], collectionId ?? undefined);
+
+    const updated = { ...activity };
+    if (collectionId === null) delete updated.collectionId;
+    else updated.collectionId = collectionId;
+    this.activity.set(updated);
+
+    const name = this.collections.nameOf(collectionId ?? undefined);
+    this.appComponent.triggerToast(
+      name
+        ? this.ts.t('history.moved_one', { name })
+        : this.ts.t('history.moved_out_one'),
+    );
+  }
+
+  /**
+   * Delete the route being looked at.
+   *
+   * Until now a route could only be deleted from the history's selection mode, which
+   * meant going back and hunting for the one just opened. The undo offered here is the
+   * same one the history gives: the activity and its points are read first, so the toast
+   * can put them back and reopen them.
+   */
+  async deleteActivity() {
+    const activity = this.activity();
+    if (!activity?.id) return;
+
+    const confirmed = await this.uiService.confirm({
+      title: this.ts.t('confirm.title.delete_single'),
+      message: this.ts.t('confirm.message.delete_single'),
+      confirmText: this.ts.t('confirm.btn.delete'),
+      cancelText: this.ts.t('confirm.btn.cancel'),
+      type: 'danger',
+    });
+    if (!confirmed) return;
+
+    const coordinates = this.coordinates();
+    await this.db.deleteActivity(activity.id);
+
+    this.uiService.showToast(this.ts.t('detail.deleted'), {
+      label: this.ts.t('history.undo'),
+      run: () => void this.restoreDeleted(activity, coordinates),
+    });
+
+    this.router.navigate(['/history']);
+  }
+
+  private async restoreDeleted(activity: Activity, coordinates: Coordinate[]) {
+    await this.db.restoreActivities([activity], coordinates);
+    if (activity.id) this.router.navigate(['/activity', activity.id]);
   }
 
   /** Store a coordinate list and rebuild every visual derived from it. */
