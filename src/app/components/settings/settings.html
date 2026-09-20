@@ -51,6 +51,70 @@
         </div>
       </div>
 
+      <!--
+        The activity the dashboard opens on.
+
+        It edits the same choice the dashboard's selector does, rather than a separate
+        preference the selector would then have to be kept in agreement with: whichever
+        of the two was touched last is what the next recording is filed as.
+      -->
+      <div class="border-t border-gray-100 pt-4">
+        <h3
+          class="text-xs font-black text-text-heading uppercase tracking-tight flex items-center space-x-2 mb-3"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-accent"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span>{{ ts.t('settings.default_activity') }}</span>
+        </h3>
+
+        <div
+          role="radiogroup"
+          [attr.aria-label]="ts.t('settings.default_activity')"
+          class="grid grid-cols-3 gap-1 p-1 bg-gray-200/30 rounded-2xl"
+        >
+          @for (type of types; track type) {
+            <button
+              (click)="activityTypes.select(type)"
+              role="radio"
+              [attr.aria-checked]="activityTypes.current() === type"
+              class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[11px] font-black uppercase transition-all tracking-wider cursor-pointer"
+              [ngClass]="
+                activityTypes.current() === type
+                  ? 'bg-accent text-on-accent shadow-sm'
+                  : 'text-text-primary hover:text-text-heading'
+              "
+            >
+              <span
+                class="h-4 w-4 shrink-0 bg-current"
+                [style.mask-image]="'url(' + typeIcon(type) + ')'"
+                [style.-webkit-mask-image]="'url(' + typeIcon(type) + ')'"
+                style="
+                  mask-size: contain;
+                  mask-repeat: no-repeat;
+                  mask-position: center;
+                  -webkit-mask-size: contain;
+                  -webkit-mask-repeat: no-repeat;
+                  -webkit-mask-position: center;
+                "
+              ></span>
+              <span class="truncate">{{ typeLabel(type) }}</span>
+            </button>
+          }
+        </div>
+
+        <p class="text-[11px] text-text-primary leading-snug px-1 mt-2">
+          {{ ts.t('settings.default_activity.hint') }}
+        </p>
+      </div>
+
       <div class="border-t border-gray-100 pt-4">
         <div class="flex justify-between items-center mb-3">
           <h3
@@ -206,7 +270,7 @@
         @if (uiService.deferredPrompt()) {
           <button
             (click)="uiService.installPwa()"
-            class="w-full bg-gradient-to-r from-accent to-orange-500 text-pure-white py-3.5 rounded-2xl font-black uppercase text-xs tracking-wider active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center shadow-md shadow-accent/20"
+            class="w-full bg-gradient-to-r from-accent to-orange-500 text-on-accent py-3.5 rounded-2xl font-black uppercase text-xs tracking-wider active:scale-95 transition-all hover:brightness-110 cursor-pointer text-center shadow-md shadow-accent/20"
           >
             {{ ts.t('app.install_app') }}
           </button>

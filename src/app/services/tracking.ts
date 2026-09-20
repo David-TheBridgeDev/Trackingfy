@@ -4,6 +4,7 @@ import { TranslationService } from './translation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
 import { TrackingNotificationService, type TrackingNotificationAction } from './tracking-notification';
+import { ActivityTypeService } from './activity-types';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
@@ -73,7 +74,8 @@ export class TrackingService {
     private db: DatabaseService,
     private ngZone: NgZone,
     private ts: TranslationService,
-    private notification: TrackingNotificationService
+    private notification: TrackingNotificationService,
+    private activityTypes: ActivityTypeService
   ) {
     void this.notification.onAction((action) => this.applyNotificationAction(action));
   }
@@ -216,7 +218,10 @@ export class TrackingService {
 
     const activity: Activity = {
       date: new Date(),
-      type: 'Cycling',
+      // What the dashboard's selector is on. Until it existed every route was filed as
+      // cycling, which left the history's type filter and the statistics' breakdown with
+      // a single row to show.
+      type: this.activityTypes.current(),
       totalDistance: 0,
       totalTime: 0,
       avgSpeed: 0,

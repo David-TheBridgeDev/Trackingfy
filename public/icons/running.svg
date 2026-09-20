@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Runner, drawn to sit beside bike.svg and walking.svg: same 24x24 box, same accent fill. -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#efbc21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16.1" cy="4.3" r="2.3" fill="#efbc21" stroke="none"/>
+  <path d="M14.6 8.4 11.3 12.6"/>
+  <path d="M14.6 8.4 18.5 9.1 19.6 12.1"/>
+  <path d="M14.6 8.4 11.1 7.2 8.9 9.8"/>
+  <path d="M11.3 12.6 13.4 16.2 12.2 20.9"/>
+  <path d="M11.3 12.6 7.5 14.6 4.9 13"/>
+</svg>

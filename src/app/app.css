@@ -1,0 +1,22 @@
+/*
+ * The onboarding gear.
+ *
+ * Decoration, not a spinner: it says nothing about progress, so it stops for anyone who
+ * has asked the system for less motion. Tailwind's `animate-spin` is deliberately left
+ * running under that setting, which is why this is a class of its own.
+ */
+.gear-spin {
+  animation: gear-spin 15s linear infinite;
+}
+
+@keyframes gear-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gear-spin {
+    animation: none;
+  }
+}

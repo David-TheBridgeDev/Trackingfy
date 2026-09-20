@@ -16,6 +16,7 @@ import { RouteNavigationService } from '../../services/route-navigation';
 import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
 import { CollectionPickerComponent } from '../collection-picker/collection-picker';
+import { activityTypeIcon } from '../../services/activity-types';
 
 export type { CollectionFilter };
 
@@ -745,9 +746,8 @@ export class HistoryComponent implements OnInit {
     return label === `activity.${type}` ? type : label;
   }
 
-  /** Only two route icons exist, so anything on foot shares the walking one. */
   typeIcon(type: string): string {
-    return type === 'Cycling' ? 'icons/bike.svg' : 'icons/walking.svg';
+    return activityTypeIcon(type);
   }
 
   collectionOf(activity: Activity): Collection | null {

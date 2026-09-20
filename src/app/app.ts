@@ -171,6 +171,22 @@ export class App {
     this.uiService.completeOnboarding();
   }
 
+  /**
+   * Escape closes whatever is open, innermost first.
+   *
+   * The Android back button has always done this; on the web and on a desktop PWA the
+   * dialogs could only be dismissed by finding their cancel button or the backdrop,
+   * which is not where anyone's hand is when a keyboard is in front of them.
+   */
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.uiService.promptRequest()) {
+      this.uiService.resolvePrompt(null);
+    } else if (this.uiService.confirmation()) {
+      this.uiService.resolveConfirm(false);
+    }
+  }
+
   isOnline = signal(navigator.onLine);
 
   @HostListener('window:online')

@@ -26,6 +26,8 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import { ShareComposerComponent } from '../share-composer/share-composer';
 import { CollectionPickerComponent } from '../collection-picker/collection-picker';
+import { ActivityTypePickerComponent } from '../activity-type-picker/activity-type-picker';
+import { ActivityType, activityTypeIcon } from '../../services/activity-types';
 
 /** A drag has to travel this far before it is a swipe rather than a tap. */
 const SWIPE_INTENT_PX = 12;
@@ -60,6 +62,7 @@ export interface ChartPoint {
     RouterLink,
     ShareComposerComponent,
     CollectionPickerComponent,
+    ActivityTypePickerComponent,
   ],
   templateUrl: './activity-detail.html',
   styleUrl: './activity-detail.css',
@@ -70,6 +73,7 @@ export class ActivityDetailComponent implements OnInit {
   isSharingImage = signal(false);
   isExportingRoute = signal(false);
   isChoosingCollection = signal(false);
+  isChoosingType = signal(false);
 
   svgViewBox = signal<string>('0 0 100 100');
   svgPath = signal<string>('');
@@ -425,6 +429,36 @@ export class ActivityDetailComponent implements OnInit {
   });
 
   collection = computed(() => this.collections.get(this.activity()?.collectionId ?? undefined) ?? null);
+
+  /** What the route is filed as, in the reader's language. */
+  typeLabel = computed(() => {
+    const type = this.activity()?.type ?? '';
+    const label = this.ts.t(`activity.${type}`);
+    return label === `activity.${type}` ? type : label;
+  });
+
+  typeIcon = computed(() => activityTypeIcon(this.activity()?.type ?? ''));
+
+  /**
+   * File the route as a different activity.
+   *
+   * Recording a walk with the dashboard left on "cycling" is an easy mistake and, until
+   * this existed, a permanent one: the type feeds the history's filter, the statistics'
+   * breakdown and the speed the route editor calls plausible, none of which could be put
+   * right afterwards.
+   */
+  async changeType(type: ActivityType) {
+    const activity = this.activity();
+    this.isChoosingType.set(false);
+    if (!activity?.id || activity.type === type) return;
+
+    await this.db.updateActivity(activity.id, { type });
+    this.activity.set({ ...activity, type });
+
+    this.appComponent.triggerToast(
+      this.ts.t('detail.type.changed', { type: this.ts.t(`activity.${type}`) }),
+    );
+  }
 
   async renameActivity() {
     const activity = this.activity();

@@ -3,6 +3,7 @@ import { TrackingService } from './tracking';
 import { DatabaseService } from './database';
 import { TranslationService } from './translation';
 import { TrackingNotificationService } from './tracking-notification';
+import { ActivityTypeService } from './activity-types';
 
 describe('TrackingService', () => {
   let service: TrackingService;
@@ -12,6 +13,8 @@ describe('TrackingService', () => {
   // through a stand-in that reports itself as available.
   let notificationUpdates: any[];
   let actionHandler: ((action: any) => void) | null;
+  /** Every activity handed to the database, so a recording's stored shape is testable. */
+  let savedActivities: any[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,7 +38,10 @@ describe('TrackingService', () => {
         {
           provide: DatabaseService,
           useValue: {
-            addActivity: () => Promise.resolve(1),
+            addActivity: (activity: any) => {
+              savedActivities.push(activity);
+              return Promise.resolve(1);
+            },
             addCoordinate: () => Promise.resolve(1),
             updateActivity: () => Promise.resolve(1)
           }
@@ -44,6 +50,8 @@ describe('TrackingService', () => {
     });
     notificationUpdates = [];
     actionHandler = null;
+    savedActivities = [];
+    localStorage.clear();
     service = TestBed.inject(TrackingService);
     ts = TestBed.inject(TranslationService);
   });
@@ -186,6 +194,16 @@ describe('TrackingService', () => {
     expect(last.title).toBe(ts.t('tracking.notif_paused_title'));
     expect(last.ongoingSince).toBeUndefined();
     expect(last.text).toContain('01:01:01');
+  });
+
+  it('files the recording as the activity the dashboard is set to', async () => {
+    // Before the selector existed this was hard-coded to cycling, which left the
+    // history's type filter and the statistics' per-activity split with one row.
+    TestBed.inject(ActivityTypeService).select('Running');
+
+    await service.startTracking();
+
+    expect(savedActivities.at(-1).type).toBe('Running');
   });
 
   it('applies the notification buttons to the recording', async () => {

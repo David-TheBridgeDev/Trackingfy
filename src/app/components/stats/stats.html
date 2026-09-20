@@ -16,14 +16,14 @@
               class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-2xl text-[11px] font-black uppercase tracking-wide border transition-all active:scale-95 cursor-pointer"
               [ngClass]="
                 isActiveTab(tab.key)
-                  ? 'bg-accent text-pure-white border-accent shadow-sm shadow-accent/20'
+                  ? 'bg-accent text-on-accent border-accent shadow-sm shadow-accent/20'
                   : 'bg-bg-surface text-text-primary border-gray-100'
               "
             >
               @if (tab.color) {
                 <span
                   class="w-2 h-2 rounded-full shrink-0"
-                  [style.background-color]="isActiveTab(tab.key) ? '#ffffff' : tab.color"
+                  [style.background-color]="isActiveTab(tab.key) ? 'var(--color-on-accent)' : tab.color"
                 ></span>
               }
               <span class="max-w-[9rem] truncate">{{ tab.label }}</span>
@@ -63,7 +63,7 @@
           class="py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
           [ngClass]="
             period() === option
-              ? 'bg-accent text-pure-white shadow-sm shadow-accent/20'
+              ? 'bg-accent text-on-accent shadow-sm shadow-accent/20'
               : 'text-text-primary'
           "
         >
@@ -97,7 +97,7 @@
       <p class="text-text-primary text-sm font-semibold mb-6">{{ ts.t('stats.empty_hint') }}</p>
       <button
         (click)="goToDashboard()"
-        class="bg-accent text-pure-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform cursor-pointer"
+        class="bg-accent text-on-accent px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg shadow-accent/20 active:scale-95 transition-transform cursor-pointer"
       >
         {{ ts.t('history.start_first') }}
       </button>
@@ -184,7 +184,7 @@
             class="shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wide border transition-colors active:scale-95 cursor-pointer"
             [ngClass]="
               metric() === option
-                ? 'bg-accent text-pure-white border-accent'
+                ? 'bg-accent text-on-accent border-accent'
                 : 'bg-bg-base text-text-primary border-transparent'
             "
           >
