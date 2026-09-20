@@ -164,50 +164,13 @@
     }
 
     <!--
-      What is about to be recorded.
+      What is being recorded.
 
-      It sits directly above the button it governs, because that is the only moment it is
-      ever answered. Once a recording is under way the choice is settled -- the activity
-      row already carries it -- so the control gives way to a chip that says what is being
-      recorded, which keeps the button in the same place either way.
+      The activity itself is chosen in Settings, so this is not a control: it is the one
+      place that says which of the three the recording in progress was filed as, without
+      leaving the screen to go and look.
     -->
-    @if (trackingService.state() === 'idle') {
-      <div
-        role="radiogroup"
-        [attr.aria-label]="ts.t('dashboard.activity_hint')"
-        class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1 p-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-xl border border-white/40 pointer-events-auto animate-in slide-in-from-bottom-4 duration-500"
-      >
-        @for (type of types; track type) {
-          <button
-            (click)="selectType(type)"
-            role="radio"
-            [attr.aria-checked]="activityTypes.current() === type"
-            [title]="typeLabel(type)"
-            class="flex items-center justify-center gap-1.5 py-2 rounded-full text-[10px] font-black uppercase tracking-wide transition-all active:scale-95 cursor-pointer"
-            [ngClass]="
-              activityTypes.current() === type
-                ? 'bg-accent text-on-accent shadow-sm'
-                : 'text-text-primary'
-            "
-          >
-            <span
-              class="h-4 w-4 shrink-0 bg-current"
-              [style.mask-image]="'url(' + typeIcon(type) + ')'"
-              [style.-webkit-mask-image]="'url(' + typeIcon(type) + ')'"
-            style="
-              mask-size: contain;
-              mask-repeat: no-repeat;
-              mask-position: center;
-              -webkit-mask-size: contain;
-              -webkit-mask-repeat: no-repeat;
-              -webkit-mask-position: center;
-            "
-            ></span>
-            <span class="truncate">{{ typeLabel(type) }}</span>
-          </button>
-        }
-      </div>
-    } @else {
+    @if (trackingService.state() !== 'idle') {
       <div class="flex justify-center pointer-events-none">
         <span
           class="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg border border-white/40"

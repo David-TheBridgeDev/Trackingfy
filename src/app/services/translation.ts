@@ -41,7 +41,7 @@ export class TranslationService {
       'settings.tab.settings': 'Ajustes',
       'settings.default_activity': 'Actividad predeterminada',
       'settings.default_activity.hint':
-        'Con la que arranca el tablero. Puedes cambiarla antes de cada grabación, y también después, desde la ruta.',
+        'La actividad con la que se guarda cada grabación. Cámbiala aquí antes de salir; si una ruta entró con la que no era, se corrige desde su pantalla.',
       'settings.backup.export_error': 'No se pudo exportar la copia de seguridad',
       'settings.created_with_love': 'Creado con mucho amor y cariño:',
       'settings.legal.privacy': 'Privacidad',
@@ -96,8 +96,7 @@ export class TranslationService {
       'dashboard.cancel_route': 'Limpiar mapa',
       'dashboard.speed': 'Velocidad',
       'dashboard.settings': 'Ajustes de Trackingfy',
-      'dashboard.activity_hint': '¿Qué vas a hacer?',
-      'dashboard.recording_type': 'Grabando {type}',
+      'dashboard.recording_type': 'Grabando: {type}',
       'dashboard.start': 'Empezar a grabar',
       'dashboard.controls': 'Controlar la grabación',
 
@@ -334,7 +333,7 @@ export class TranslationService {
       'settings.tab.settings': 'Settings',
       'settings.default_activity': 'Default activity',
       'settings.default_activity.hint':
-        'What the dashboard starts on. You can change it before any recording, and afterwards from the route itself.',
+        'The activity every recording is filed as. Change it here before you set out; a route that went in as the wrong one is put right from its own screen.',
       'settings.backup.export_error': 'The backup could not be exported',
       'settings.created_with_love': 'Created with lots of love and care:',
       'settings.legal.privacy': 'Privacy',
@@ -389,8 +388,7 @@ export class TranslationService {
       'dashboard.cancel_route': 'Clear Map',
       'dashboard.speed': 'Speed',
       'dashboard.settings': 'Trackingfy settings',
-      'dashboard.activity_hint': 'What are you doing?',
-      'dashboard.recording_type': 'Recording {type}',
+      'dashboard.recording_type': 'Recording: {type}',
       'dashboard.start': 'Start recording',
       'dashboard.controls': 'Recording controls',
 

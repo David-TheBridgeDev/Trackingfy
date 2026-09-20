@@ -6,12 +6,7 @@ import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../services/translation';
-import {
-  ACTIVITY_TYPES,
-  ActivityType,
-  ActivityTypeService,
-  activityTypeIcon,
-} from '../../services/activity-types';
+import { ActivityTypeService, activityTypeIcon } from '../../services/activity-types';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,20 +25,14 @@ export class DashboardComponent implements OnInit {
     public activityTypes: ActivityTypeService,
   ) {}
 
-  readonly types = ACTIVITY_TYPES;
-
   /**
-   * The type the next recording will carry.
+   * The activity a recording in progress is filed as.
    *
-   * Offered only while idle: once a recording is under way its activity row already
-   * holds the type, and a selector that silently disagreed with the stored route would
-   * be worse than no selector at all. Correcting it afterwards is the detail view's job.
+   * Read only: the choice is made in Settings, so this screen names it rather than
+   * offering it. Nothing can change it mid-recording anyway -- the activity row was
+   * written with the type when the recording started, and putting a route right after
+   * the fact is the detail view's job.
    */
-  selectType(type: ActivityType) {
-    if (this.trackingService.state() !== 'idle') return;
-    this.activityTypes.select(type);
-  }
-
   typeLabel(type: string): string {
     const label = this.ts.t(`activity.${type}`);
     return label === `activity.${type}` ? type : label;
