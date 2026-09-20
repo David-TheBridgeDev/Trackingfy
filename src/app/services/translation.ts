@@ -96,7 +96,6 @@ export class TranslationService {
       'dashboard.cancel_route': 'Limpiar mapa',
       'dashboard.speed': 'Velocidad',
       'dashboard.settings': 'Ajustes de Trackingfy',
-      'dashboard.recording_type': 'Grabando: {type}',
       'dashboard.start': 'Empezar a grabar',
       'dashboard.controls': 'Controlar la grabación',
 
@@ -388,7 +387,6 @@ export class TranslationService {
       'dashboard.cancel_route': 'Clear Map',
       'dashboard.speed': 'Speed',
       'dashboard.settings': 'Trackingfy settings',
-      'dashboard.recording_type': 'Recording: {type}',
       'dashboard.start': 'Start recording',
       'dashboard.controls': 'Recording controls',
 

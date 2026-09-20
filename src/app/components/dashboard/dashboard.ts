@@ -6,7 +6,6 @@ import { MapComponent } from '../map/map';
 import { UIService } from '../../services/ui';
 import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../services/translation';
-import { ActivityTypeService, activityTypeIcon } from '../../services/activity-types';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,25 +21,7 @@ export class DashboardComponent implements OnInit {
     public trackingService: TrackingService,
     public uiService: UIService,
     public ts: TranslationService,
-    public activityTypes: ActivityTypeService,
   ) {}
-
-  /**
-   * The activity a recording in progress is filed as.
-   *
-   * Read only: the choice is made in Settings, so this screen names it rather than
-   * offering it. Nothing can change it mid-recording anyway -- the activity row was
-   * written with the type when the recording started, and putting a route right after
-   * the fact is the detail view's job.
-   */
-  typeLabel(type: string): string {
-    const label = this.ts.t(`activity.${type}`);
-    return label === `activity.${type}` ? type : label;
-  }
-
-  typeIcon(type: string): string {
-    return activityTypeIcon(type);
-  }
 
   /** What the record button does next, said out loud for screen readers. */
   recordLabel = computed(() =>

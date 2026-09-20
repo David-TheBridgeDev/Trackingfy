@@ -9,7 +9,7 @@ There is no account and no server-side storage: every activity lives in the brow
 ## ✨ Features
 
 ### Tracking
-- **Pick the activity:** walking, running or cycling, chosen once in Settings and kept, so the tracking screen stays a map and a button. It is what every recording is filed as, what the history filters by, what the statistics split the kilometres by, and what the route editor uses to judge whether a hand-drawn stretch implies a plausible speed. While a recording is under way a chip names the activity it is being filed as, and a route recorded under the wrong one can be re-filed from its detail screen.
+- **Pick the activity:** walking, running or cycling, chosen once in Settings and kept, so the tracking screen stays a map and a button. It is what every recording is filed as, what the history filters by, what the statistics split the kilometres by, and what the route editor uses to judge whether a hand-drawn stretch implies a plausible speed. A route recorded under the wrong one can be re-filed from its detail screen.
 - **Real-time tracking** for walking, running and cycling: duration, moving time, distance, pace, average/max speed, climb, descent, altitude and grade.
 - **Background tracking on Android** through a foreground service, so recording continues with the screen off. On the web, tracking uses the Geolocation API and needs the tab to stay open.
 - **Interactive recording notification (Android):** live distance, climb and elapsed time, with **Pause / Resume / Finish** buttons. On Android 16 it is promoted to a status bar chip and the lock screen (Live Updates).

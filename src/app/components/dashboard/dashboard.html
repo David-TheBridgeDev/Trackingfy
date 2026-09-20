@@ -163,38 +163,6 @@
       </div>
     }
 
-    <!--
-      What is being recorded.
-
-      The activity itself is chosen in Settings, so this is not a control: it is the one
-      place that says which of the three the recording in progress was filed as, without
-      leaving the screen to go and look.
-    -->
-    @if (trackingService.state() !== 'idle') {
-      <div class="flex justify-center pointer-events-none">
-        <span
-          class="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg border border-white/40"
-        >
-          <span
-            class="h-4 w-4 shrink-0 bg-accent"
-            [style.mask-image]="'url(' + typeIcon(activityTypes.current()) + ')'"
-            [style.-webkit-mask-image]="'url(' + typeIcon(activityTypes.current()) + ')'"
-            style="
-              mask-size: contain;
-              mask-repeat: no-repeat;
-              mask-position: center;
-              -webkit-mask-size: contain;
-              -webkit-mask-repeat: no-repeat;
-              -webkit-mask-position: center;
-            "
-          ></span>
-          <span class="text-[10px] font-black uppercase tracking-wider text-text-heading">
-            {{ ts.t('dashboard.recording_type', { type: typeLabel(activityTypes.current()) }) }}
-          </span>
-        </span>
-      </div>
-    }
-
     <div class="flex items-center justify-center space-x-6 pointer-events-auto">
       @if (trackingService.state() !== 'idle') {
         <div class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500">
