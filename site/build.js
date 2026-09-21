@@ -91,7 +91,8 @@ const ICONS = {
   map: 'M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z',
   menu: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5',
   moon: 'M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z',
-  'no-symbol': 'M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636',
+  'no-symbol':
+    'M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636',
   offline:
     'm3 3 8.735 8.735m0 0a.374.374 0 1 1 .53.53m-.53-.53.53.53m0 0L21 21M14.652 9.348a3.75 3.75 0 0 1 0 5.304m2.121-7.425a6.75 6.75 0 0 1 0 9.546m2.121-11.667c3.808 3.807 3.808 9.98 0 13.788m-9.546-4.242a3.733 3.733 0 0 1-1.06-2.122m-1.061 4.243a6.75 6.75 0 0 1-1.625-6.929m-.496 9.05c-3.068-3.067-3.664-7.67-1.79-11.334M12 12h.008v.008H12V12Z',
   pencil:
@@ -115,7 +116,11 @@ const TEMPLATES = new Map();
 
 const read = (file) => fs.readFileSync(file, 'utf8');
 const escapeHtml = (value) =>
-  String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 const stripTags = (html) =>
   html
     .replace(/<[^>]+>/g, ' ')
@@ -126,9 +131,12 @@ const stripTags = (html) =>
     .trim();
 const canonical = (pagePath) => SITE_URL + pagePath;
 const formatDate = (iso) =>
-  new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-    new Date(iso),
-  );
+  new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(iso));
 
 function icon(name, className = 'h-5 w-5') {
   const d = ICONS[name];
@@ -142,7 +150,9 @@ function render(html, vars) {
       if (!PARTIALS.has(name)) throw new Error(`Unknown partial "${name}"`);
       return render(PARTIALS.get(name), vars);
     })
-    .replace(/\{\{icon ([\w-]+)(?: "([^"]*)")?\s*\}\}/g, (_, name, className) => icon(name, className))
+    .replace(/\{\{icon ([\w-]+)(?: "([^"]*)")?\s*\}\}/g, (_, name, className) =>
+      icon(name, className),
+    )
     .replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key) => {
       if (vars[key] === undefined) throw new Error(`Unknown variable "{{${key}}}"`);
       return vars[key];
@@ -201,7 +211,8 @@ function blogCard(post, headingTag) {
 
 function extractFaq(html) {
   const faq = [];
-  const pattern = /<details[^>]*data-faq[^>]*>\s*<summary[^>]*>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g;
+  const pattern =
+    /<details[^>]*data-faq[^>]*>\s*<summary[^>]*>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g;
   for (const [, question, answer] of html.matchAll(pattern)) {
     faq.push({ question: stripTags(question), answer: stripTags(answer) });
   }
@@ -303,7 +314,10 @@ function structuredData(page, html) {
   }
 
   if (!graph.length) return '';
-  return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+  return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(
+    /</g,
+    '\\u003c',
+  );
 }
 
 function head(page, html, assets) {
@@ -317,7 +331,9 @@ function head(page, html, assets) {
     `<script>${HEAD_SCRIPT}</script>`,
     `<title>${escapeHtml(page.title)}</title>`,
     `<meta name="description" content="${escapeHtml(page.description)}">`,
-    page.noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${url}">`,
+    page.noindex
+      ? '<meta name="robots" content="noindex">'
+      : `<link rel="canonical" href="${url}">`,
     '<meta property="og:site_name" content="Trackingfy">',
     '<meta property="og:locale" content="es_ES">',
     `<meta property="og:type" content="${page.template === 'article' ? 'article' : 'website'}">`,
@@ -328,8 +344,12 @@ function head(page, html, assets) {
     '<meta property="og:image:width" content="1200">',
     '<meta property="og:image:height" content="630">',
     '<meta property="og:image:alt" content="Trackingfy: graba tus rutas sin regalar tus datos">',
-    page.template === 'article' ? `<meta property="article:published_time" content="${page.date}">` : '',
-    page.template === 'article' ? `<meta property="article:modified_time" content="${page.updated}">` : '',
+    page.template === 'article'
+      ? `<meta property="article:published_time" content="${page.date}">`
+      : '',
+    page.template === 'article'
+      ? `<meta property="article:modified_time" content="${page.updated}">`
+      : '',
     '<meta name="twitter:card" content="summary_large_image">',
     '<meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">',
     '<meta name="theme-color" content="#0d0d0e" media="(prefers-color-scheme: dark)">',
@@ -378,7 +398,8 @@ function checkLinks(rendered) {
         byPath.has(targetPath) ||
         APP_ROUTES.some((route) => targetPath === route || targetPath.startsWith(route)) ||
         fs.existsSync(path.join(OUT_DIR, targetPath));
-      const anchorOk = !hash || !byPath.has(targetPath) || byPath.get(targetPath).includes(`id="${hash}"`);
+      const anchorOk =
+        !hash || !byPath.has(targetPath) || byPath.get(targetPath).includes(`id="${hash}"`);
       if (!exists || !anchorOk) broken.push(`${page.source}: ${href}`);
     }
   }
@@ -400,7 +421,9 @@ function writeHashed(name, extension, content) {
 
 async function buildAssets() {
   const from = path.join(SITE_DIR, 'styles.css');
-  const { css } = await postcss([tailwindcss({ base: SITE_DIR, optimize: { minify: true } })]).process(read(from), {
+  const { css } = await postcss([
+    tailwindcss({ base: SITE_DIR, optimize: { minify: true } }),
+  ]).process(read(from), {
     from,
   });
   fs.rmSync(path.join(OUT_DIR, 'site'), { recursive: true, force: true });
@@ -414,7 +437,9 @@ async function buildAssets() {
 function sitemap(pages) {
   const urls = pages
     .filter((page) => !page.noindex)
-    .map((page) => `  <url><loc>${canonical(page.path)}</loc><lastmod>${page.updated}</lastmod></url>`);
+    .map(
+      (page) => `  <url><loc>${canonical(page.path)}</loc><lastmod>${page.updated}</lastmod></url>`,
+    );
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join('\n')}
@@ -468,7 +493,9 @@ ${legal.map(line).join('\n')}
 
 async function main() {
   if (!fs.existsSync(path.join(OUT_DIR, 'app.html'))) {
-    console.warn('⚠️  No app.html in the output folder: run `ng build` first so /dashboard can be served.');
+    console.warn(
+      '⚠️  No app.html in the output folder: run `ng build` first so /dashboard can be served.',
+    );
   }
 
   for (const file of fs.readdirSync(path.join(SITE_DIR, 'partials'))) {
@@ -487,11 +514,21 @@ async function main() {
     .filter((page) => page.template === 'article')
     .sort((a, b) => b.date.localeCompare(a.date) || a.path.localeCompare(b.path));
 
-  PARTIALS.set('blog-cards', posts.slice(0, 3).map((post) => blogCard(post, 'h3')).join(''));
+  PARTIALS.set(
+    'blog-cards',
+    posts
+      .slice(0, 3)
+      .map((post) => blogCard(post, 'h3'))
+      .join(''),
+  );
   PARTIALS.set('blog-list', posts.map((post) => blogCard(post, 'h2')).join(''));
   PARTIALS.set(
     'footer-posts',
-    posts.map((post) => `<li><a href="${post.path}">${escapeHtml(post.short || post.heading)}</a></li>`).join(''),
+    posts
+      .map(
+        (post) => `<li><a href="${post.path}">${escapeHtml(post.short || post.heading)}</a></li>`,
+      )
+      .join(''),
   );
 
   const assets = await buildAssets();
@@ -508,7 +545,8 @@ async function main() {
 
     let content = render(page.body, vars);
     if (page.template) {
-      if (!TEMPLATES.has(page.template)) throw new Error(`${page.source}: unknown template "${page.template}"`);
+      if (!TEMPLATES.has(page.template))
+        throw new Error(`${page.source}: unknown template "${page.template}"`);
       content = render(TEMPLATES.get(page.template), { ...vars, content });
     }
     return { page, html: layout(page, content, vars, assets) };
@@ -525,7 +563,9 @@ async function main() {
     write(page.path === '/' ? 'index.html' : `${page.path.slice(1)}.html`, html);
   }
 
-  console.log(`✅ Site: ${pages.length} pages written to ${path.relative(process.cwd(), OUT_DIR) || '.'}`);
+  console.log(
+    `✅ Site: ${pages.length} pages written to ${path.relative(process.cwd(), OUT_DIR) || '.'}`,
+  );
 }
 
 main().catch((error) => {

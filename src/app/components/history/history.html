@@ -130,7 +130,9 @@
                 @if (tab.color) {
                   <span
                     class="w-2 h-2 rounded-full shrink-0"
-                    [style.background-color]="isActiveTab(tab.key) ? 'var(--color-on-accent)' : tab.color"
+                    [style.background-color]="
+                      isActiveTab(tab.key) ? 'var(--color-on-accent)' : tab.color
+                    "
                   ></span>
                 }
                 <span class="max-w-[9rem] truncate">{{ tab.label }}</span>
@@ -729,7 +731,11 @@
                   stroke="currentColor"
                   class="w-4 h-4"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                  />
                 </svg>
               </button>
               <button
@@ -746,7 +752,11 @@
                   stroke="currentColor"
                   class="w-4 h-4"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                  />
                 </svg>
               </button>
               <button
@@ -798,7 +808,9 @@
                   class="w-6 h-6 rounded-full border-2 transition-transform active:scale-90 cursor-pointer"
                   [style.background-color]="color"
                   [ngClass]="
-                    collection.color === color ? 'border-text-heading scale-110' : 'border-transparent'
+                    collection.color === color
+                      ? 'border-text-heading scale-110'
+                      : 'border-transparent'
                   "
                   [attr.aria-label]="ts.t('collections.color')"
                 ></button>

@@ -34,7 +34,7 @@
   --theme-bg-surface: #1e1e1e;
   --theme-text-primary: #a1a1aa;
   --theme-text-heading: #f3f4f6;
-  
+
   /* Overrides for common utility colors used in the app */
   --color-white: #2a2a2a;
   --color-black: #ffffff;
@@ -45,16 +45,26 @@
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply bg-bg-base text-text-primary overflow-hidden h-full w-full;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      sans-serif;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-text-heading font-bold;
   }
 
@@ -175,14 +185,14 @@
 }
 
 .leaflet-container {
-    font-family: inherit !important;
+  font-family: inherit !important;
 }
 
 /* Ensure Angular app root also fills screen */
 app-root {
-    display: block;
-    height: 100%;
-    width: 100%;
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 /*

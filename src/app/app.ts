@@ -28,37 +28,37 @@ export class App {
   // Tracks if we are on the dashboard
   isHomePage = toSignal(
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url === '/' || this.router.url === '/dashboard')
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.router.url === '/' || this.router.url === '/dashboard'),
     ),
-    { initialValue: true }
+    { initialValue: true },
   );
 
   // Tracks if we are on the history or activity details page
   isHistoryPage = toSignal(
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url === '/history' || this.router.url.startsWith('/activity/'))
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.router.url === '/history' || this.router.url.startsWith('/activity/')),
     ),
-    { initialValue: false }
+    { initialValue: false },
   );
 
   // Tracks if we are on the statistics page
   isStatsPage = toSignal(
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url === '/stats')
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.router.url === '/stats'),
     ),
-    { initialValue: false }
+    { initialValue: false },
   );
 
   // Tracks if we are on the settings page
   isSettingsPage = toSignal(
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url === '/settings')
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.router.url === '/settings'),
     ),
-    { initialValue: false }
+    { initialValue: false },
   );
 
   private lastBackPress = 0;
@@ -128,8 +128,8 @@ export class App {
 
     this.triggerToast(
       this.ts.t(
-        result.imported ? 'settings.backup.route_imported' : 'settings.backup.route_duplicate'
-      )
+        result.imported ? 'settings.backup.route_imported' : 'settings.backup.route_duplicate',
+      ),
     );
 
     // Opening the route is the obvious next step, but not in the middle of an activity:

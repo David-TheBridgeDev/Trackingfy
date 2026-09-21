@@ -616,9 +616,7 @@ export class HistoryComponent implements OnInit {
     // The routes and their points are read before the delete so the toast can put them
     // back: a mis-tap on a route recorded months ago is otherwise unrecoverable.
     const removed = this.activities().filter((a) => a.id !== undefined && ids.includes(a.id));
-    const coordinates = (
-      await Promise.all(ids.map((id) => this.db.getCoordinates(id)))
-    ).flat();
+    const coordinates = (await Promise.all(ids.map((id) => this.db.getCoordinates(id)))).flat();
 
     await this.db.deleteActivities(ids);
     await this.loadActivities();

@@ -7,7 +7,7 @@ describe('DatabaseService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DatabaseService]
+      providers: [DatabaseService],
     });
     // service = TestBed.inject(DatabaseService);
   });

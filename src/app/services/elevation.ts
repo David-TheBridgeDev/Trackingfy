@@ -62,9 +62,7 @@ export class ElevationService {
         return null;
       }
 
-      return data.elevation.map((e: any) =>
-        typeof e === 'number' && isFinite(e) ? e : null,
-      );
+      return data.elevation.map((e: any) => (typeof e === 'number' && isFinite(e) ? e : null));
     } catch (e) {
       console.warn('Open-Meteo elevation lookup failed:', e);
       return null;

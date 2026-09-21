@@ -9,8 +9,7 @@ describe('SettingsComponent', () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
 
-  const mockTrackingService = {
-  };
+  const mockTrackingService = {};
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -18,8 +17,8 @@ describe('SettingsComponent', () => {
       providers: [
         { provide: TrackingService, useValue: mockTrackingService },
         { provide: App, useValue: {} },
-        provideRouter([])
-      ]
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SettingsComponent);

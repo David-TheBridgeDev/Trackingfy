@@ -548,7 +548,14 @@ export class RouteImageService {
       const columns = Math.min(3, statIds.length);
       const rows = Math.ceil(statIds.length / columns);
       const cardHeight = 44 * u * 2 + rows * 116 * u + (rows - 1) * 20 * u;
-      statsCard = { x: pad, y: bottom - cardHeight, w: width - pad * 2, h: cardHeight, columns, rows };
+      statsCard = {
+        x: pad,
+        y: bottom - cardHeight,
+        w: width - pad * 2,
+        h: cardHeight,
+        columns,
+        rows,
+      };
       bottom = statsCard.y - gap;
     }
 
@@ -757,7 +764,8 @@ export class RouteImageService {
     if (floating) {
       // Opposite the text colour, so it separates the header from a light ground as well
       // as a dark one.
-      ctx.shadowColor = options.theme === 'dark' ? 'rgba(0, 0, 0, 0.65)' : 'rgba(255, 255, 255, 0.8)';
+      ctx.shadowColor =
+        options.theme === 'dark' ? 'rgba(0, 0, 0, 0.65)' : 'rgba(255, 255, 255, 0.8)';
       ctx.shadowBlur = 10 * u;
     }
 
@@ -926,12 +934,7 @@ export class RouteImageService {
     });
   }
 
-  private drawAttribution(
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    u: number,
-  ) {
+  private drawAttribution(ctx: CanvasRenderingContext2D, width: number, height: number, u: number) {
     // Required whenever OpenStreetMap imagery is redistributed, which a shared picture is.
     const text = '© OpenStreetMap';
     ctx.font = `600 ${18 * u}px ${FONT_STACK}`;
@@ -994,7 +997,10 @@ export class RouteImageService {
           unit: 'km',
         };
       case 'duration':
-        return { label: this.ts.t('dashboard.duration'), value: formatDuration(activity.totalTime) };
+        return {
+          label: this.ts.t('dashboard.duration'),
+          value: formatDuration(activity.totalTime),
+        };
       case 'movingTime':
         return {
           label: this.ts.t('dashboard.moving_time'),

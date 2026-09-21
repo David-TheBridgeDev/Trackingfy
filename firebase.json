@@ -1,12 +1,7 @@
 {
   "hosting": {
     "public": "dist/trackingfy/browser",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/apk/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/apk/**"],
     "cleanUrls": true,
     "trailingSlash": false,
     "rewrites": [

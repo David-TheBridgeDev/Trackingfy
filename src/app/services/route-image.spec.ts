@@ -138,9 +138,9 @@ describe('fillAltitudeGaps', () => {
   });
 
   it('carries the nearest reading outwards at the ends', () => {
-    expect(
-      fillAltitudeGaps([coord(0, 0, undefined), coord(0, 0, 80), coord(0, 0, null)]),
-    ).toEqual([80, 80, 80]);
+    expect(fillAltitudeGaps([coord(0, 0, undefined), coord(0, 0, 80), coord(0, 0, null)])).toEqual([
+      80, 80, 80,
+    ]);
   });
 
   it('falls back to zero when the route has no altitude at all', () => {
@@ -169,7 +169,10 @@ describe('downsample', () => {
   });
 
   it('keeps the first and last sample so the profile still spans the route', () => {
-    const thinned = downsample(Array.from({ length: 1000 }, (_, i) => i), 50);
+    const thinned = downsample(
+      Array.from({ length: 1000 }, (_, i) => i),
+      50,
+    );
     expect(thinned.length).toBe(50);
     expect(thinned[0]).toBe(0);
     expect(thinned[thinned.length - 1]).toBe(999);

@@ -67,7 +67,11 @@
               stroke-linejoin="round"
               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
             />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
         </a>
 
@@ -75,22 +79,36 @@
         <div class="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
 
         <!-- Center View Button -->
-        <button (click)="recenterMap()" 
+        <button
+          (click)="recenterMap()"
           [attr.aria-label]="ts.t('dashboard.center')"
           [title]="ts.t('dashboard.center')"
-          class="w-12 h-12 flex items-center justify-center rounded-full transition-all border border-transparent active:scale-95 active:shadow-inner" 
-          [ngClass]="trackingService.permissionDenied() || !trackingService.lastCoordinate() ? 
-            'bg-red-50 text-red-500 animate-pulse active:bg-red-100' : 
-            (map.isFollowing() ? 'bg-accent/10 text-accent active:bg-accent/20' : 'bg-gray-50/50 text-text-heading active:bg-gray-100')">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          class="w-12 h-12 flex items-center justify-center rounded-full transition-all border border-transparent active:scale-95 active:shadow-inner"
+          [ngClass]="
+            trackingService.permissionDenied() || !trackingService.lastCoordinate()
+              ? 'bg-red-50 text-red-500 animate-pulse active:bg-red-100'
+              : map.isFollowing()
+                ? 'bg-accent/10 text-accent active:bg-accent/20'
+                : 'bg-gray-50/50 text-text-heading active:bg-gray-100'
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <circle cx="12" cy="12" r="3" />
             <path d="M3 12h3m12 0h3M12 3v3m0 12v3" />
           </svg>
         </button>
       </div>
-
     </div>
-    
+
     <!-- Cancel Reference Route Button -->
     @if (trackingService.referenceCoordinates().length > 0) {
       <div class="mt-4 flex justify-center pointer-events-auto w-full">
@@ -98,7 +116,14 @@
           (click)="trackingService.clearReferenceRoute()"
           class="bg-red-600/90 backdrop-blur-md text-pure-white px-4 py-2 rounded-full font-black uppercase text-[10px] tracking-wider shadow-lg flex items-center gap-2 transition-all active:scale-95"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-4 h-4"
+          >
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
           {{ ts.t('dashboard.cancel_route') }}
@@ -139,7 +164,7 @@
               {{ formattedSpeed() }}
             </p>
           </div>
-          
+
           <!-- Row 2 / Secondary Info -->
           <div class="text-center md:border-l border-gray-100/50">
             <p class="text-text-primary text-[8px] uppercase font-bold tracking-wider mb-0.5">
@@ -165,8 +190,12 @@
 
     <div class="flex items-center justify-center space-x-6 pointer-events-auto">
       @if (trackingService.state() !== 'idle') {
-        <div class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500">
-          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.climb') }}</p>
+        <div
+          class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500"
+        >
+          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">
+            {{ ts.t('dashboard.climb') }}
+          </p>
           <p class="text-sm font-black text-green-600">{{ formattedClimb() }}</p>
         </div>
       }
@@ -226,8 +255,12 @@
       </button>
 
       @if (trackingService.state() !== 'idle') {
-        <div class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500">
-          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">{{ ts.t('dashboard.descent') }}</p>
+        <div
+          class="bg-white/90 backdrop-blur-md rounded-xl py-2 px-4 shadow-lg border border-white/20 text-center animate-in slide-in-from-bottom-4 duration-500"
+        >
+          <p class="text-[7px] font-bold uppercase text-text-primary tracking-tighter">
+            {{ ts.t('dashboard.descent') }}
+          </p>
           <p class="text-sm font-black text-red-600">{{ formattedDescent() }}</p>
         </div>
       }
@@ -261,17 +294,15 @@
             stroke="currentColor"
             stroke-width="2.5"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         <!-- Title & Icon -->
         <div class="text-center mt-3 mb-6">
-          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div
+            class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-8 w-8 text-accent animate-pulse"
@@ -287,7 +318,9 @@
           <h3 class="text-2xl font-black text-text-heading uppercase tracking-tighter">
             {{ ts.t('confirm.title.stop') }}
           </h3>
-          <p class="text-text-primary font-bold text-xs mt-2 uppercase tracking-wide px-2 leading-relaxed">
+          <p
+            class="text-text-primary font-bold text-xs mt-2 uppercase tracking-wide px-2 leading-relaxed"
+          >
             @if (trackingService.state() === 'paused') {
               {{ ts.t('confirm.message.paused') }}
             } @else {

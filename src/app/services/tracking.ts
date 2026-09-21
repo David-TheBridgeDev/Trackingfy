@@ -3,7 +3,10 @@ import { DatabaseService, Activity, Coordinate, Split } from './database';
 import { TranslationService } from './translation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { BackgroundGeolocationPlugin } from '@capgo/background-geolocation';
-import { TrackingNotificationService, type TrackingNotificationAction } from './tracking-notification';
+import {
+  TrackingNotificationService,
+  type TrackingNotificationAction,
+} from './tracking-notification';
 import { ActivityTypeService } from './activity-types';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
@@ -25,7 +28,7 @@ function formatElapsed(seconds: number): string {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TrackingService {
   private watchId: number | string | null = null;
@@ -42,7 +45,7 @@ export class TrackingService {
   currentAltitude = signal<number | null>(null);
   lastCoordinate = signal<Coordinate | null>(null);
   currentCoordinates = signal<Coordinate[]>([]);
-  
+
   // Reference route
   referenceCoordinates = signal<Coordinate[]>([]);
   referenceActivityId = signal<number | null>(null);
@@ -56,7 +59,7 @@ export class TrackingService {
   maxGrade = signal(0); // in % (highest climb)
   minGrade = signal(0); // in % (steepest descent)
   splits = signal<Split[]>([]);
-  
+
   private lastSplitTime: number = 0;
   private lastSmoothedAltitude: number | null = null;
   private lastAccumulatedAltitude: number | null = null;
@@ -65,7 +68,7 @@ export class TrackingService {
 
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
-  
+
   private timerInterval: any;
   private permissionProbe: { done: Promise<boolean>; cancel: () => void } | null = null;
   private lastNotificationKey: string | null = null;
@@ -75,7 +78,7 @@ export class TrackingService {
     private ngZone: NgZone,
     private ts: TranslationService,
     private notification: TrackingNotificationService,
-    private activityTypes: ActivityTypeService
+    private activityTypes: ActivityTypeService,
   ) {
     void this.notification.onAction((action) => this.applyNotificationAction(action));
   }
@@ -133,7 +136,7 @@ export class TrackingService {
           backgroundTitle: this.ts.t('tracking.permission_title'),
           backgroundMessage: this.ts.t('tracking.permission_message'),
           requestPermissions: true,
-          stale: true
+          stale: true,
         },
         (location, error) => {
           if (error) {
@@ -150,13 +153,13 @@ export class TrackingService {
                 lng: location.longitude,
                 timestamp: location.time || Date.now(),
                 altitude: location.altitude ?? null,
-                speed: location.speed ?? null
+                speed: location.speed ?? null,
               });
               this.currentAltitude.set(location.altitude ?? null);
             });
             void finish(true);
           }
-        }
+        },
       ).catch(fail);
     } catch (e) {
       fail(e);
@@ -184,7 +187,7 @@ export class TrackingService {
               lng: longitude,
               timestamp,
               altitude: altitude ?? null,
-              speed: speed ?? null
+              speed: speed ?? null,
             });
             this.currentAltitude.set(altitude ?? null);
           });
@@ -199,7 +202,7 @@ export class TrackingService {
           });
           resolve(false);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
       );
     });
   }
@@ -227,7 +230,7 @@ export class TrackingService {
       avgSpeed: 0,
       totalClimb: 0,
       totalDescent: 0,
-      startTime: Date.now()
+      startTime: Date.now(),
     };
 
     this.currentActivityId = await this.db.addActivity(activity);
@@ -290,8 +293,6 @@ export class TrackingService {
     this.referenceActivityId.set(null);
   }
 
-
-
   private applyNotificationAction(action: TrackingNotificationAction) {
     if (action === 'pause') {
       this.pauseTracking();
@@ -337,14 +338,12 @@ export class TrackingService {
         : undefined;
 
     void this.notification.update({
-      title: paused
-        ? this.ts.t('tracking.notif_paused_title')
-        : this.ts.t('tracking.bg_title'),
+      title: paused ? this.ts.t('tracking.notif_paused_title') : this.ts.t('tracking.bg_title'),
       text: paused
         ? this.ts.t('tracking.notif_stats_paused', {
             distance,
             climb,
-            time: formatElapsed(elapsed)
+            time: formatElapsed(elapsed),
           })
         : this.ts.t('tracking.notif_stats', { distance, climb }),
       chipText: `${distance} km`,
@@ -354,8 +353,8 @@ export class TrackingService {
         paused
           ? { id: 'resume', title: this.ts.t('tracking.notif_action_resume') }
           : { id: 'pause', title: this.ts.t('tracking.notif_action_pause') },
-        { id: 'finish', title: this.ts.t('tracking.notif_action_finish') }
-      ]
+        { id: 'finish', title: this.ts.t('tracking.notif_action_finish') },
+      ],
     });
   }
 
@@ -366,11 +365,11 @@ export class TrackingService {
     } else {
       this.currentTime.set(this.accumulatedTime);
     }
-    
+
     // Update avgPace
     const distKm = this.currentDistance() / 1000;
     if (distKm > 0) {
-      this.avgPace.set((this.currentTime() / 60) / distKm);
+      this.avgPace.set(this.currentTime() / 60 / distKm);
     }
   }
 
@@ -403,7 +402,7 @@ export class TrackingService {
             backgroundTitle: this.ts.t('tracking.bg_title'),
             requestPermissions: true,
             stale: false,
-            distanceFilter: 2
+            distanceFilter: 2,
           },
           (location) => {
             if (location) {
@@ -416,13 +415,13 @@ export class TrackingService {
                   speed: location.speed,
                   accuracy: location.accuracy,
                   altitudeAccuracy: location.altitudeAccuracy,
-                  heading: 0 // Default heading
+                  heading: 0, // Default heading
                 },
-                timestamp: location.time || Date.now()
+                timestamp: location.time || Date.now(),
               } as GeolocationPosition;
               this.handlePosition(position);
             }
-          }
+          },
         );
         this.watchId = 'native';
       } catch (e) {
@@ -436,8 +435,8 @@ export class TrackingService {
         {
           enableHighAccuracy: true,
           timeout: 5000,
-          maximumAge: 0
-        }
+          maximumAge: 0,
+        },
       );
     } else {
       console.error('Geolocation not supported');
@@ -447,60 +446,58 @@ export class TrackingService {
 
   private handlePosition(position: GeolocationPosition) {
     this.ngZone.run(() => {
-      // If paused, we still want to keep the "current position" updated for the map, 
+      // If paused, we still want to keep the "current position" updated for the map,
       // but we don't record the point in the DB or add to distance.
       const { latitude, longitude, altitude, speed } = position.coords;
       const { timestamp } = position;
-      
+
       const newCoord: Coordinate = {
         activityId: this.currentActivityId || 0,
         lat: latitude,
         lng: longitude,
         timestamp,
         altitude: altitude ?? null,
-        speed: speed ?? null
+        speed: speed ?? null,
       };
 
       if (this.state() === 'tracking') {
         const last = this.lastCoordinate();
         if (last) {
-          const dist = this.calculateDistance(
-            last.lat,
-            last.lng,
-            latitude,
-            longitude
-          );
+          const dist = this.calculateDistance(last.lat, last.lng, latitude, longitude);
           const timeDiffSec = (timestamp - last.timestamp) / 1000;
-          
+
           if (timeDiffSec > 0) {
             const calculatedSpeed = dist / timeDiffSec;
             const currentSpeedVal = speed || calculatedSpeed;
-            
+
             // If the average speed between points is greater than 0.3 m/s (approx 1 km/h)
             // or if the instantaneous speed is high and the interval is small (e.g. just started moving)
             if (calculatedSpeed > 0.3 || (currentSpeedVal > 0.3 && timeDiffSec < 10)) {
-              this.movingTime.update(m => m + timeDiffSec);
+              this.movingTime.update((m) => m + timeDiffSec);
             }
           }
 
           // Only add distance if it's more than 2 meters to avoid GPS noise
           if (dist > 2) {
-            this.currentDistance.update(d => {
+            this.currentDistance.update((d) => {
               const newDist = d + dist;
               const currentKm = Math.floor(newDist / 1000);
               const lastKm = Math.floor(d / 1000);
-              
+
               if (currentKm > lastKm) {
                 const splitTime = this.currentTime() - this.lastSplitTime;
                 const splitSpeed = splitTime > 0 ? 1000 / splitTime : 0;
-                this.splits.update(s => [...s, {
-                  kilometer: currentKm,
-                  time: splitTime,
-                  speed: splitSpeed
-                }]);
+                this.splits.update((s) => [
+                  ...s,
+                  {
+                    kilometer: currentKm,
+                    time: splitTime,
+                    speed: splitSpeed,
+                  },
+                ]);
                 this.lastSplitTime = this.currentTime();
               }
-              
+
               return newDist;
             });
 
@@ -517,7 +514,7 @@ export class TrackingService {
               if (this.lastAccumulatedAltitude === null) {
                 this.lastAccumulatedAltitude = smoothed;
               }
-              
+
               if (this.gradeAltitudeBaseline === null) {
                 this.gradeAltitudeBaseline = smoothed;
               }
@@ -525,22 +522,23 @@ export class TrackingService {
               // 2. Grade calculation (accumulating over 15 meters for stability)
               this.gradeDistanceAccumulator += dist;
               if (this.gradeDistanceAccumulator >= 15) {
-                 const grade = ((smoothed - this.gradeAltitudeBaseline) / this.gradeDistanceAccumulator) * 100;
-                 // Cap impossible grades (e.g. GPS jumps) to reasonable limits (-45% to +45%)
-                 const cappedGrade = Math.max(-45, Math.min(45, grade));
-                 
-                 this.currentGrade.set(cappedGrade);
-                 
-                 if (cappedGrade > this.maxGrade()) {
-                   this.maxGrade.set(cappedGrade);
-                 }
-                 if (cappedGrade < this.minGrade()) {
-                   this.minGrade.set(cappedGrade);
-                 }
-                 
-                 // Reset baseline for next segment
-                 this.gradeDistanceAccumulator = 0;
-                 this.gradeAltitudeBaseline = smoothed;
+                const grade =
+                  ((smoothed - this.gradeAltitudeBaseline) / this.gradeDistanceAccumulator) * 100;
+                // Cap impossible grades (e.g. GPS jumps) to reasonable limits (-45% to +45%)
+                const cappedGrade = Math.max(-45, Math.min(45, grade));
+
+                this.currentGrade.set(cappedGrade);
+
+                if (cappedGrade > this.maxGrade()) {
+                  this.maxGrade.set(cappedGrade);
+                }
+                if (cappedGrade < this.minGrade()) {
+                  this.minGrade.set(cappedGrade);
+                }
+
+                // Reset baseline for next segment
+                this.gradeDistanceAccumulator = 0;
+                this.gradeAltitudeBaseline = smoothed;
               }
 
               // 3. Accumulate differences using a threshold and comparing with the last accumulated baseline
@@ -549,9 +547,9 @@ export class TrackingService {
 
               if (Math.abs(diff) >= ALTITUDE_THRESHOLD) {
                 if (diff > 0) {
-                  this.currentClimb.update(c => c + diff);
+                  this.currentClimb.update((c) => c + diff);
                 } else {
-                  this.currentDescent.update(d => d + Math.abs(diff));
+                  this.currentDescent.update((d) => d + Math.abs(diff));
                 }
                 this.lastAccumulatedAltitude = smoothed;
               }
@@ -565,21 +563,21 @@ export class TrackingService {
           }
         }
         this.db.addCoordinate(newCoord);
-        this.currentCoordinates.update(coords => [...coords, newCoord]);
-        
+        this.currentCoordinates.update((coords) => [...coords, newCoord]);
+
         const currentSpeedVal = speed || 0;
         this.currentSpeed.set(currentSpeedVal);
-        
+
         if (currentSpeedVal > this.maxSpeed()) {
           this.maxSpeed.set(currentSpeedVal);
         }
-        
+
         if (currentSpeedVal > 0) {
-          this.currentPace.set((1000 / currentSpeedVal) / 60);
+          this.currentPace.set(1000 / currentSpeedVal / 60);
         } else {
           this.currentPace.set(0);
         }
-        
+
         this.updateCurrentTime();
         this.syncNotification();
       }
@@ -622,7 +620,7 @@ export class TrackingService {
         totalClimb,
         totalDescent,
         endTime: Date.now(),
-        splits: this.splits()
+        splits: this.splits(),
       });
     }
 

@@ -121,12 +121,14 @@ export class SettingsComponent implements OnInit {
 
   async downloadLatestApk() {
     try {
-      const response = await fetch('https://api.github.com/repos/David-TheBridgeDev/Trackingfy/releases/latest');
+      const response = await fetch(
+        'https://api.github.com/repos/David-TheBridgeDev/Trackingfy/releases/latest',
+      );
       if (!response.ok) throw new Error('Error fetching latest release');
-      
+
       const data = await response.json();
       const apkAsset = data.assets.find((asset: any) => asset.name.endsWith('.apk'));
-      
+
       if (apkAsset) {
         window.location.href = apkAsset.browser_download_url;
       } else {

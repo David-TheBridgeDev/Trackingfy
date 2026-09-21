@@ -6,8 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'dist/trackingfy/browser',
   server: {
     url: 'https://trackingfy.web.app',
-    allowNavigation: ['trackingfy.web.app']
-  }
+    allowNavigation: ['trackingfy.web.app'],
+  },
 };
 
 export default config;

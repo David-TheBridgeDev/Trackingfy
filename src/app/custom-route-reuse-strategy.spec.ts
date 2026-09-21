@@ -9,7 +9,7 @@ describe('CustomRouteReuseStrategy', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CustomRouteReuseStrategy, UIService]
+      providers: [CustomRouteReuseStrategy, UIService],
     });
     strategy = TestBed.inject(CustomRouteReuseStrategy);
     uiService = TestBed.inject(UIService);
@@ -18,7 +18,7 @@ describe('CustomRouteReuseStrategy', () => {
   it('should detach route when path is history', () => {
     const route = {
       routeConfig: { path: 'history' },
-      data: {}
+      data: {},
     } as unknown as ActivatedRouteSnapshot;
 
     expect(strategy.shouldDetach(route)).toBe(true);
@@ -27,7 +27,7 @@ describe('CustomRouteReuseStrategy', () => {
   it('should detach route when data.reuse is true', () => {
     const route = {
       routeConfig: { path: 'custom-path' },
-      data: { reuse: true }
+      data: { reuse: true },
     } as unknown as ActivatedRouteSnapshot;
 
     expect(strategy.shouldDetach(route)).toBe(true);
@@ -36,7 +36,7 @@ describe('CustomRouteReuseStrategy', () => {
   it('should not detach routes that do not match history or reuse flag', () => {
     const route = {
       routeConfig: { path: 'activity/:id' },
-      data: {}
+      data: {},
     } as unknown as ActivatedRouteSnapshot;
 
     expect(strategy.shouldDetach(route)).toBe(false);
@@ -45,7 +45,7 @@ describe('CustomRouteReuseStrategy', () => {
   it('should store and attach detached route handle', () => {
     const route = {
       routeConfig: { path: 'history' },
-      data: { reuse: true }
+      data: { reuse: true },
     } as unknown as ActivatedRouteSnapshot;
 
     const mockHandle = {} as DetachedRouteHandle;
@@ -62,7 +62,7 @@ describe('CustomRouteReuseStrategy', () => {
   it('should delete stored route handle when stored with null', () => {
     const route = {
       routeConfig: { path: 'history' },
-      data: { reuse: true }
+      data: { reuse: true },
     } as unknown as ActivatedRouteSnapshot;
 
     const mockHandle = {} as DetachedRouteHandle;

@@ -21,7 +21,7 @@ interface TrackingNotificationPlugin {
   requestPermissions(): Promise<{ notifications: PermissionState }>;
   addListener(
     eventName: 'trackingAction',
-    listenerFunc: (event: { action: TrackingNotificationAction }) => void
+    listenerFunc: (event: { action: TrackingNotificationAction }) => void,
   ): Promise<PluginListenerHandle>;
 }
 
@@ -34,7 +34,7 @@ const TrackingNotification = registerPlugin<TrackingNotificationPlugin>('Trackin
  * there is no equivalent surface worth faking, so every method here is a no-op off native.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TrackingNotificationService {
   private ngZone = inject(NgZone);

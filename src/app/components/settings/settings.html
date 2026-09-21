@@ -189,8 +189,14 @@
           </svg>
           <span>{{ ts.t('settings.backup') }}</span>
         </h3>
-        
-        <input type="file" accept=".json" (change)="onFileSelected($event)" class="hidden" #fileInput>
+
+        <input
+          type="file"
+          accept=".json"
+          (change)="onFileSelected($event)"
+          class="hidden"
+          #fileInput
+        />
 
         <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200/30 rounded-2xl mb-2">
           <button
@@ -211,7 +217,9 @@
           {{ ts.t('settings.backup.import_hint') }}
         </p>
 
-        <p class="text-[11px] text-text-primary/80 leading-snug px-1 mt-3 pt-3 border-t border-gray-100">
+        <p
+          class="text-[11px] text-text-primary/80 leading-snug px-1 mt-3 pt-3 border-t border-gray-100"
+        >
           {{ ts.t('settings.backup.elevation_note') }}
         </p>
       </div>
@@ -249,7 +257,9 @@
         </div>
 
         <div class="px-4 py-3 bg-accent/5 rounded-2xl border border-accent/20 mb-3 text-center">
-          <p class="text-[11px] font-bold text-text-heading/80 leading-relaxed uppercase tracking-wide">
+          <p
+            class="text-[11px] font-bold text-text-heading/80 leading-relaxed uppercase tracking-wide"
+          >
             {{ ts.t('onboarding.disclaimer') }}
           </p>
         </div>
@@ -280,8 +290,19 @@
           (click)="downloadLatestApk()"
           class="flex items-center justify-center space-x-2 w-full bg-bg-base text-text-heading border border-gray-200/50 py-3.5 rounded-2xl font-black uppercase text-xs tracking-wider active:scale-95 transition-all hover:bg-gray-50 cursor-pointer text-center shadow-sm"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
           </svg>
           <span>{{ ts.t('app.download_apk') }}</span>
         </button>
@@ -310,17 +331,29 @@
           <nav
             class="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-wider text-text-primary"
           >
-            <a href="/privacidad" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
-              ts.t('settings.legal.privacy')
-            }}</a>
+            <a
+              href="/privacidad"
+              target="_blank"
+              rel="noopener"
+              class="hover:text-text-heading transition-colors"
+              >{{ ts.t('settings.legal.privacy') }}</a
+            >
             <span aria-hidden="true">·</span>
-            <a href="/aviso-legal" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
-              ts.t('settings.legal.notice')
-            }}</a>
+            <a
+              href="/aviso-legal"
+              target="_blank"
+              rel="noopener"
+              class="hover:text-text-heading transition-colors"
+              >{{ ts.t('settings.legal.notice') }}</a
+            >
             <span aria-hidden="true">·</span>
-            <a href="/cookies" target="_blank" rel="noopener" class="hover:text-text-heading transition-colors">{{
-              ts.t('settings.legal.cookies')
-            }}</a>
+            <a
+              href="/cookies"
+              target="_blank"
+              rel="noopener"
+              class="hover:text-text-heading transition-colors"
+              >{{ ts.t('settings.legal.cookies') }}</a
+            >
           </nav>
         }
       </div>

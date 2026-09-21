@@ -42,9 +42,7 @@
   "dataGroups": [
     {
       "name": "leaflet-tiles",
-      "urls": [
-        "https://*.tile.openstreetmap.org/**"
-      ],
+      "urls": ["https://*.tile.openstreetmap.org/**"],
       "cacheConfig": {
         "maxSize": 500,
         "maxAge": "30d",

@@ -1,4 +1,14 @@
-import { Component, input, output, effect, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  effect,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { Coordinate } from '../../services/database';
@@ -15,16 +25,30 @@ const MAP_RESIZE_TRANSITION_MS = 300;
   template: `
     <div class="relative w-full h-full">
       <div #mapContainer class="w-full h-full"></div>
-      
+
       <!-- GPS Location Button (Google Maps/Waze style) -->
       @if (showLocationButton()) {
-        <button 
+        <button
           (click)="recenter()"
-          [class]="'absolute bottom-40 right-4 w-12 h-12 flex items-center justify-center rounded-full shadow-2xl border transition-all active:scale-90 z-[1000] ' + 
-                   (trackingService.permissionDenied() || !currentPoint() ? 'bg-red-500 text-pure-white border-red-400 animate-pulse' : 
-                   (isFollowing() ? 'bg-accent text-pure-white border-accent' : 'bg-white/95 text-gray-700 border-gray-100'))"
+          [class]="
+            'absolute bottom-40 right-4 w-12 h-12 flex items-center justify-center rounded-full shadow-2xl border transition-all active:scale-90 z-[1000] ' +
+            (trackingService.permissionDenied() || !currentPoint()
+              ? 'bg-red-500 text-pure-white border-red-400 animate-pulse'
+              : isFollowing()
+                ? 'bg-accent text-pure-white border-accent'
+                : 'bg-white/95 text-gray-700 border-gray-100')
+          "
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <circle cx="12" cy="12" r="3" />
             <path d="M3 12h3m12 0h3M12 3v3m0 12v3" />
           </svg>
@@ -32,13 +56,19 @@ const MAP_RESIZE_TRANSITION_MS = 300;
       }
     </div>
   `,
-  styles: [`
-    :host { display: block; width: 100%; height: 100%; }
-  `]
+  styles: [
+    `
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef;
-  
+
   coordinates = input<Coordinate[]>([]);
   referenceCoordinates = input<Coordinate[]>([]);
   currentPoint = input<Coordinate | null>(null);
@@ -68,7 +98,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private ignoreInteraction = true;
   private hasFittedDraft = false;
 
-  constructor(public uiService: UIService, public trackingService: TrackingService) {
+  constructor(
+    public uiService: UIService,
+    public trackingService: TrackingService,
+  ) {
     // Clear map when tracking stops
     effect(() => {
       const state = this.trackingService.state();
@@ -93,23 +126,26 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const point = this.currentPoint();
       if (point && this.isMapInitialized()) {
         const latLng: L.LatLngExpression = [point.lat, point.lng];
-        
+
         this.marker.setLatLng(latLng);
         this.marker.setOpacity(1);
 
         if (point.activityId > 0 && this.coordinates().length === 0) {
           this.polyline.addLatLng(latLng);
         }
-        
+
         if (this.isFollowing() && this.enablePan()) {
           this.ignoreInteraction = true;
-          if (point.activityId === 0 || (this.coordinates().length === 0 && this.polyline.getLatLngs().length <= 1)) {
+          if (
+            point.activityId === 0 ||
+            (this.coordinates().length === 0 && this.polyline.getLatLngs().length <= 1)
+          ) {
             this.map.setView(latLng, 16);
           } else {
             this.map.panTo(latLng);
           }
           // Resume detection after movement finishes
-          setTimeout(() => this.ignoreInteraction = false, 500);
+          setTimeout(() => (this.ignoreInteraction = false), 500);
         }
       }
     });
@@ -117,11 +153,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       const coords = this.coordinates();
       if (coords.length > 0 && this.isMapInitialized()) {
-        const latLngs = coords.map(c => [c.lat, c.lng] as L.LatLngExpression);
+        const latLngs = coords.map((c) => [c.lat, c.lng] as L.LatLngExpression);
         const { recorded, manual } = this.splitBySource(coords);
         this.polyline.setLatLngs(recorded);
         this.manualPolyline.setLatLngs(manual);
-        
+
         // While editing, framing is owned by the draft effect, which also has to fit the
         // drawn segment in. Refitting to the recorded track alone here would push it out
         // of view again every time the coordinate list changes.
@@ -130,10 +166,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             this.ignoreInteraction = true;
             this.map.fitBounds(this.polyline.getBounds(), { padding: [20, 20] });
             this.isFollowing.set(true);
-            setTimeout(() => this.ignoreInteraction = false, 1000);
+            setTimeout(() => (this.ignoreInteraction = false), 1000);
           } catch (e) {}
         }
-        
+
         const last = coords[coords.length - 1];
         this.marker.setLatLng([last.lat, last.lng]);
         this.marker.setOpacity(1);
@@ -141,7 +177,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         if (this.showLocationButton() && this.isFollowing() && this.enablePan()) {
           this.ignoreInteraction = true;
           this.map.panTo([last.lat, last.lng]);
-          setTimeout(() => this.ignoreInteraction = false, 500);
+          setTimeout(() => (this.ignoreInteraction = false), 500);
         }
       }
     });
@@ -150,7 +186,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const coords = this.referenceCoordinates();
       if (this.isMapInitialized()) {
         if (coords.length > 0) {
-          const latLngs = coords.map(c => [c.lat, c.lng] as L.LatLngExpression);
+          const latLngs = coords.map((c) => [c.lat, c.lng] as L.LatLngExpression);
           this.referencePolyline.setLatLngs(latLngs);
         } else {
           this.referencePolyline.setLatLngs([]);
@@ -176,7 +212,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         // The drawn segment always ends at the first recorded fix, so the user can see
         // exactly where their reconstruction joins the real track.
         const anchor = coords[0];
-        const path = draft.map(p => [p.lat, p.lng] as L.LatLngExpression);
+        const path = draft.map((p) => [p.lat, p.lng] as L.LatLngExpression);
         if (anchor) path.push([anchor.lat, anchor.lng]);
         this.draftPolyline.setLatLngs(path);
 
@@ -189,7 +225,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             keyboard: false,
             // A tap on a point must not also count as a tap on the map, which would
             // delete the point and drop a new one in its place.
-            bubblingMouseEvents: false
+            bubblingMouseEvents: false,
           });
 
           let lastDragEnd = 0;
@@ -278,7 +314,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       iconAnchor: [15, 15],
       html:
         '<span style="display:block;width:14px;height:14px;margin:8px;border-radius:9999px;' +
-        `border:2px solid #ffffff;background:${color};box-shadow:0 1px 4px rgba(0,0,0,.45)"></span>`
+        `border:2px solid #ffffff;background:${color};box-shadow:0 1px 4px rgba(0,0,0,.45)"></span>`,
     });
   }
 
@@ -287,7 +323,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
    * drawn in its own style. The manual run keeps the first recorded point so the two
    * polylines meet instead of leaving a visual gap.
    */
-  private splitBySource(coords: Coordinate[]): { recorded: L.LatLngExpression[]; manual: L.LatLngExpression[] } {
+  private splitBySource(coords: Coordinate[]): {
+    recorded: L.LatLngExpression[];
+    manual: L.LatLngExpression[];
+  } {
     const toLatLng = (c: Coordinate) => [c.lat, c.lng] as L.LatLngExpression;
 
     let manualCount = 0;
@@ -301,7 +340,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     return {
       recorded: coords.slice(manualCount).map(toLatLng),
-      manual: coords.slice(0, Math.min(manualCount + 1, coords.length)).map(toLatLng)
+      manual: coords.slice(0, Math.min(manualCount + 1, coords.length)).map(toLatLng),
     };
   }
 
@@ -317,7 +356,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   async recenter() {
     let point = this.currentPoint();
-    
+
     // If we don't have a point, it might be because permissions weren't granted or GPS is off.
     // We try to request/activate it.
     if (!point) {
@@ -333,44 +372,61 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.ignoreInteraction = true;
       this.map.setView([point.lat, point.lng], 16);
       this.isFollowing.set(true);
-      setTimeout(() => this.ignoreInteraction = false, 500);
+      setTimeout(() => (this.ignoreInteraction = false), 500);
     } else if (coords.length > 0) {
       this.ignoreInteraction = true;
       this.map.fitBounds(this.polyline.getBounds(), { padding: [20, 20] });
       this.isFollowing.set(true); // Treat fitting bounds as "following" the full track in history
-      setTimeout(() => this.ignoreInteraction = false, 500);
+      setTimeout(() => (this.ignoreInteraction = false), 500);
     }
   }
 
   private initMap() {
     const iconDefault = L.icon({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+      iconRetinaUrl:
+        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
       iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
       tooltipAnchor: [16, -28],
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     });
     L.Marker.prototype.options.icon = iconDefault;
 
     this.map = L.map(this.mapContainer.nativeElement, {
       zoomControl: false,
       dragging: true,
-      touchZoom: true
+      touchZoom: true,
     }).setView([0, 0], 2);
-    
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
 
     this.polyline = L.polyline([], { color: 'red', weight: 6, opacity: 0.8 }).addTo(this.map);
     // Hand-drawn stretches are dashed so a reconstructed opening is never mistaken for
     // something the GPS actually recorded.
-    this.manualPolyline = L.polyline([], { color: '#f97316', weight: 6, opacity: 0.85, dashArray: '2, 12', lineCap: 'round' }).addTo(this.map);
-    this.referencePolyline = L.polyline([], { color: 'blue', weight: 4, opacity: 0.6, dashArray: '5, 10' }).addTo(this.map);
-    this.draftPolyline = L.polyline([], { color: '#f97316', weight: 4, opacity: 0.9, dashArray: '6, 8' }).addTo(this.map);
+    this.manualPolyline = L.polyline([], {
+      color: '#f97316',
+      weight: 6,
+      opacity: 0.85,
+      dashArray: '2, 12',
+      lineCap: 'round',
+    }).addTo(this.map);
+    this.referencePolyline = L.polyline([], {
+      color: 'blue',
+      weight: 4,
+      opacity: 0.6,
+      dashArray: '5, 10',
+    }).addTo(this.map);
+    this.draftPolyline = L.polyline([], {
+      color: '#f97316',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '6, 8',
+    }).addTo(this.map);
     this.draftMarkers = L.layerGroup().addTo(this.map);
     this.anchorMarker = L.circleMarker([0, 0], {
       radius: 7,
@@ -378,7 +434,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       weight: 3,
       fillColor: '#ef4444',
       fillOpacity: 0,
-      opacity: 0
+      opacity: 0,
     }).addTo(this.map);
     this.marker = L.marker([0, 0], { opacity: 0 }).addTo(this.map);
 
@@ -409,7 +465,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.marker.setOpacity(1);
       }
       // Allow interaction detection after map is settled
-      setTimeout(() => this.ignoreInteraction = false, 1000);
+      setTimeout(() => (this.ignoreInteraction = false), 1000);
     }, 200);
   }
 }

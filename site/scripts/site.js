@@ -27,7 +27,8 @@
   const RELEASE_API = 'https://api.github.com/repos/David-TheBridgeDev/Trackingfy/releases/latest';
   for (const link of document.querySelectorAll('a[data-apk]')) {
     link.addEventListener('click', async (event) => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
       event.preventDefault();
       link.setAttribute('aria-busy', 'true');
       let target = link.href;

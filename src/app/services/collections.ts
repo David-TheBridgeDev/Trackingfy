@@ -244,6 +244,9 @@ export class CollectionsService {
   /** Walk the palette so consecutive collections do not come out the same colour. */
   private nextColor(): string {
     const used = new Set(this.collections().map((c) => c.color));
-    return COLLECTION_COLORS.find((color) => !used.has(color)) ?? COLLECTION_COLORS[this.collections().length % COLLECTION_COLORS.length];
+    return (
+      COLLECTION_COLORS.find((color) => !used.has(color)) ??
+      COLLECTION_COLORS[this.collections().length % COLLECTION_COLORS.length]
+    );
   }
 }

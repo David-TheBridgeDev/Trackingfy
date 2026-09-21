@@ -12,5 +12,5 @@ export const routes: Routes = [
   { path: 'stats', component: StatsComponent },
   { path: 'activity/:id', component: ActivityDetailComponent },
   { path: 'settings', component: SettingsComponent },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'dashboard' },
 ];

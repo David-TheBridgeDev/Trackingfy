@@ -22,16 +22,13 @@ describe('DashboardComponent', () => {
     startTracking: vi.fn(),
     stopTracking: vi.fn(),
     pauseTracking: vi.fn(),
-    resumeTracking: vi.fn()
+    resumeTracking: vi.fn(),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DashboardComponent],
-      providers: [
-        { provide: TrackingService, useValue: mockTrackingService },
-        provideRouter([])
-      ]
+      providers: [{ provide: TrackingService, useValue: mockTrackingService }, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);

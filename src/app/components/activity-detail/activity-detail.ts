@@ -46,13 +46,12 @@ const SWIPE_RESISTANCE = 0.25;
 export interface ChartPoint {
   distance: number; // in km
   altitude: number;
-  speed: number;    // in km/h
-  x: number;        // percentage 0 to 100
-  yAlt: number;     // percentage 0 to 100
-  ySpeed: number;   // percentage 0 to 100
+  speed: number; // in km/h
+  x: number; // percentage 0 to 100
+  yAlt: number; // percentage 0 to 100
+  ySpeed: number; // percentage 0 to 100
   coordinate: Coordinate;
 }
-
 
 @Component({
   selector: 'app-activity-detail',
@@ -131,11 +130,7 @@ export class ActivityDetailComponent implements OnInit {
     const context = this.editContext();
     if (!context) return null;
 
-    return this.routeEditor.previewOpeningSegment(
-      context,
-      this.draftPoints(),
-      this.startTimeMs(),
-    );
+    return this.routeEditor.previewOpeningSegment(context, this.draftPoints(), this.startTimeMs());
   });
 
   /** The projection when the draft is valid, so the template does not narrow a union. */
@@ -167,7 +162,7 @@ export class ActivityDetailComponent implements OnInit {
     private appComponent: App,
     public uiService: UIService,
     public trackingService: TrackingService,
-    public ts: TranslationService
+    public ts: TranslationService,
   ) {
     // Walking to the next route reuses this screen rather than building a new one, so the
     // id has to be followed instead of read once on the way in.
@@ -213,7 +208,6 @@ export class ActivityDetailComponent implements OnInit {
     // -- the gallery falls back to the whole history rather than to nothing.
     if (activity) await this.routeNavigation.ensureContains(id, this.ts.t('app.history'));
   }
-
 
   /** Drop everything that belonged to the route being left behind. */
   private resetView() {
@@ -432,7 +426,9 @@ export class ActivityDetailComponent implements OnInit {
     return activity.name?.trim() || (label === `activity.${activity.type}` ? activity.type : label);
   });
 
-  collection = computed(() => this.collections.get(this.activity()?.collectionId ?? undefined) ?? null);
+  collection = computed(
+    () => this.collections.get(this.activity()?.collectionId ?? undefined) ?? null,
+  );
 
   /** What the route is filed as, in the reader's language. */
   typeLabel = computed(() => {
@@ -496,9 +492,7 @@ export class ActivityDetailComponent implements OnInit {
 
     const name = this.collections.nameOf(collectionId ?? undefined);
     this.appComponent.triggerToast(
-      name
-        ? this.ts.t('history.moved_one', { name })
-        : this.ts.t('history.moved_out_one'),
+      name ? this.ts.t('history.moved_one', { name }) : this.ts.t('history.moved_out_one'),
     );
   }
 
@@ -555,8 +549,8 @@ export class ActivityDetailComponent implements OnInit {
       return;
     }
 
-    const lats = coords.map(c => c.lat);
-    const lngs = coords.map(c => c.lng);
+    const lats = coords.map((c) => c.lat);
+    const lngs = coords.map((c) => c.lng);
     const minLat = Math.min(...lats);
     const maxLat = Math.max(...lats);
     const minLng = Math.min(...lngs);
@@ -568,8 +562,8 @@ export class ActivityDetailComponent implements OnInit {
 
     const vbMinX = minLng - padding;
     const vbMinY = -(maxLat + padding);
-    const vbWidth = (maxLng - minLng) + padding * 2;
-    const vbHeight = (maxLat - minLat) + padding * 2;
+    const vbWidth = maxLng - minLng + padding * 2;
+    const vbHeight = maxLat - minLat + padding * 2;
 
     this.svgViewBox.set(`${vbMinX} ${vbMinY} ${vbWidth} ${vbHeight}`);
     this.svgStrokeWidth.set(Math.max(vbWidth, vbHeight) * 0.01); // 1% of the view box
@@ -608,7 +602,7 @@ export class ActivityDetailComponent implements OnInit {
     if (points.length === 0) return;
 
     const maxDist = points[points.length - 1].distance || 1;
-    const speeds = points.map(p => p.speed);
+    const speeds = points.map((p) => p.speed);
     const minAlt = Math.min(...altitudes);
     const maxAlt = Math.max(...altitudes);
     const altRange = maxAlt - minAlt;
@@ -675,7 +669,6 @@ export class ActivityDetailComponent implements OnInit {
     this.hoveredCoordinate.set(null);
   }
 
-
   formatTime(seconds: number | undefined): string {
     if (seconds === undefined) return '0m 0s';
     const total = Math.round(seconds);
@@ -684,7 +677,6 @@ export class ActivityDetailComponent implements OnInit {
     const s = total % 60;
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
   }
-
 
   formatMaxSpeed(speed: number | undefined): string {
     if (!speed) return '0.0 km/h';
@@ -811,7 +803,7 @@ export class ActivityDetailComponent implements OnInit {
 
   /** Every change to the draft goes through here, so all of them can be undone. */
   private mutateDraft(points: DraftPoint[]) {
-    this.draftHistory.update(history => [...history, this.draftPoints()]);
+    this.draftHistory.update((history) => [...history, this.draftPoints()]);
     this.draftPoints.set(points);
     this.refreshSuggestedStartTime();
   }

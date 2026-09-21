@@ -21,3 +21,11 @@ package-lock.json
 # Served verbatim: the Google site-verification file has to stay byte for byte as issued,
 # and the rest of this folder is icons and binaries.
 public/
+
+# The site's HTML, but not its JavaScript or CSS.
+#
+# These pages are templates for site/build.js, not plain HTML: they carry {{variable}},
+# {{> partial}} and {{icon name "classes"}}. Prettier's HTML parser does not know the
+# syntax, breaks a placeholder across two lines and, on site/pages/index.html, never
+# settles -- each run adds another eight blank lines, so `format:check` could never pass.
+site/**/*.html

@@ -38,7 +38,7 @@ describe('ElevationService', () => {
 
     const points: LatLng[] = [
       { lat: 40.4168, lng: -3.7038 },
-      { lat: 40.4170, lng: -3.7040 },
+      { lat: 40.417, lng: -3.704 },
     ];
 
     const result = await service.lookup(points);
@@ -50,9 +50,7 @@ describe('ElevationService', () => {
 
   it('falls back to Open-Elevation when Open-Meteo fails', async () => {
     const openElevationResponse = {
-      results: [
-        { latitude: 40.4168, longitude: -3.7038, elevation: 652.0 },
-      ],
+      results: [{ latitude: 40.4168, longitude: -3.7038, elevation: 652.0 }],
     };
 
     globalThis.fetch = vi
@@ -82,7 +80,7 @@ describe('ElevationService', () => {
 
     const points: LatLng[] = [
       { lat: 40.4168, lng: -3.7038 },
-      { lat: 40.4170, lng: -3.7040 },
+      { lat: 40.417, lng: -3.704 },
     ];
 
     const result = await service.lookup(points);

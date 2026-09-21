@@ -82,7 +82,7 @@ export type ImportResult =
   | { kind: 'route'; imported: boolean; activityId?: number };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DatabaseService extends Dexie {
   activities!: Table<Activity, number>;
@@ -95,7 +95,7 @@ export class DatabaseService extends Dexie {
     // unindexed, so they need no schema version bump.
     this.version(2).stores({
       activities: '++id, date, type',
-      coordinates: '++id, activityId, timestamp'
+      coordinates: '++id, activityId, timestamp',
     });
     // Collections: a new table, plus an index on the activity's collection so the
     // history can pull a tab's routes without walking every activity. The activity
@@ -103,7 +103,7 @@ export class DatabaseService extends Dexie {
     this.version(3).stores({
       activities: '++id, date, type, collectionId',
       coordinates: '++id, activityId, timestamp',
-      collections: '++id, order'
+      collections: '++id, order',
     });
   }
 
@@ -188,7 +188,7 @@ export class DatabaseService extends Dexie {
       await this.activities
         .where('collectionId')
         .equals(id)
-        .modify(activity => {
+        .modify((activity) => {
           delete activity.collectionId;
         });
       await this.collections.delete(id);
@@ -216,7 +216,7 @@ export class DatabaseService extends Dexie {
     await this.activities
       .where('id')
       .anyOf(activityIds)
-      .modify(activity => {
+      .modify((activity) => {
         if (collectionId === undefined) {
           delete activity.collectionId;
         } else {
@@ -236,7 +236,7 @@ export class DatabaseService extends Dexie {
     activityId: number,
     removedCoordinateIds: number[],
     newCoordinates: Coordinate[],
-    changes: Partial<Activity>
+    changes: Partial<Activity>,
   ): Promise<void> {
     await this.transaction('rw', this.activities, this.coordinates, async () => {
       if (removedCoordinateIds.length > 0) {
@@ -259,14 +259,16 @@ export class DatabaseService extends Dexie {
     const { activity, coordinates } = parseRouteExport(data);
 
     return await this.transaction('rw', this.activities, this.coordinates, async () => {
-      const duplicate = await this.activities.filter(a => a.startTime === activity.startTime).first();
+      const duplicate = await this.activities
+        .filter((a) => a.startTime === activity.startTime)
+        .first();
       if (duplicate) {
         return { imported: false, activityId: duplicate.id };
       }
 
       const activityId = await this.activities.add(activity as Activity);
       await this.coordinates.bulkAdd(
-        coordinates.map(c => ({ ...c, activityId })) as Coordinate[]
+        coordinates.map((c) => ({ ...c, activityId })) as Coordinate[],
       );
 
       return { imported: true, activityId };
@@ -311,7 +313,7 @@ export class DatabaseService extends Dexie {
 
       // Get existing activities to prevent duplicates
       const existingActivities = await this.activities.toArray();
-      const existingStartTimes = new Set(existingActivities.map(a => a.startTime));
+      const existingStartTimes = new Set(existingActivities.map((a) => a.startTime));
 
       const newCoordinatesToAdd: Coordinate[] = [];
 
@@ -343,7 +345,9 @@ export class DatabaseService extends Dexie {
         imported++;
 
         // Find and map associated coordinates
-        const activityCoords = (data.coordinates as Coordinate[]).filter(c => c.activityId === oldId);
+        const activityCoords = (data.coordinates as Coordinate[]).filter(
+          (c) => c.activityId === oldId,
+        );
         for (const coord of activityCoords) {
           delete coord.id;
           coord.activityId = newId as number;
@@ -373,7 +377,7 @@ export class DatabaseService extends Dexie {
     if (!Array.isArray(source)) return idMap;
 
     const existing = await this.collections.toArray();
-    const byName = new Map(existing.map(c => [normalizeCollectionName(c.name), c.id!]));
+    const byName = new Map(existing.map((c) => [normalizeCollectionName(c.name), c.id!]));
     let nextOrder = existing.reduce((max, c) => Math.max(max, c.order + 1), 0);
 
     for (const raw of source as Collection[]) {
@@ -388,7 +392,7 @@ export class DatabaseService extends Dexie {
           name,
           color: typeof raw.color === 'string' ? raw.color : DEFAULT_COLLECTION_COLOR,
           order: nextOrder++,
-          createdAt: typeof raw.createdAt === 'number' ? raw.createdAt : Date.now()
+          createdAt: typeof raw.createdAt === 'number' ? raw.createdAt : Date.now(),
         } as Collection);
         byName.set(key, localId);
       }

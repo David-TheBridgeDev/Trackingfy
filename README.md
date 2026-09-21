@@ -9,6 +9,7 @@ There is no account and no server-side storage: every activity lives in the brow
 ## ✨ Features
 
 ### Tracking
+
 - **Pick the activity:** walking, running or cycling, chosen once in Settings and kept, so the tracking screen stays a map and a button. It is what every recording is filed as, what the history filters by, what the statistics split the kilometres by, and what the route editor uses to judge whether a hand-drawn stretch implies a plausible speed. A route recorded under the wrong one can be re-filed from its detail screen.
 - **Real-time tracking** for walking, running and cycling: duration, moving time, distance, pace, average/max speed, climb, descent, altitude and grade.
 - **Background tracking on Android** through a foreground service, so recording continues with the screen off. On the web, tracking uses the Geolocation API and needs the tab to stay open.
@@ -16,6 +17,7 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Follow a route:** load any past activity as a reference line on the live map.
 
 ### History & activity detail
+
 - **Collections:** file your routes under tabs you create yourself — trail, hiking, training, whatever you ride or walk. The tab bar shows how many routes each one holds, and collections can be renamed, recoloured, reordered and deleted (deleting one never deletes the routes in it: they go back to being ungrouped).
 - **Search** across route names, activity type, collection and date, ignoring case and accents; every word has to match, so `monte 2025` narrows the list.
 - **Filters:** activity type, plus sorting by date, name, distance, duration, climb or descent. Day separators appear while the list runs in date order.
@@ -25,9 +27,10 @@ There is no account and no server-side storage: every activity lives in the brow
 - Activity detail with the full track on the map and all the recorded stats, plus its name, its collection and its delete button in the header.
 - **Walk between routes like a gallery:** from a route's detail, swipe the header sideways — or use the arrows, or the left/right keys — to move to the next and previous route of the list you opened it from (that tab, that search, that sort). A bar above the stats says where you are in it (`3 of 48`) and what list it is. The map and the elevation chart keep their own horizontal gestures, and Back still returns to the history rather than retracing every route you walked.
 - **Change the activity:** the type chip next to the collection chip re-files a route that went in as the wrong activity, which puts its icon, the history's filter and the statistics right again.
-- **Route editing:** trace the opening stretch that was never recorded (e.g. you started the recording late). Trackingfy proposes a start time from your average pace, warns about unrealistic speeds, and fills in the terrain elevation of the added stretch. Edited activities are marked with an *Edited* badge.
+- **Route editing:** trace the opening stretch that was never recorded (e.g. you started the recording late). Trackingfy proposes a start time from your average pace, warns about unrealistic speeds, and fills in the terrain elevation of the added stretch. Edited activities are marked with an _Edited_ badge.
 
 ### Statistics
+
 - **A statistics screen** (`/stats`, reachable from the history's toolbar) that reads the same routes as a training record instead of a list.
 - **By week, by month or by year:** a bar chart of distance, time, climb or number of routes, one bar per period, with the empty periods kept in place so a gap in training is visible. Tapping a bar shows that period's routes, distance, moving time and climb, and how it compares with the period before it.
 - **Per collection:** every number obeys the collection tab on top, so a collection of hikes can be read without the rides flattening its chart.
@@ -35,6 +38,7 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Records:** longest route, most climb, longest time and fastest average, each one tap away from the route itself — which then walks the same selection with the gallery gesture.
 
 ### Sharing
+
 - **Share as image:** a composer that renders the route as a picture for social networks.
   - Formats: square (1:1), portrait (3:4) and story (9:16).
   - Dark or light style; solid or transparent (sticker-style PNG) background.
@@ -44,6 +48,7 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Import from other apps (Android):** open a shared route file with Trackingfy, or send it from another app's share sheet, and it lands straight in your history. Duplicates are detected and skipped.
 
 ### Data & settings
+
 - **Local-first storage** in IndexedDB via Dexie.js.
 - **Backup & restore:** export all your data — routes, points and collections — to a JSON file and import it back. Collections are matched by name on import, so restoring onto a device that already has them refills the tabs instead of duplicating them. The same import button also accepts a single shared route, which lands ungrouped.
 - **Offline capable:** the app shell is cached by the service worker, and map tiles you have viewed stay cached (up to 500 tiles, 30 days).
@@ -52,20 +57,22 @@ There is no account and no server-side storage: every activity lives in the brow
 - Spanish and English UI (auto-detected), light and dark themes, and the activity (walking, running or cycling) every recording is filed as.
 
 ### Interface
+
 - **Readable on the brand yellow:** everything drawn on the accent — tabs, chips, the record button, primary buttons — uses a dark ink rather than white, which takes it from roughly 1.8:1 contrast to about 9:1.
 - **Edge to edge:** the header, the dashboard's floating controls and the toast keep clear of notches and gesture bars through `env(safe-area-inset-*)`.
 - **Keyboard and screen readers:** Escape closes the confirmation and the naming dialog (as the Android back button already did), the dialogs carry their roles and labels, toasts are announced, and the icon-only buttons have names.
 - **Reduced motion** is honoured: the decorative animations stop, while spinners — the only ones that carry information — keep turning.
 
 ### 🔒 What leaves your device
+
 Everything runs locally, except for these requests:
 
-| When | Service | What is sent |
-|------|---------|--------------|
-| Viewing the map | [OpenStreetMap](https://www.openstreetmap.org/) tile servers | Requests for the map tiles on screen |
-| Saving a route edit | [Open-Meteo Elevation API](https://open-meteo.com/en/docs/elevation-api) (fallback: [Open-Elevation](https://open-elevation.com/)) | Coordinates of the hand-drawn stretch only |
-| Sharing an image with the map layer on | OpenStreetMap tile servers | Requests for the tiles covering the route |
-| Downloading the APK from Settings | GitHub API | Request for the latest release |
+| When                                   | Service                                                                                                                            | What is sent                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Viewing the map                        | [OpenStreetMap](https://www.openstreetmap.org/) tile servers                                                                       | Requests for the map tiles on screen       |
+| Saving a route edit                    | [Open-Meteo Elevation API](https://open-meteo.com/en/docs/elevation-api) (fallback: [Open-Elevation](https://open-elevation.com/)) | Coordinates of the hand-drawn stretch only |
+| Sharing an image with the map layer on | OpenStreetMap tile servers                                                                                                         | Requests for the tiles covering the route  |
+| Downloading the APK from Settings      | GitHub API                                                                                                                         | Request for the latest release             |
 
 The Settings page tells users about the elevation lookup and the share-image tile downloads, next to the backup section.
 
@@ -201,6 +208,7 @@ cover: cover-share
 date: 2026-09-15
 updated: 2026-09-15
 ---
+
 <p>Page content…</p>
 ```
 
@@ -242,14 +250,17 @@ on bundle sizes that change whenever the app grows.
 The Android build process is fully automated. You can build it locally for testing or use GitHub Actions for production releases.
 
 #### 🟢 Debug Build (Local Development & Testing)
+
 Generates an APK suitable for testing on your device without manual signing.
 
 ```bash
 npm run build:apk
 ```
+
 The script builds the web app, runs `npx cap sync android`, runs Gradle and copies the APK to `public/apk/app-debug.apk`. The `public/apk/` folder is excluded from the Firebase deploy.
 
 #### 🟠 Local Release Build
+
 Builds a signed release APK on your machine (copied to `public/apk/app-release.apk`). It needs the signing files described in the security note below.
 
 ```bash
@@ -257,6 +268,7 @@ npm run build:apk:release
 ```
 
 #### 🔵 Release Build (Production via GitHub Actions)
+
 The production APK is optimized, minified and signed in the cloud by GitHub Actions (`.github/workflows/release.yml`).
 
 To launch a new update, run the release script:
@@ -266,12 +278,14 @@ npm run release
 ```
 
 **What this command does:**
+
 1. Bumps the version number (e.g., `1.0.5` → `1.0.6`) in `package.json` and in `src/app/services/translation.ts` (the version shown in the app).
 2. Commits the changes and creates a Git tag (e.g., `v1.0.6`).
 3. Pushes the commit and the tag to GitHub.
 4. The tag triggers the release workflow, which compiles and signs the APK and publishes it as `Trackingfy-v<version>.apk` in the **Releases** tab, with auto-generated release notes.
 
-*(Optional)* You can specify the version bump type:
+_(Optional)_ You can specify the version bump type:
+
 1. `npm run release patch` (e.g., 1.0.x), the default
 2. `npm run release minor` (e.g., 1.x.0)
 3. `npm run release major` (e.g., x.0.0)
@@ -285,8 +299,8 @@ npm run release
 To regenerate the app icons and splash screens (`@capacitor/assets` is already a dev dependency):
 
 1. Place the source images in the `assets/` folder (recommended 1024x1024px for the icon and 2732x2732px for the splash):
-   * `assets/icon.png`
-   * `assets/splash.png` and `assets/splash-dark.png`
+   - `assets/icon.png`
+   - `assets/splash.png` and `assets/splash-dark.png`
 
 2. Run the generator:
    ```bash
@@ -318,7 +332,14 @@ Files exported with **Export route (JSON)** use a versioned envelope, separate f
     "startTime": 1789201800000
   },
   "coordinates": [
-    { "lat": 28.123456, "lng": -15.43211, "timestamp": 1789201800000, "altitude": 12, "speed": 0, "source": "gps" }
+    {
+      "lat": 28.123456,
+      "lng": -15.43211,
+      "timestamp": 1789201800000,
+      "altitude": 12,
+      "speed": 0,
+      "source": "gps"
+    }
   ]
 }
 ```
