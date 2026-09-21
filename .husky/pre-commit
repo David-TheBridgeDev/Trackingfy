@@ -1,0 +1,9 @@
+# Format what is about to be committed, and stage the result.
+#
+# lint-staged runs Prettier over the staged files only -- a second here rather than the
+# forty a whole-repository run costs -- and re-stages whatever it rewrote, so the commit
+# carries the formatted version. What is in the working tree but not staged is left alone.
+#
+# This is a convenience, not the guarantee: it is local, and `git commit --no-verify`
+# walks straight past it. The Format workflow is what actually holds the line.
+npx lint-staged

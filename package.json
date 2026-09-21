@@ -8,6 +8,7 @@
     "build:site": "node site/build.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:apk": "node build-apk.js",
@@ -15,6 +16,9 @@
     "release": "node release.js"
   },
   "private": true,
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
+  },
   "packageManager": "npm@11.12.1",
   "dependencies": {
     "@angular/common": "^21.2.0",
@@ -45,7 +49,9 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.3.4",
     "@tailwindcss/postcss": "^4.1.12",
+    "husky": "^9.1.7",
     "jsdom": "^28.0.0",
+    "lint-staged": "^17.5.1",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.12",
