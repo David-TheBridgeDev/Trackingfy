@@ -8,6 +8,8 @@
     "build:site": "node site/build.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build:apk": "node build-apk.js",
     "build:apk:release": "node build-apk.js --release",
     "release": "node release.js"
