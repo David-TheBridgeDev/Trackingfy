@@ -3,7 +3,7 @@
   <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closed.emit()"></div>
 
   <div
-    class="relative w-full sm:max-w-sm bg-bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100/20 max-h-[85dvh] flex flex-col animate-in slide-in-from-bottom duration-300"
+    class="relative w-full sm:max-w-sm bg-bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100/20 max-h-[85dvh] flex flex-col pb-safe sm:pb-0 animate-in slide-in-from-bottom duration-300"
   >
     <header class="p-5 pb-3 flex items-start justify-between gap-3 shrink-0">
       <div class="min-w-0">
@@ -98,7 +98,7 @@
     <footer class="p-3 border-t border-gray-100 shrink-0">
       <button
         (click)="createAndPick()"
-        class="w-full flex items-center justify-center gap-2 bg-accent text-pure-white py-3 rounded-2xl font-black uppercase text-xs tracking-wider shadow-lg shadow-accent/20 active:scale-95 transition-transform cursor-pointer"
+        class="w-full flex items-center justify-center gap-2 bg-accent text-on-accent py-3 rounded-2xl font-black uppercase text-xs tracking-wider shadow-lg shadow-accent/20 active:scale-95 transition-transform cursor-pointer"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -12,7 +12,7 @@
   </div>
 
   <!-- Top Overlay -->
-  <div class="absolute top-4 left-4 right-4 z-10 pointer-events-none">
+  <div class="absolute inset-top-safe left-4 right-4 z-10 pointer-events-none">
     <div class="max-w-4xl mx-auto flex flex-col items-center space-y-4">
       <div
         class="w-full flex items-center justify-between bg-white/95 backdrop-blur-xl rounded-full shadow-xl border border-white/60 pointer-events-auto p-1"
@@ -46,11 +46,29 @@
         <!-- Trackingfy Button -->
         <a
           routerLink="/settings"
-          class="flex-1 flex justify-center active:scale-95 active:opacity-70 transition-all group cursor-pointer"
+          [attr.aria-label]="ts.t('dashboard.settings')"
+          [title]="ts.t('dashboard.settings')"
+          class="flex-1 flex items-center justify-center gap-1.5 active:scale-95 active:opacity-70 transition-all cursor-pointer"
         >
           <h1 class="text-2xl font-black uppercase tracking-tighter text-accent transition-all">
             Trackingfy
           </h1>
+          <!-- The wordmark has always opened Settings; the cog is what says so. -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-text-primary shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
         </a>
 
         <!-- Separator -->
@@ -78,7 +96,7 @@
       <div class="mt-4 flex justify-center pointer-events-auto w-full">
         <button
           (click)="trackingService.clearReferenceRoute()"
-          class="bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-black uppercase text-[10px] tracking-wider shadow-lg flex items-center gap-2 transition-all active:scale-95"
+          class="bg-red-600/90 backdrop-blur-md text-pure-white px-4 py-2 rounded-full font-black uppercase text-[10px] tracking-wider shadow-lg flex items-center gap-2 transition-all active:scale-95"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -91,7 +109,7 @@
 
   <!-- Bottom Controls Overlay -->
   <div
-    class="absolute bottom-10 left-0 right-0 z-20 px-4 flex flex-col items-center pointer-events-none space-y-6"
+    class="absolute inset-bottom-safe left-0 right-0 z-20 px-4 flex flex-col items-center pointer-events-none space-y-6"
   >
     @if (trackingService.state() !== 'idle') {
       <div
@@ -155,7 +173,9 @@
 
       <button
         (click)="$event.stopPropagation(); toggleTracking()"
-        class="w-24 h-24 shrink-0 rounded-full bg-accent text-white shadow-[0_20px_50px_rgba(239,188,33,0.3)] flex items-center justify-center transition-all active:scale-90 focus:outline-none hover:scale-105 border-4 border-white"
+        [attr.aria-label]="recordLabel()"
+        [title]="recordLabel()"
+        class="w-24 h-24 shrink-0 rounded-full bg-accent text-on-accent shadow-[0_20px_50px_rgba(239,188,33,0.3)] flex items-center justify-center transition-all active:scale-90 hover:scale-105 border-4 border-white"
       >
         @if (trackingService.state() === 'idle') {
           <svg
@@ -231,7 +251,7 @@
         <button
           (click)="closeControlModal()"
           class="absolute top-4 right-4 text-text-primary hover:text-text-heading transition-colors p-2 cursor-pointer rounded-full hover:bg-bg-base active:scale-95"
-          aria-label="Cerrar"
+          [attr.aria-label]="ts.t('settings.close')"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -288,14 +308,14 @@
           } @else if (trackingService.state() === 'paused') {
             <button
               (click)="resumeActivity()"
-              class="w-full bg-accent hover:brightness-110 text-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-accent/20 transition-all active:scale-95 text-center cursor-pointer text-xs"
+              class="w-full bg-accent hover:brightness-110 text-on-accent py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-accent/20 transition-all active:scale-95 text-center cursor-pointer text-xs"
             >
               {{ ts.t('confirm.btn.resume') }}
             </button>
           }
           <button
             (click)="stopActivity()"
-            class="w-full bg-red-500 hover:bg-red-600 text-pure-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-red-500/30 transition-all active:scale-95 text-center cursor-pointer text-xs"
+            class="w-full bg-red-600 hover:bg-red-700 text-pure-white py-4 rounded-2xl font-black uppercase tracking-wider shadow-lg shadow-red-600/30 transition-all active:scale-95 text-center cursor-pointer text-xs"
           >
             {{ ts.t('confirm.btn.stop') }}
           </button>

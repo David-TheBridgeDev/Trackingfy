@@ -5,6 +5,15 @@
 @theme {
   --color-accent: #efbc21;
   --color-accent-hover: #d4a71d;
+  /*
+   * The ink that goes on top of the accent.
+   *
+   * White on #efbc21 is a 1.8:1 contrast ratio -- every tab, chip and primary button in
+   * the app was being read against a background that is nearly as bright as the text.
+   * A warm near-black takes the same surfaces to about 9:1, and reads as deliberate on a
+   * high-visibility yellow rather than washed out.
+   */
+  --color-on-accent: #241c00;
   --color-bg-base: var(--theme-bg-base);
   --color-bg-surface: var(--theme-bg-surface);
   --color-text-primary: var(--theme-text-primary);
@@ -32,6 +41,7 @@
   --color-gray-50: #1a1a1a;
   --color-gray-100: #2a2a2a;
   --color-gray-200: #333333;
+  --color-gray-300: #3f3f46;
 }
 
 @layer base {
@@ -47,6 +57,45 @@
   h1, h2, h3, h4, h5, h6 {
     @apply text-text-heading font-bold;
   }
+
+  /* A visible focus ring for keyboard users, on a UI built almost entirely of buttons. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /*
+   * Room for the notch and the gesture bar.
+   *
+   * The app runs edge to edge (`viewport-fit=cover`) as an installed PWA and inside the
+   * Capacitor shell, so the chrome has to keep itself out from under the system's own
+   * furniture; `env()` is 0 everywhere else, which leaves the browser untouched.
+   */
+
+  /* The header, which replaces its own `p-4` top with the same padding plus the notch. */
+  .pt-safe {
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+  }
+
+  /* Scrolling screens, so the last card clears the gesture bar. */
+  .pb-safe {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* The dashboard's overlays, which float over a map that runs edge to edge. */
+  .inset-top-safe {
+    top: calc(1rem + env(safe-area-inset-top, 0px));
+  }
+
+  .inset-bottom-safe {
+    bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .toast-bottom-safe {
+    bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .leaflet-container {
@@ -58,4 +107,22 @@ app-root {
     display: block;
     height: 100%;
     width: 100%;
+}
+
+/*
+ * Honour "reduce motion".
+ *
+ * Everything here is decoration -- cards sliding in, the onboarding gear turning, the
+ * pulse on the locate button. Spinners are left alone on purpose: they are the only
+ * animation that carries information, and freezing one makes a slow save look hung.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *:not(.animate-spin)::before,
+  *:not(.animate-spin)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

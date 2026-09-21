@@ -4,6 +4,12 @@ import { UIService } from '../../services/ui';
 import { TranslationService } from '../../services/translation';
 import { TrackingService } from '../../services/tracking';
 import { DatabaseService } from '../../services/database';
+import {
+  ACTIVITY_TYPES,
+  ActivityType,
+  ActivityTypeService,
+  activityTypeIcon,
+} from '../../services/activity-types';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -20,7 +26,18 @@ export class SettingsComponent implements OnInit {
   public ts = inject(TranslationService);
   public trackingService = inject(TrackingService);
   public db = inject(DatabaseService);
+  public activityTypes = inject(ActivityTypeService);
   private appComponent = inject(App);
+
+  readonly types = ACTIVITY_TYPES;
+
+  typeLabel(type: ActivityType): string {
+    return this.ts.t(`activity.${type}`);
+  }
+
+  typeIcon(type: ActivityType): string {
+    return activityTypeIcon(type);
+  }
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -58,7 +75,10 @@ export class SettingsComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       }
     } catch (error) {
+      // A failed export used to reach only the console, so someone who tapped Export and
+      // saw nothing happen had no way to tell a broken backup from a finished one.
       console.error('Export error:', error);
+      this.appComponent.triggerToast(this.ts.t('settings.backup.export_error'));
     }
   }
 

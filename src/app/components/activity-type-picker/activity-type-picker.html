@@ -1,0 +1,82 @@
+<div class="fixed inset-0 z-[90000] flex items-end sm:items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closed.emit()"></div>
+
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="activity-type-picker-title"
+    class="relative w-full sm:max-w-sm bg-bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100/20 max-h-[85dvh] flex flex-col pb-safe sm:pb-0 animate-in slide-in-from-bottom duration-300"
+  >
+    <header class="p-5 pb-3 flex items-start justify-between gap-3 shrink-0">
+      <div class="min-w-0">
+        <h3
+          id="activity-type-picker-title"
+          class="text-lg font-black uppercase tracking-tight text-text-heading truncate"
+        >
+          {{ ts.t('detail.type.title') }}
+        </h3>
+        <p class="text-[10px] font-bold uppercase tracking-wider text-text-primary truncate">
+          {{ ts.t('detail.type.subtitle') }}
+        </p>
+      </div>
+      <button
+        (click)="closed.emit()"
+        class="shrink-0 text-text-primary p-1 -m-1 active:scale-90 transition-transform cursor-pointer"
+        [attr.aria-label]="ts.t('confirm.btn.cancel')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2.5"
+          stroke="currentColor"
+          class="w-5 h-5"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="overflow-y-auto px-3 pb-3 space-y-1 flex-1">
+      @for (type of types; track type) {
+        <button
+          (click)="picked.emit(type)"
+          class="w-full flex items-center gap-3 p-3 rounded-2xl transition-colors active:bg-bg-base text-left cursor-pointer"
+          [class.bg-bg-base]="current() === type"
+        >
+          <span
+            class="h-6 w-6 shrink-0 bg-accent"
+            [style.mask-image]="'url(' + icon(type) + ')'"
+            [style.-webkit-mask-image]="'url(' + icon(type) + ')'"
+            style="
+              mask-size: contain;
+              mask-repeat: no-repeat;
+              mask-position: center;
+              -webkit-mask-size: contain;
+              -webkit-mask-repeat: no-repeat;
+              -webkit-mask-position: center;
+            "
+          ></span>
+          <span class="flex-1 min-w-0 font-bold text-text-heading text-sm truncate">
+            {{ label(type) }}
+          </span>
+          @if (current() === type) {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-accent shrink-0"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>

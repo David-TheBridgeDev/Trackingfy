@@ -9,6 +9,7 @@ There is no account and no server-side storage: every activity lives in the brow
 ## ✨ Features
 
 ### Tracking
+- **Pick the activity:** walking, running or cycling, chosen once in Settings and kept, so the tracking screen stays a map and a button. It is what every recording is filed as, what the history filters by, what the statistics split the kilometres by, and what the route editor uses to judge whether a hand-drawn stretch implies a plausible speed. A route recorded under the wrong one can be re-filed from its detail screen.
 - **Real-time tracking** for walking, running and cycling: duration, moving time, distance, pace, average/max speed, climb, descent, altitude and grade.
 - **Background tracking on Android** through a foreground service, so recording continues with the screen off. On the web, tracking uses the Geolocation API and needs the tab to stay open.
 - **Interactive recording notification (Android):** live distance, climb and elapsed time, with **Pause / Resume / Finish** buttons. On Android 16 it is promoted to a status bar chip and the lock screen (Live Updates).
@@ -23,6 +24,7 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Deleting is undoable:** the toast that confirms a deletion offers to put the routes and their points back, from the history and from the detail screen alike.
 - Activity detail with the full track on the map and all the recorded stats, plus its name, its collection and its delete button in the header.
 - **Walk between routes like a gallery:** from a route's detail, swipe the header sideways — or use the arrows, or the left/right keys — to move to the next and previous route of the list you opened it from (that tab, that search, that sort). A bar above the stats says where you are in it (`3 of 48`) and what list it is. The map and the elevation chart keep their own horizontal gestures, and Back still returns to the history rather than retracing every route you walked.
+- **Change the activity:** the type chip next to the collection chip re-files a route that went in as the wrong activity, which puts its icon, the history's filter and the statistics right again.
 - **Route editing:** trace the opening stretch that was never recorded (e.g. you started the recording late). Trackingfy proposes a start time from your average pace, warns about unrealistic speeds, and fills in the terrain elevation of the added stretch. Edited activities are marked with an *Edited* badge.
 
 ### Statistics
@@ -47,7 +49,13 @@ There is no account and no server-side storage: every activity lives in the brow
 - **Offline capable:** the app shell is cached by the service worker, and map tiles you have viewed stay cached (up to 500 tiles, 30 days).
 - **Installable PWA** on mobile and desktop.
 - **Direct APK download** from the Settings page, which fetches the latest release from GitHub.
-- Spanish and English UI (auto-detected), light and dark themes, and a default activity type.
+- Spanish and English UI (auto-detected), light and dark themes, and the activity (walking, running or cycling) every recording is filed as.
+
+### Interface
+- **Readable on the brand yellow:** everything drawn on the accent — tabs, chips, the record button, primary buttons — uses a dark ink rather than white, which takes it from roughly 1.8:1 contrast to about 9:1.
+- **Edge to edge:** the header, the dashboard's floating controls and the toast keep clear of notches and gesture bars through `env(safe-area-inset-*)`.
+- **Keyboard and screen readers:** Escape closes the confirmation and the naming dialog (as the Android back button already did), the dialogs carry their roles and labels, toasts are announced, and the icon-only buttons have names.
+- **Reduced motion** is honoured: the decorative animations stop, while spinners — the only ones that carry information — keep turning.
 
 ### 🔒 What leaves your device
 Everything runs locally, except for these requests:
@@ -83,6 +91,7 @@ src/app/
 │   ├── history/           # Route list: collections, search, filters, bulk actions
 │   ├── stats/             # Statistics screen: periods, totals, breakdowns, records
 │   ├── collection-picker/ # Sheet that files routes under a collection
+│   ├── activity-type-picker/ # Sheet that re-files a route as another activity
 │   ├── activity-detail/   # Activity view, route editor, export and follow
 │   ├── share-composer/    # Share-as-image composer UI
 │   └── settings/          # Preferences, backup/restore, APK download
@@ -90,6 +99,7 @@ src/app/
     ├── tracking.ts               # Recording engine (GPS stream, pause/resume, live stats)
     ├── tracking-notification.ts  # Bridge to the Android recording notification
     ├── database.ts               # Dexie schema, backup export/import, route import
+    ├── activity-types.ts         # Walking/Running/Cycling: the list, the icons and the chosen one
     ├── collections.ts            # The history's collections, shared by the screens that use them
     ├── statistics.ts             # Aggregates routes into periods, totals, breakdowns and records
     ├── route-navigation.ts       # The list a route was opened from, walked by the detail view

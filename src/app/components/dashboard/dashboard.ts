@@ -23,6 +23,13 @@ export class DashboardComponent implements OnInit {
     public ts: TranslationService,
   ) {}
 
+  /** What the record button does next, said out loud for screen readers. */
+  recordLabel = computed(() =>
+    this.trackingService.state() === 'idle'
+      ? this.ts.t('dashboard.start')
+      : this.ts.t('dashboard.controls'),
+  );
+
   ngOnInit() {
     this.uiService.setFullScreen(true);
     this.uiService.historyScrollTop = 0;

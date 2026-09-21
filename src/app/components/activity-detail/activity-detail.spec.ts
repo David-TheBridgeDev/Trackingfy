@@ -56,6 +56,7 @@ describe('ActivityDetailComponent', () => {
     getCollections: vi.fn(),
     getActivities: vi.fn(),
     deleteActivity: vi.fn(),
+    updateActivity: vi.fn(),
   };
 
   /** Stand in for the router: the stub route is what actually swaps the id. */
@@ -80,6 +81,7 @@ describe('ActivityDetailComponent', () => {
     mockDatabaseService.getCollections.mockResolvedValue([]);
     mockDatabaseService.getActivities.mockResolvedValue([makeActivity(1), makeActivity(2)]);
     mockDatabaseService.deleteActivity.mockResolvedValue(undefined);
+    mockDatabaseService.updateActivity.mockResolvedValue(1);
 
     paramMap = new BehaviorSubject(convertToParamMap({ id: '2' }));
 
@@ -293,6 +295,24 @@ describe('ActivityDetailComponent', () => {
     expect(component.activity()).toBeNull();
     expect(component.coordinates()).toEqual([]);
     expect(component.chartPoints()).toEqual([]);
+  });
+
+  it('should re-file a route recorded under the wrong activity', async () => {
+    component.isChoosingType.set(true);
+
+    await component.changeType('Walking');
+
+    expect(mockDatabaseService.updateActivity).toHaveBeenCalledWith(2, { type: 'Walking' });
+    expect(component.activity()?.type).toBe('Walking');
+    expect(component.typeLabel()).toBe('Walking');
+    expect(component.typeIcon()).toContain('walking');
+    expect(component.isChoosingType()).toBe(false);
+  });
+
+  it('should not write to the database when the activity is already that one', async () => {
+    await component.changeType('Cycling');
+
+    expect(mockDatabaseService.updateActivity).not.toHaveBeenCalled();
   });
 
   it('should take a deleted route out of the gallery', async () => {
