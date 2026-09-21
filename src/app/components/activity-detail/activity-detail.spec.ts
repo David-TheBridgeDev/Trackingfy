@@ -324,4 +324,54 @@ describe('ActivityDetailComponent', () => {
     expect(mockDatabaseService.deleteActivity).toHaveBeenCalledWith(2);
     expect(navigation.sequence()).toEqual([1, 3]);
   });
+
+  describe('the map actions sheet', () => {
+    it('should open and close', () => {
+      expect(component.isChoosingAction()).toBe(false);
+
+      component.openActions();
+      expect(component.isChoosingAction()).toBe(true);
+
+      component.closeActions();
+      expect(component.isChoosingAction()).toBe(false);
+    });
+
+    it('should close when an action takes over the screen', () => {
+      component.openActions();
+      component.startEdit();
+
+      // The editor owns the map from here, so the sheet must not stay on top of it.
+      expect(component.isChoosingAction()).toBe(false);
+      expect(component.isEditing()).toBe(true);
+    });
+
+    it('should close itself once the export has finished', async () => {
+      component.openActions();
+
+      // The export is the one action that does not hand the screen to something else:
+      // the sheet carries its spinner, so it closes at the end rather than on the tap,
+      // and it must not be left open afterwards.
+      await component.exportRoute();
+
+      expect(component.isExportingRoute()).toBe(false);
+      expect(component.isChoosingAction()).toBe(false);
+    });
+
+    it('should not let an arrow key walk to another route behind it', async () => {
+      component.openActions();
+
+      component.onKeydown({ key: 'ArrowRight', target: null } as unknown as KeyboardEvent);
+      await fixture.whenStable();
+
+      expect(component.activity()?.id).toBe(2);
+    });
+
+    it('should not follow a route change', async () => {
+      component.openActions();
+
+      await goTo(3);
+
+      expect(component.isChoosingAction()).toBe(false);
+    });
+  });
 });

@@ -74,6 +74,8 @@ export class ActivityDetailComponent implements OnInit {
   isExportingRoute = signal(false);
   isChoosingCollection = signal(false);
   isChoosingType = signal(false);
+  /** The map's actions, gathered behind one button so they cannot crowd the route. */
+  isChoosingAction = signal(false);
 
   svgViewBox = signal<string>('0 0 100 100');
   svgPath = signal<string>('');
@@ -220,6 +222,7 @@ export class ActivityDetailComponent implements OnInit {
     this.hoveredCoordinate.set(null);
     this.isSharingImage.set(false);
     this.isChoosingCollection.set(false);
+    this.isChoosingAction.set(false);
     this.isExportingRoute.set(false);
   }
 
@@ -355,6 +358,7 @@ export class ActivityDetailComponent implements OnInit {
   onKeydown(event: KeyboardEvent) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     if (this.isEditing() || this.isSharingImage() || this.isChoosingCollection()) return;
+    if (this.isChoosingAction()) return;
     if (this.uiService.promptRequest() || this.uiService.confirmation()) return;
 
     const target = event.target as HTMLElement | null;
@@ -756,12 +760,15 @@ export class ActivityDetailComponent implements OnInit {
       this.appComponent.triggerToast(this.ts.t('detail.export.error'));
     } finally {
       this.isExportingRoute.set(false);
+      this.closeActions();
     }
   }
 
   // --- Route editing -------------------------------------------------------
 
   startEdit() {
+    this.closeActions();
+
     const manual = this.segments().manual;
 
     this.isEditing.set(true);
@@ -901,9 +908,20 @@ export class ActivityDetailComponent implements OnInit {
     }
   }
 
+  // --- Map actions ---------------------------------------------------------
+
+  openActions() {
+    this.isChoosingAction.set(true);
+  }
+
+  closeActions() {
+    this.isChoosingAction.set(false);
+  }
+
   /** Open the composer, where the picture is built before it is shared. */
   openShareComposer() {
     if (this.coordinates().length === 0) return;
+    this.closeActions();
     this.isSharingImage.set(true);
   }
 
@@ -919,6 +937,7 @@ export class ActivityDetailComponent implements OnInit {
     const act = this.activity();
     const coords = this.coordinates();
     if (act && act.id && coords.length > 0) {
+      this.closeActions();
       this.trackingService.loadReferenceRoute(coords, act.id);
       this.router.navigate(['/']);
     }
