@@ -16,7 +16,6 @@ import { TranslationService } from '../../services/translation';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './activity-type-picker.html',
-  styleUrl: './activity-type-picker.css',
 })
 export class ActivityTypePickerComponent {
   public ts = inject(TranslationService);

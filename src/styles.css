@@ -98,6 +98,82 @@
   }
 }
 
+/*
+ * Entrance animations.
+ *
+ * The templates were written against `tailwindcss-animate`, a plugin that is not a
+ * dependency of this project and never has been. Tailwind emits nothing for a class it
+ * does not know and reports no error, so `animate-in fade-in slide-in-from-bottom-5` on
+ * the toast, the onboarding modal and the dashboard's overlays was a string of words that
+ * did nothing at all. Three components had already noticed and written their own copy of
+ * the keyframes; these are those definitions, kept once, for everyone.
+ *
+ * One keyframe covers all of them. Each modifier only sets a custom property, so the
+ * combinations the templates already ask for -- a modal that zooms and rises at the same
+ * time -- compose instead of overwriting each other, which separate keyframes could not
+ * do. Distances follow the spacing scale the class names name (4 = 1rem), and the bare
+ * `slide-in-from-bottom` keeps the 1rem the pickers have always used rather than the full
+ * sheet height the plugin would have given it.
+ *
+ * Reduced motion is already handled at the foot of this file, which is why nothing here
+ * repeats the media query.
+ */
+@layer utilities {
+  .animate-in {
+    animation-name: enter;
+    /* `duration-*` sets --tw-duration for transitions; here it drives the animation too,
+       so the durations spelled out in the templates finally mean something. */
+    animation-duration: var(--tw-duration, 0.3s);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    --enter-opacity: 0;
+  }
+
+  .zoom-in-95 {
+    --enter-scale: 0.95;
+  }
+
+  .slide-in-from-bottom {
+    --enter-translate-y: 1rem;
+  }
+
+  .slide-in-from-bottom-4 {
+    --enter-translate-y: 1rem;
+  }
+
+  .slide-in-from-bottom-5 {
+    --enter-translate-y: 1.25rem;
+  }
+
+  .slide-in-from-bottom-10 {
+    --enter-translate-y: 2.5rem;
+  }
+
+  .slide-in-from-top {
+    --enter-translate-y: -100%;
+  }
+}
+
+/*
+ * Only the starting state is written out: the end of the animation is whatever the
+ * element's own styles say, which `animation-fill-mode: both` then leaves in place.
+ *
+ * The movement goes through `transform` on purpose. Tailwind v4 puts its own translate
+ * and scale utilities on the separate `translate` and `scale` properties, so a toast that
+ * is centred with `-translate-x-1/2` keeps its centring while this animation runs; a
+ * keyframe that set `translate` instead would throw it half a width to the right.
+ */
+@keyframes enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    transform: translate3d(0, var(--enter-translate-y, 0), 0)
+      scale3d(var(--enter-scale, 1), var(--enter-scale, 1), 1);
+  }
+}
+
 .leaflet-container {
     font-family: inherit !important;
 }

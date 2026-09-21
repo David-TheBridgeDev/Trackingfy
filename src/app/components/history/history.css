@@ -1,24 +1,3 @@
-.animate-in {
-  animation-duration: 0.3s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  animation-fill-mode: both;
-}
-
-.slide-in-from-top {
-  animation-name: slide-in-from-top;
-}
-
-@keyframes slide-in-from-top {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 /* The tab strip scrolls sideways; a scrollbar across it would eat the row's height. */
 .no-scrollbar {
   scrollbar-width: none;

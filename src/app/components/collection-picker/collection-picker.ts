@@ -16,7 +16,6 @@ import { UIService } from '../../services/ui';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './collection-picker.html',
-  styleUrl: './collection-picker.css',
 })
 export class CollectionPickerComponent {
   private collectionsService = inject(CollectionsService);
