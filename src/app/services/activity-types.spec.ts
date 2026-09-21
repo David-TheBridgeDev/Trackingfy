@@ -43,9 +43,16 @@ describe('activity types', () => {
     });
   });
 
+  // Asserted as the literal rather than against the constant: comparing the constant
+  // with itself would pass whatever it was changed to, and this is the value a fresh
+  // install records -- the one every route carried before the type could be chosen.
+  it('defaults to cycling', () => {
+    expect(DEFAULT_ACTIVITY_TYPE).toBe('Cycling');
+  });
+
   describe('ActivityTypeService', () => {
-    it('starts on the default when nothing has been chosen', () => {
-      expect(TestBed.inject(ActivityTypeService).current()).toBe(DEFAULT_ACTIVITY_TYPE);
+    it('starts on cycling when nothing has been chosen', () => {
+      expect(TestBed.inject(ActivityTypeService).current()).toBe('Cycling');
     });
 
     it('remembers the choice across a restart', () => {
