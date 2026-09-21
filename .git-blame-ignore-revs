@@ -1,0 +1,10 @@
+# Commits that only moved whitespace around, and that `git blame` should look past.
+#
+# GitHub reads this file on its own. Locally it has to be pointed at once, per clone:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Only ever add a commit here that changed formatting and nothing else.
+
+# style: apply Prettier across the code it is configured for
+653a148195aca6b22ed282d5503216dc8efc82e5

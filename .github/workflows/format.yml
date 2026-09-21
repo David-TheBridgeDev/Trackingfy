@@ -1,0 +1,32 @@
+name: Format
+
+# The point of this check is that nobody has to remember to run the formatter. It is the
+# only thing standing between the repository and the state it spent a year in: Prettier
+# installed and configured, and never run.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reports what is out of shape without touching it. `npm run format` fixes it.
+      - name: Check formatting
+        run: npm run format:check
