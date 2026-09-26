@@ -7,7 +7,7 @@ export type Lang = 'en' | 'es';
 })
 export class TranslationService {
   currentLang = signal<Lang>('es');
-  version = '1.0.5';
+  version = '1.0.6';
 
   private translations: Record<Lang, Record<string, string>> = {
     es: {
