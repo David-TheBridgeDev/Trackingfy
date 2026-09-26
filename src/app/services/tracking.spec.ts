@@ -15,6 +15,8 @@ describe('TrackingService', () => {
   let actionHandler: ((action: any) => void) | null;
   /** Every activity handed to the database, so a recording's stored shape is testable. */
   let savedActivities: any[];
+  let savedCoordinates: any[];
+  let activityUpdates: any[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,8 +44,14 @@ describe('TrackingService', () => {
               savedActivities.push(activity);
               return Promise.resolve(1);
             },
-            addCoordinate: () => Promise.resolve(1),
-            updateActivity: () => Promise.resolve(1),
+            addCoordinate: (coordinate: any) => {
+              savedCoordinates.push(coordinate);
+              return Promise.resolve(1);
+            },
+            updateActivity: (_id: number, changes: any) => {
+              activityUpdates.push(changes);
+              return Promise.resolve(1);
+            },
           },
         },
       ],
@@ -51,6 +59,8 @@ describe('TrackingService', () => {
     notificationUpdates = [];
     actionHandler = null;
     savedActivities = [];
+    savedCoordinates = [];
+    activityUpdates = [];
     localStorage.clear();
     service = TestBed.inject(TrackingService);
     ts = TestBed.inject(TranslationService);
@@ -60,22 +70,97 @@ describe('TrackingService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should calculate distance correctly (Haversine)', () => {
-    // Madrid to Barcelona (approx 504km)
-    const madrid = { lat: 40.4168, lng: -3.7038 };
-    const barcelona = { lat: 41.3851, lng: 2.1734 };
+  /** A fix `meters` north of a fixed origin, `seconds` into the recording. */
+  function fix(
+    meters: number,
+    seconds: number,
+    extra: Partial<GeolocationCoordinates> = {},
+  ): GeolocationPosition {
+    return {
+      coords: {
+        latitude: 40 + meters / 111_195,
+        longitude: -3.7,
+        altitude: 650,
+        speed: 2,
+        accuracy: 5,
+        altitudeAccuracy: 6,
+        heading: 0,
+        ...extra,
+      },
+      timestamp: 1_700_000_000_000 + seconds * 1000,
+    } as GeolocationPosition;
+  }
 
-    // Using any to access private method for testing
-    const distance = (service as any).calculateDistance(
-      madrid.lat,
-      madrid.lng,
-      barcelona.lat,
-      barcelona.lng,
+  function startRecordingInPlace() {
+    // Bypasses startGeolocation, which has no GPS to talk to in the test environment.
+    service.state.set('tracking');
+    (service as any).currentActivityId = 1;
+  }
+
+  it('stores what the receiver said about each fix, and leaves out the fixes it refuses', () => {
+    startRecordingInPlace();
+
+    (service as any).handlePosition(fix(0, 0));
+    (service as any).handlePosition(fix(2, 1, { accuracy: 80 }));
+    (service as any).handlePosition(fix(4, 2));
+
+    expect(savedCoordinates).toHaveLength(2);
+    expect(savedCoordinates[1]).toEqual(
+      expect.objectContaining({ accuracy: 5, altitudeAccuracy: 6, speed: 2, segment: 0 }),
     );
+  });
 
-    // Distance should be approx 504,000 meters
-    expect(distance).toBeGreaterThan(500000);
-    expect(distance).toBeLessThan(510000);
+  it('measures nothing across a pause', () => {
+    startRecordingInPlace();
+    for (let s = 0; s <= 10; s++) (service as any).handlePosition(fix(s * 2, s));
+
+    service.pauseTracking();
+    // Driven a kilometer while paused: shown on the map, never measured.
+    (service as any).handlePosition(fix(1000, 300));
+    expect(service.lastCoordinate()?.lat).toBeCloseTo(40 + 1000 / 111_195, 6);
+    service.resumeTracking();
+
+    for (let s = 0; s <= 10; s++) (service as any).handlePosition(fix(1000 + s * 2, 600 + s));
+
+    expect(service.currentDistance()).toBeLessThan(45);
+    expect(savedCoordinates.at(-1).segment).toBe(1);
+  });
+
+  it('saves the recording from the same numbers it showed', async () => {
+    startRecordingInPlace();
+    for (let s = 0; s <= 60; s++) (service as any).handlePosition(fix(s * 2, s));
+    (service as any).accumulatedTime = 61;
+
+    await service.stopTracking();
+
+    const saved = activityUpdates.at(-1);
+    expect(saved.totalDistance).toBeCloseTo(120, 0);
+    expect(saved.movingTime).toBeLessThanOrEqual(saved.totalTime);
+    expect(saved.avgSpeed).toBeCloseTo(saved.totalDistance / saved.movingTime, 6);
+  });
+
+  it('leaves the map alone while the app is in the background, and catches it up after', () => {
+    const setVisibility = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state });
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+
+    try {
+      startRecordingInPlace();
+      setVisibility('hidden');
+      for (let s = 0; s <= 20; s++) (service as any).handlePosition(fix(s * 2, s));
+
+      // Measured and stored all along, but nothing drawn.
+      expect(service.currentDistance()).toBeGreaterThan(35);
+      expect(savedCoordinates).toHaveLength(21);
+      expect(service.currentCoordinates()).toHaveLength(0);
+
+      setVisibility('visible');
+      expect(service.currentCoordinates()).toHaveLength(21);
+      expect(service.lastCoordinate()?.lat).toBeCloseTo(40 + 40 / 111_195, 6);
+    } finally {
+      delete (document as any).visibilityState;
+    }
   });
 
   it('should filter out altitude changes when there is no horizontal movement', async () => {
@@ -120,44 +205,26 @@ describe('TrackingService', () => {
   });
 
   it('should filter out minor altitude changes (noise) and accumulate real climb correctly', async () => {
-    // Manually set state to bypass startGeolocation geolocation failures in test environment
-    service.state.set('tracking');
-    (service as any).currentActivityId = 1;
+    startRecordingInPlace();
 
-    // Position 1: start at (40.0, 3.0), altitude 100
-    const pos1 = {
-      coords: { latitude: 40.0, longitude: 3.0, altitude: 100, speed: 1 },
-      timestamp: Date.now(),
-    } as GeolocationPosition;
-    (service as any).handlePosition(pos1);
-
-    // Position 2: small horizontal move (dist > 2m), small altitude fluctuation (100.5m)
-    // Since diff (0.5m) is below 2.0m threshold, it should not accumulate climb
-    const pos2 = {
-      coords: { latitude: 40.0001, longitude: 3.0001, altitude: 100.5, speed: 1 },
-      timestamp: Date.now() + 1000,
-    } as GeolocationPosition;
-    (service as any).handlePosition(pos2);
-
+    // A minute on the flat with the altitude wobbling a meter either side: no climb.
+    for (let s = 0; s < 60; s++) {
+      (service as any).handlePosition(
+        fix(s * 3, s, { speed: 3, altitude: 100 + (s % 2 ? 1 : -1) }),
+      );
+    }
     expect(service.currentClimb()).toBe(0);
 
-    // Position 3+: significant climb (altitude goes to 115m)
-    // We send multiple coordinates to allow the Exponential Moving Average (EMA) to smooth up to the target altitude
-    for (let i = 0; i < 15; i++) {
-      const posClimb = {
-        coords: {
-          latitude: 40.0002 + i * 0.0001,
-          longitude: 3.0002 + i * 0.0001,
-          altitude: 115,
-          speed: 1,
-        },
-        timestamp: Date.now() + 2000 + i * 1000,
-      } as GeolocationPosition;
-      (service as any).handlePosition(posClimb);
+    // Then five minutes up a 10% ramp: 90 m of real climbing.
+    for (let s = 60; s < 360; s++) {
+      const along = s * 3;
+      (service as any).handlePosition(
+        fix(along, s, { speed: 3, altitude: 100 + (along - 180) * 0.1 }),
+      );
     }
 
-    // Climb should be accumulated since the total change (from 100m to 115m smoothed) is well above the 2.0m threshold
-    expect(service.currentClimb()).toBeGreaterThan(10);
+    expect(service.currentClimb()).toBeGreaterThan(80);
+    expect(service.currentClimb()).toBeLessThanOrEqual(90);
     expect(service.currentDescent()).toBe(0);
   });
 

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import type { Activity, Coordinate } from './database';
-import { haversine } from './route-stats';
+import { altitudeProfile, haversine } from './route-stats';
 import { TranslationService } from './translation';
 
 /**
@@ -296,46 +296,48 @@ export function tileGrid(proj: Projection, canvasW: number, canvasH: number): Ti
 // --- Elevation -----------------------------------------------------------
 
 /**
- * Altitude for every fix, with missing readings filled from their nearest neighbours.
+ * A series with its missing values filled from their nearest neighbours.
  *
  * GPS drops altitude far more often than position, and a gap left at zero would draw a
  * cliff through the middle of the profile.
  */
-export function fillAltitudeGaps(coords: Coordinate[]): number[] {
-  const filled: number[] = [];
+export function fillGaps(values: (number | null | undefined)[]): number[] {
+  const known = (v: number | null | undefined): v is number => v !== null && v !== undefined;
 
-  for (let i = 0; i < coords.length; i++) {
-    const alt = coords[i].altitude;
-    if (alt !== null && alt !== undefined) {
-      filled.push(alt);
+  // The nearest known value to the right of every index, found in one pass backwards.
+  const right: (number | null)[] = new Array(values.length).fill(null);
+  let next: number | null = null;
+  for (let i = values.length - 1; i >= 0; i--) {
+    const v = values[i];
+    if (known(v)) next = v;
+    right[i] = next;
+  }
+
+  const filled: number[] = [];
+  let left: number | null = null;
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (known(v)) {
+      filled.push(v);
+      left = v;
       continue;
     }
 
-    let left: number | null = null;
-    for (let j = i - 1; j >= 0; j--) {
-      const candidate = coords[j].altitude;
-      if (candidate !== null && candidate !== undefined) {
-        left = candidate;
-        break;
-      }
-    }
-
-    let right: number | null = null;
-    for (let j = i + 1; j < coords.length; j++) {
-      const candidate = coords[j].altitude;
-      if (candidate !== null && candidate !== undefined) {
-        right = candidate;
-        break;
-      }
-    }
-
-    if (left !== null && right !== null) filled.push((left + right) / 2);
-    else if (left !== null) filled.push(left);
-    else if (right !== null) filled.push(right);
-    else filled.push(0);
+    const r = right[i];
+    if (left !== null && r !== null) filled.push((left + r) / 2);
+    else filled.push(left ?? r ?? 0);
   }
 
   return filled;
+}
+
+/**
+ * The altitude to draw at every fix: filtered as the route's climb was, taken from the
+ * barometer where the route has one, smoothed and with its gaps filled. Raw GPS altitude
+ * draws as a saw along the whole profile.
+ */
+export function profileAltitudes(coords: Coordinate[]): number[] {
+  return fillGaps(altitudeProfile(coords));
 }
 
 export interface ElevationPoint {
@@ -347,7 +349,7 @@ export interface ElevationPoint {
 export function elevationSeries(coords: Coordinate[]): ElevationPoint[] {
   if (coords.length === 0) return [];
 
-  const altitudes = fillAltitudeGaps(coords);
+  const altitudes = profileAltitudes(coords);
   const points: ElevationPoint[] = [];
   let distance = 0;
 

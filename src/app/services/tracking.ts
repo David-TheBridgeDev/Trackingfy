@@ -8,6 +8,8 @@ import {
   type TrackingNotificationAction,
 } from './tracking-notification';
 import { ActivityTypeService } from './activity-types';
+import { ActivityMetrics } from './activity-metrics';
+import { AltimeterService } from './altimeter';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
@@ -27,6 +29,10 @@ function formatElapsed(seconds: number): string {
   return [h, m, s].map((v) => (v < 10 ? '0' + v : v)).join(':');
 }
 
+function finiteOrNull(value: number | null | undefined): number | null {
+  return typeof value === 'number' && isFinite(value) ? value : null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,6 +40,10 @@ export class TrackingService {
   private watchId: number | string | null = null;
   private currentActivityId: number | null = null;
   private startTimeSegment: number | null = null;
+  /**
+   * Seconds recorded in the segments a pause has already closed. Fractional: rounding
+   * each segment down lost up to a second per pause.
+   */
   private accumulatedTime: number = 0;
 
   state = signal<TrackingState>('idle');
@@ -60,11 +70,16 @@ export class TrackingService {
   minGrade = signal(0); // in % (steepest descent)
   splits = signal<Split[]>([]);
 
-  private lastSplitTime: number = 0;
-  private lastSmoothedAltitude: number | null = null;
-  private lastAccumulatedAltitude: number | null = null;
-  private gradeDistanceAccumulator: number = 0;
-  private gradeAltitudeBaseline: number | null = null;
+  /** Every number above is read from here; see activity-metrics.ts. */
+  private metrics = new ActivityMetrics();
+  /** Increments on every resume, so the stored track remembers where the pauses were. */
+  private segment = 0;
+  /** The recording's stored fixes, published to the map only while someone can see it. */
+  private track: Coordinate[] = [];
+  /** The latest position, and whether the map is behind on it because the page is hidden. */
+  private viewPoint: Coordinate | null = null;
+  private viewBehind = false;
+  private pageVisible = typeof document === 'undefined' || document.visibilityState !== 'hidden';
 
   isTracking = signal(false); // Legacy support for simple checks
   permissionDenied = signal(false);
@@ -79,8 +94,16 @@ export class TrackingService {
     private ts: TranslationService,
     private notification: TrackingNotificationService,
     private activityTypes: ActivityTypeService,
+    private altimeter: AltimeterService,
   ) {
     void this.notification.onAction((action) => this.applyNotificationAction(action));
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        this.pageVisible = document.visibilityState !== 'hidden';
+        if (this.pageVisible && this.viewBehind) this.ngZone.run(() => this.publishView());
+      });
+    }
   }
 
   async requestPermission(): Promise<boolean> {
@@ -236,28 +259,12 @@ export class TrackingService {
     this.currentActivityId = await this.db.addActivity(activity);
     this.state.set('tracking');
     this.isTracking.set(true);
-    this.currentDistance.set(0);
-    this.currentTime.set(0);
-    this.currentSpeed.set(0);
-    this.currentClimb.set(0);
-    this.currentDescent.set(0);
+    this.resetRecording();
     this.lastCoordinate.set(null);
-    this.currentCoordinates.set([]);
-    this.currentPace.set(0);
-    this.avgPace.set(0);
-    this.maxSpeed.set(0);
-    this.movingTime.set(0);
-    this.currentGrade.set(0);
-    this.maxGrade.set(0);
-    this.minGrade.set(0);
-    this.splits.set([]);
-    this.lastSplitTime = 0;
-    this.lastSmoothedAltitude = null;
-    this.lastAccumulatedAltitude = null;
-    this.gradeDistanceAccumulator = 0;
-    this.gradeAltitudeBaseline = null;
-    this.accumulatedTime = 0;
 
+    // Not awaited: the barometer starts in the time the first fix takes to arrive, and
+    // until it does the fixes simply carry no pressure.
+    void this.altimeter.beginRecording();
     this.startTimer();
     await this.startGeolocation();
     this.syncNotification(true);
@@ -278,6 +285,8 @@ export class TrackingService {
 
   resumeTracking() {
     if (this.state() !== 'paused') return;
+    // Whatever happened while paused, nothing is measured across it.
+    this.segment++;
     this.state.set('tracking');
     this.startTimer();
     this.syncNotification(true);
@@ -334,7 +343,7 @@ export class TrackingService {
     // jitter. A paused session sends none at all and carries its frozen time in the text.
     const chronometerBase =
       !paused && this.startTimeSegment !== null
-        ? this.startTimeSegment - this.accumulatedTime * 1000
+        ? Math.round(this.startTimeSegment - this.accumulatedTime * 1000)
         : undefined;
 
     void this.notification.update({
@@ -359,12 +368,11 @@ export class TrackingService {
   }
 
   private updateCurrentTime() {
-    if (this.state() === 'tracking' && this.startTimeSegment !== null) {
-      const elapsedInSegment = Math.floor((Date.now() - this.startTimeSegment) / 1000);
-      this.currentTime.set(this.accumulatedTime + elapsedInSegment);
-    } else {
-      this.currentTime.set(this.accumulatedTime);
-    }
+    const running =
+      this.state() === 'tracking' && this.startTimeSegment !== null
+        ? (Date.now() - this.startTimeSegment) / 1000
+        : 0;
+    this.currentTime.set(Math.floor(this.accumulatedTime + running));
 
     // Update avgPace
     const distKm = this.currentDistance() / 1000;
@@ -387,7 +395,7 @@ export class TrackingService {
       this.timerInterval = null;
     }
     if (this.startTimeSegment !== null) {
-      this.accumulatedTime += Math.floor((Date.now() - this.startTimeSegment) / 1000);
+      this.accumulatedTime += (Date.now() - this.startTimeSegment) / 1000;
       this.startTimeSegment = null;
     }
     this.updateCurrentTime();
@@ -446,145 +454,114 @@ export class TrackingService {
 
   private handlePosition(position: GeolocationPosition) {
     this.ngZone.run(() => {
-      // If paused, we still want to keep the "current position" updated for the map,
-      // but we don't record the point in the DB or add to distance.
-      const { latitude, longitude, altitude, speed } = position.coords;
-      const { timestamp } = position;
+      const { latitude, longitude, altitude, speed, accuracy, altitudeAccuracy } = position.coords;
 
-      const newCoord: Coordinate = {
+      if (this.state() !== 'tracking') {
+        // Paused: the map keeps following, but nothing is measured or stored.
+        this.showPosition({
+          activityId: this.currentActivityId || 0,
+          lat: latitude,
+          lng: longitude,
+          timestamp: position.timestamp,
+          altitude: finiteOrNull(altitude),
+          speed: finiteOrNull(speed),
+        });
+        return;
+      }
+
+      const coord: Coordinate = {
         activityId: this.currentActivityId || 0,
         lat: latitude,
         lng: longitude,
-        timestamp,
-        altitude: altitude ?? null,
-        speed: speed ?? null,
+        timestamp: position.timestamp,
+        altitude: this.altimeter.toSeaLevel(latitude, longitude, altitude),
+        speed: finiteOrNull(speed),
+        accuracy: finiteOrNull(accuracy),
+        altitudeAccuracy: finiteOrNull(altitudeAccuracy),
+        pressure: this.altimeter.currentPressure(),
+        segment: this.segment,
       };
 
-      if (this.state() === 'tracking') {
-        const last = this.lastCoordinate();
-        if (last) {
-          const dist = this.calculateDistance(last.lat, last.lng, latitude, longitude);
-          const timeDiffSec = (timestamp - last.timestamp) / 1000;
+      // A fix the metrics refuse (too inaccurate, a jump, a repeat) is not part of the
+      // route: storing it would draw it and bring it back on any recomputation.
+      if (this.metrics.push(coord) !== 'accepted') return;
 
-          if (timeDiffSec > 0) {
-            const calculatedSpeed = dist / timeDiffSec;
-            const currentSpeedVal = speed || calculatedSpeed;
-
-            // If the average speed between points is greater than 0.3 m/s (approx 1 km/h)
-            // or if the instantaneous speed is high and the interval is small (e.g. just started moving)
-            if (calculatedSpeed > 0.3 || (currentSpeedVal > 0.3 && timeDiffSec < 10)) {
-              this.movingTime.update((m) => m + timeDiffSec);
-            }
-          }
-
-          // Only add distance if it's more than 2 meters to avoid GPS noise
-          if (dist > 2) {
-            this.currentDistance.update((d) => {
-              const newDist = d + dist;
-              const currentKm = Math.floor(newDist / 1000);
-              const lastKm = Math.floor(d / 1000);
-
-              if (currentKm > lastKm) {
-                const splitTime = this.currentTime() - this.lastSplitTime;
-                const splitSpeed = splitTime > 0 ? 1000 / splitTime : 0;
-                this.splits.update((s) => [
-                  ...s,
-                  {
-                    kilometer: currentKm,
-                    time: splitTime,
-                    speed: splitSpeed,
-                  },
-                ]);
-                this.lastSplitTime = this.currentTime();
-              }
-
-              return newDist;
-            });
-
-            // Calculate altitude changes only when there is horizontal movement
-            if (altitude !== null) {
-              // 1. Smooth the altitude using Exponential Moving Average (EMA)
-              let smoothed = altitude;
-              if (this.lastSmoothedAltitude !== null) {
-                const alpha = 0.2; // Smoothing factor (lower = smoother, but more lag)
-                smoothed = alpha * altitude + (1 - alpha) * this.lastSmoothedAltitude;
-              }
-              this.lastSmoothedAltitude = smoothed;
-
-              if (this.lastAccumulatedAltitude === null) {
-                this.lastAccumulatedAltitude = smoothed;
-              }
-
-              if (this.gradeAltitudeBaseline === null) {
-                this.gradeAltitudeBaseline = smoothed;
-              }
-
-              // 2. Grade calculation (accumulating over 15 meters for stability)
-              this.gradeDistanceAccumulator += dist;
-              if (this.gradeDistanceAccumulator >= 15) {
-                const grade =
-                  ((smoothed - this.gradeAltitudeBaseline) / this.gradeDistanceAccumulator) * 100;
-                // Cap impossible grades (e.g. GPS jumps) to reasonable limits (-45% to +45%)
-                const cappedGrade = Math.max(-45, Math.min(45, grade));
-
-                this.currentGrade.set(cappedGrade);
-
-                if (cappedGrade > this.maxGrade()) {
-                  this.maxGrade.set(cappedGrade);
-                }
-                if (cappedGrade < this.minGrade()) {
-                  this.minGrade.set(cappedGrade);
-                }
-
-                // Reset baseline for next segment
-                this.gradeDistanceAccumulator = 0;
-                this.gradeAltitudeBaseline = smoothed;
-              }
-
-              // 3. Accumulate differences using a threshold and comparing with the last accumulated baseline
-              const diff = smoothed - this.lastAccumulatedAltitude;
-              const ALTITUDE_THRESHOLD = 2.0; // 2 meters threshold to filter GPS jitter
-
-              if (Math.abs(diff) >= ALTITUDE_THRESHOLD) {
-                if (diff > 0) {
-                  this.currentClimb.update((c) => c + diff);
-                } else {
-                  this.currentDescent.update((d) => d + Math.abs(diff));
-                }
-                this.lastAccumulatedAltitude = smoothed;
-              }
-            }
-          }
-        } else {
-          // First coordinate recorded: initialize baseline
-          if (altitude !== null) {
-            this.lastSmoothedAltitude = altitude;
-            this.lastAccumulatedAltitude = altitude;
-          }
-        }
-        this.db.addCoordinate(newCoord);
-        this.currentCoordinates.update((coords) => [...coords, newCoord]);
-
-        const currentSpeedVal = speed || 0;
-        this.currentSpeed.set(currentSpeedVal);
-
-        if (currentSpeedVal > this.maxSpeed()) {
-          this.maxSpeed.set(currentSpeedVal);
-        }
-
-        if (currentSpeedVal > 0) {
-          this.currentPace.set(1000 / currentSpeedVal / 60);
-        } else {
-          this.currentPace.set(0);
-        }
-
-        this.updateCurrentTime();
-        this.syncNotification();
-      }
-
-      this.lastCoordinate.set(newCoord);
-      this.currentAltitude.set(altitude ?? null);
+      this.db.addCoordinate(coord);
+      this.track.push(coord);
+      this.publishMetrics();
+      this.showPosition(coord);
+      this.updateCurrentTime();
+      this.syncNotification();
     });
+  }
+
+  private publishMetrics() {
+    const metrics = this.metrics;
+
+    this.currentDistance.set(metrics.distance);
+    this.movingTime.set(metrics.movingTime);
+    this.currentSpeed.set(metrics.speed);
+    this.currentPace.set(metrics.speed > 0 ? 1000 / metrics.speed / 60 : 0);
+    this.maxSpeed.set(metrics.maxSpeed);
+    this.currentClimb.set(metrics.climb);
+    this.currentDescent.set(metrics.descent);
+    this.currentGrade.set(metrics.grade);
+    this.maxGrade.set(metrics.maxGrade);
+    this.minGrade.set(metrics.minGrade);
+    this.currentAltitude.set(metrics.altitude);
+    if (metrics.splits.length !== this.splits().length) this.splits.set([...metrics.splits]);
+  }
+
+  /**
+   * Move the map to a new position, unless nobody can see it.
+   *
+   * With the screen off or the app in the background, redrawing a route of thousands of
+   * points and panning the map (which fetches tiles) on every fix only drains the battery.
+   * The recording itself does not depend on any of it, so the view catches up in one go
+   * when the page is visible again.
+   */
+  private showPosition(coord: Coordinate) {
+    this.viewPoint = coord;
+    if (this.pageVisible) {
+      this.publishView();
+    } else {
+      this.viewBehind = true;
+    }
+  }
+
+  private publishView() {
+    this.viewBehind = false;
+    if (this.viewPoint) this.lastCoordinate.set(this.viewPoint);
+    if (this.currentCoordinates().length !== this.track.length) {
+      this.currentCoordinates.set(this.track.slice());
+    }
+  }
+
+  /** Clear everything measured, for a recording that starts or one that has ended. */
+  private resetRecording() {
+    this.metrics = new ActivityMetrics();
+    this.segment = 0;
+    this.track = [];
+    this.viewPoint = null;
+    this.viewBehind = false;
+    this.accumulatedTime = 0;
+    this.startTimeSegment = null;
+
+    this.currentTime.set(0);
+    this.currentDistance.set(0);
+    this.currentSpeed.set(0);
+    this.currentClimb.set(0);
+    this.currentDescent.set(0);
+    this.currentAltitude.set(null);
+    this.currentCoordinates.set([]);
+    this.currentPace.set(0);
+    this.avgPace.set(0);
+    this.maxSpeed.set(0);
+    this.movingTime.set(0);
+    this.currentGrade.set(0);
+    this.maxGrade.set(0);
+    this.minGrade.set(0);
+    this.splits.set([]);
   }
 
   async stopTracking() {
@@ -598,15 +575,18 @@ export class TrackingService {
       }
       this.watchId = null;
     }
+    void this.altimeter.endRecording();
 
     this.stopTimer();
 
-    const totalDistance = this.currentDistance();
+    const metrics = this.metrics;
+    metrics.finish();
+    const totalDistance = metrics.distance;
     const totalTime = this.currentTime();
-    const movingTime = Math.floor(this.movingTime());
+    // Moving time runs on the fixes' clock and the duration on the phone's; the first can
+    // never honestly exceed the second.
+    const movingTime = Math.min(Math.round(metrics.movingTime), totalTime);
     const avgSpeed = movingTime > 0 ? totalDistance / movingTime : 0;
-    const totalClimb = this.currentClimb();
-    const totalDescent = this.currentDescent();
 
     if (this.currentActivityId) {
       await this.db.updateActivity(this.currentActivityId, {
@@ -614,54 +594,21 @@ export class TrackingService {
         totalTime,
         movingTime,
         avgSpeed,
-        maxSpeed: this.maxSpeed(),
-        maxGrade: this.maxGrade(),
-        minGrade: this.minGrade(),
-        totalClimb,
-        totalDescent,
+        maxSpeed: metrics.maxSpeed,
+        maxGrade: metrics.maxGrade,
+        minGrade: metrics.minGrade,
+        totalClimb: metrics.climb,
+        totalDescent: metrics.descent,
         endTime: Date.now(),
-        splits: this.splits(),
+        splits: [...metrics.splits],
       });
     }
 
     this.state.set('idle');
     this.isTracking.set(false);
     this.currentActivityId = null;
-    this.currentTime.set(0);
-    this.currentDistance.set(0);
-    this.currentSpeed.set(0);
-    this.currentClimb.set(0);
-    this.currentDescent.set(0);
-    this.currentCoordinates.set([]);
-    this.currentPace.set(0);
-    this.avgPace.set(0);
-    this.maxSpeed.set(0);
-    this.movingTime.set(0);
-    this.currentGrade.set(0);
-    this.maxGrade.set(0);
-    this.minGrade.set(0);
-    this.splits.set([]);
-    this.lastSplitTime = 0;
-    this.lastSmoothedAltitude = null;
-    this.lastAccumulatedAltitude = null;
-    this.accumulatedTime = 0;
-    this.startTimeSegment = null;
+    this.resetRecording();
     this.lastNotificationKey = null;
     this.clearReferenceRoute();
-  }
-
-  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3; // meters
-    const φ1 = (lat1 * Math.PI) / 180;
-    const φ2 = (lat2 * Math.PI) / 180;
-    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-
-    const a =
-      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // in meters
   }
 }

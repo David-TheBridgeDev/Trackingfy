@@ -18,6 +18,10 @@ export interface ExportedCoordinate {
   altitude?: number | null;
   speed?: number | null;
   source?: CoordinateSource;
+  accuracy?: number | null;
+  altitudeAccuracy?: number | null;
+  pressure?: number | null;
+  segment?: number;
 }
 
 export interface ExportedActivity {
@@ -54,6 +58,15 @@ function round(value: number, decimals: number): number {
   return Math.round(value * factor) / factor;
 }
 
+function roundOptional(value: number | null | undefined, decimals: number): number | null {
+  return value === null || value === undefined ? null : round(value, decimals);
+}
+
+/** A finite number from an untrusted file, or null. */
+function optionalNumber(value: unknown): number | null {
+  return typeof value === 'number' && isFinite(value) ? value : null;
+}
+
 export function buildRouteExport(
   activity: Activity,
   coordinates: Coordinate[],
@@ -86,9 +99,14 @@ export function buildRouteExport(
       lat: round(c.lat, 6),
       lng: round(c.lng, 6),
       timestamp: c.timestamp,
-      altitude: c.altitude === null || c.altitude === undefined ? null : round(c.altitude, 2),
-      speed: c.speed === null || c.speed === undefined ? null : round(c.speed, 2),
+      altitude: roundOptional(c.altitude, 2),
+      speed: roundOptional(c.speed, 2),
       source: c.source,
+      accuracy: roundOptional(c.accuracy, 1),
+      altitudeAccuracy: roundOptional(c.altitudeAccuracy, 1),
+      // A thousandth of a hectopascal is about a centimeter of height.
+      pressure: roundOptional(c.pressure, 3),
+      segment: c.segment,
     })),
   };
 }
@@ -169,6 +187,10 @@ export function parseRouteExport(data: any): {
       altitude: c.altitude ?? null,
       speed: c.speed ?? null,
       source: c.source === 'manual' ? 'manual' : 'gps',
+      accuracy: optionalNumber(c.accuracy),
+      altitudeAccuracy: optionalNumber(c.altitudeAccuracy),
+      pressure: optionalNumber(c.pressure),
+      segment: Number.isInteger(c.segment) ? c.segment : undefined,
     })),
   };
 }

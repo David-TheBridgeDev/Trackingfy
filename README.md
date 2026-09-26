@@ -12,6 +12,8 @@ There is no account and no server-side storage: every activity lives in the brow
 
 - **Pick the activity:** walking, running or cycling, chosen once in Settings and kept, so the tracking screen stays a map and a button. It is what every recording is filed as, what the history filters by, what the statistics split the kilometres by, and what the route editor uses to judge whether a hand-drawn stretch implies a plausible speed. A route recorded under the wrong one can be re-filed from its detail screen.
 - **Real-time tracking** for walking, running and cycling: duration, moving time, distance, pace, average/max speed, climb, descent, altitude and grade.
+- **Measured, not just summed:** every fix goes through one metrics engine (`activity-metrics.ts`) that the live screen and any later recomputation share. It drops fixes that are too inaccurate or that jump further than the measured speed allows, counts distance from the last counted point and caps it by the receiver's Doppler speed (so jitter neither inflates a slow walk nor adds up while standing still), decides moving versus stopped from that speed, takes the top speed as a median so a single spike cannot set it, and runs altitude through a Kalman filter before counting climb and descent between confirmed turning points. Grade is a slope fitted over 100 m (barometer) or 200 m (GPS). Pauses are stored with the track, so nothing is ever measured across one.
+- **Barometer and sea-level altitude (Android):** phones with a barometer take climb, descent and grade from air pressure, which resolves centimetres where GPS altitude wanders by metres. Android reports GPS height above the WGS84 ellipsoid, 40–55 m above sea level across Europe; on Android 14+ it is converted with the system's geoid model, so the altitude shown is the one on the map.
 - **Background tracking on Android** through a foreground service, so recording continues with the screen off. On the web, tracking uses the Geolocation API and needs the tab to stay open.
 - **Interactive recording notification (Android):** live distance, climb and elapsed time, with **Pause / Resume / Finish** buttons. On Android 16 it is promoted to a status bar chip and the lock screen (Live Updates).
 - **Follow a route:** load any past activity as a reference line on the live map.
@@ -104,13 +106,15 @@ src/app/
 │   └── settings/          # Preferences, backup/restore, APK download
 └── services/
     ├── tracking.ts               # Recording engine (GPS stream, pause/resume, live stats)
+    ├── activity-metrics.ts       # Every stat derived from the fixes, live and on recomputation
+    ├── altimeter.ts              # Barometer and sea-level altitude, from AltimeterPlugin
     ├── tracking-notification.ts  # Bridge to the Android recording notification
     ├── database.ts               # Dexie schema, backup export/import, route import
     ├── activity-types.ts         # Walking/Running/Cycling: the list, the icons and the chosen one
     ├── collections.ts            # The history's collections, shared by the screens that use them
     ├── statistics.ts             # Aggregates routes into periods, totals, breakdowns and records
     ├── route-navigation.ts       # The list a route was opened from, walked by the detail view
-    ├── route-stats.ts            # Recomputes stats from stored coordinates (mirrors tracking.ts)
+    ├── route-stats.ts            # Recomputes stats and chart series from stored coordinates
     ├── route-editor.ts           # Logic for adding a hand-drawn opening stretch
     ├── elevation.ts              # Terrain elevation lookup (Open-Meteo + fallback)
     ├── route-export.ts           # `trackingfy.route` file format
@@ -122,7 +126,8 @@ src/app/
 android/app/src/main/java/com/trackingfy/app/
 ├── MainActivity.java
 ├── RouteImportPlugin.java           # Receives VIEW/SEND intents with route files
-└── TrackingNotificationPlugin.java  # Interactive recording notification
+├── TrackingNotificationPlugin.java  # Interactive recording notification
+└── AltimeterPlugin.java             # Barometer samples and geoid height (Android 14+)
 
 site/                  # Public website: landing, blog and legal pages (see below)
 ├── build.js           # Static generator, runs after `ng build`
@@ -344,7 +349,7 @@ Files exported with **Export route (JSON)** use a versioned envelope, separate f
 }
 ```
 
-Distances and elevations are in metres, durations in seconds, speeds in m/s and timestamps in epoch milliseconds. Only the main activity fields are shown; the file also carries optional ones such as `movingTime`, `maxSpeed`, `splits` and `editedAt`.
+Distances and elevations are in metres, durations in seconds, speeds in m/s and timestamps in epoch milliseconds. Only the main activity fields are shown; the file also carries optional ones such as `movingTime`, `maxSpeed`, `splits` and `editedAt`. Coordinates recorded since fix quality is kept also carry `accuracy` and `altitudeAccuracy` (metres), `pressure` (hPa, on phones with a barometer) and `segment`, which increments at every resume after a pause; the receiving device uses them to recompute the route exactly as it was measured.
 
 The file has no database ids, so the receiving device inserts it as a new activity. An import is skipped as a duplicate when an activity with the same `startTime` already exists. Coordinates marked `"source": "manual"` were drawn by hand in the route editor.
 

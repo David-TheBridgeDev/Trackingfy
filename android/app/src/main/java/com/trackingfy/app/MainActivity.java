@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
         // that launched the activity.
         registerPlugin(RouteImportPlugin.class);
         registerPlugin(TrackingNotificationPlugin.class);
+        registerPlugin(AltimeterPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

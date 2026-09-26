@@ -72,9 +72,19 @@ export interface Coordinate {
   lat: number;
   lng: number;
   timestamp: number;
+  /** Above mean sea level, in meters. */
   altitude?: number | null;
   speed?: number | null;
   source?: CoordinateSource;
+  /**
+   * What the receiver reported alongside the fix, kept so a route can be recomputed with
+   * the same information it was recorded with. All absent on routes recorded before them.
+   */
+  accuracy?: number | null; // horizontal, in meters
+  altitudeAccuracy?: number | null; // in meters
+  pressure?: number | null; // barometric, in hPa
+  /** Increments each time a paused recording resumes. See `TrackSample.segment`. */
+  segment?: number;
 }
 
 export type ImportResult =
@@ -91,8 +101,8 @@ export class DatabaseService extends Dexie {
 
   constructor() {
     super('TrackingfyDB');
-    // The fields added for route editing and route sharing are all optional and
-    // unindexed, so they need no schema version bump.
+    // The fields added for route editing, route sharing and the recorded fix quality are
+    // all optional and unindexed, so they need no schema version bump.
     this.version(2).stores({
       activities: '++id, date, type',
       coordinates: '++id, activityId, timestamp',

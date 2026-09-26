@@ -4,7 +4,7 @@ import {
   MAX_SHARE_STATS,
   downsample,
   elevationSeries,
-  fillAltitudeGaps,
+  fillGaps,
   fitProjection,
   formatDuration,
   normalizeOptions,
@@ -130,32 +130,47 @@ describe('tileGrid', () => {
   });
 });
 
-describe('fillAltitudeGaps', () => {
+describe('fillGaps', () => {
   it('averages a gap between two known readings', () => {
-    expect(fillAltitudeGaps([coord(0, 0, 100), coord(0, 0, null), coord(0, 0, 200)])).toEqual([
-      100, 150, 200,
-    ]);
+    expect(fillGaps([100, null, 200])).toEqual([100, 150, 200]);
   });
 
   it('carries the nearest reading outwards at the ends', () => {
-    expect(fillAltitudeGaps([coord(0, 0, undefined), coord(0, 0, 80), coord(0, 0, null)])).toEqual([
-      80, 80, 80,
-    ]);
+    expect(fillGaps([undefined, 80, null])).toEqual([80, 80, 80]);
   });
 
   it('falls back to zero when the route has no altitude at all', () => {
-    expect(fillAltitudeGaps([coord(0, 0, null), coord(0, 0, null)])).toEqual([0, 0]);
+    expect(fillGaps([null, null])).toEqual([0, 0]);
   });
 });
 
 describe('elevationSeries', () => {
   it('accumulates distance along the route', () => {
-    const series = elevationSeries([coord(40, -3, 100), coord(40.01, -3, 120)]);
+    const series = elevationSeries([
+      { ...coord(40, -3, 100), timestamp: 0 },
+      { ...coord(40.01, -3, 120), timestamp: 600_000 },
+    ]);
     expect(series[0].distance).toBe(0);
     // A hundredth of a degree of latitude is about 1.1 km.
     expect(series[1].distance).toBeGreaterThan(1000);
     expect(series[1].distance).toBeLessThan(1200);
-    expect(series.map((p) => p.altitude)).toEqual([100, 120]);
+    // A kilometer apart, the filter has every reason to believe both readings.
+    expect(series[0].altitude).toBeCloseTo(100, 0);
+    expect(series[1].altitude).toBeCloseTo(120, 0);
+  });
+
+  it('draws the filtered altitude, not the saw of raw GPS readings', () => {
+    // Flat ground at 500 m, walked at 1.4 m/s, with readings alternating 4 m either side.
+    const route = Array.from({ length: 200 }, (_, i) => ({
+      ...coord(40 + (i * 1.4) / 111_195, -3, 500 + (i % 2 ? 4 : -4)),
+      timestamp: i * 1000,
+      speed: 1.4,
+      accuracy: 5,
+    }));
+
+    const altitudes = elevationSeries(route).map((p) => p.altitude);
+    const spread = Math.max(...altitudes.slice(20)) - Math.min(...altitudes.slice(20));
+    expect(spread).toBeLessThan(2);
   });
 
   it('returns nothing for an empty route', () => {

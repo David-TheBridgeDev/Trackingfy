@@ -233,8 +233,9 @@ export class RouteEditorService {
     const addedDuration = Math.max(1, Math.round((anchor.timestamp - startTime) / 1000));
     const impliedSpeed = addedDistance / addedDuration;
 
-    // Duration is carried on the recorded base rather than recomputed: pause intervals
-    // are not stored, so the activity's own totals are the only reliable source for them.
+    // Duration is carried on the recorded base rather than recomputed: it was measured by
+    // the recording clock, and older routes do not even store where their pauses were, so
+    // the activity's own totals are the only reliable source for it.
     const newTotalTime = baseTotalTime + addedDuration;
     const newMovingTime = baseMovingTime + addedDuration;
     const newTotalDistance = baseDistance + addedDistance;
@@ -348,7 +349,7 @@ export class RouteEditorService {
    *
    * Geometry-derived metrics (distance, climb, descent, grades, top speed, splits) are
    * recomputed from the merged track. Duration is carried on the recorded base, because
-   * pauses leave no trace in the stored coordinates and so cannot be reconstructed.
+   * it comes from the recording clock, which the fixes cannot reproduce exactly.
    */
   async saveOpeningSegment(
     context: OpeningSegmentContext,

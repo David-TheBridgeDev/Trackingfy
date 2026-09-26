@@ -18,8 +18,8 @@ import {
   toLocalInputValue,
 } from '../../services/route-editor';
 import { buildRouteExport } from '../../services/route-export';
-import { fillAltitudeGaps } from '../../services/route-image';
-import { haversine } from '../../services/route-stats';
+import { profileAltitudes } from '../../services/route-image';
+import { haversine, speedProfile } from '../../services/route-stats';
 import { App } from '../../app';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
@@ -579,7 +579,8 @@ export class ActivityDetailComponent implements OnInit {
 
     let totalDist = 0;
     const points: ChartPoint[] = [];
-    const altitudes = fillAltitudeGaps(coords);
+    const altitudes = profileAltitudes(coords);
+    const speeds = speedProfile(coords);
 
     for (let i = 0; i < coords.length; i++) {
       const c = coords[i];
@@ -587,7 +588,7 @@ export class ActivityDetailComponent implements OnInit {
         totalDist += haversine(coords[i - 1].lat, coords[i - 1].lng, c.lat, c.lng);
       }
 
-      const speed = (c.speed || 0) * 3.6;
+      const speed = speeds[i] * 3.6;
       points.push({
         distance: totalDist / 1000,
         altitude: altitudes[i],
@@ -602,7 +603,6 @@ export class ActivityDetailComponent implements OnInit {
     if (points.length === 0) return;
 
     const maxDist = points[points.length - 1].distance || 1;
-    const speeds = points.map((p) => p.speed);
     const minAlt = Math.min(...altitudes);
     const maxAlt = Math.max(...altitudes);
     const altRange = maxAlt - minAlt;
@@ -610,7 +610,7 @@ export class ActivityDetailComponent implements OnInit {
     const yAltMax = maxAlt + (altRange * 0.1 || 10);
     const altScale = yAltMax - yAltMin || 1;
 
-    const maxSpeed = Math.max(...speeds, 5); // At least 5 km/h
+    const maxSpeed = Math.max(...points.map((p) => p.speed), 5); // At least 5 km/h
 
     for (const p of points) {
       p.x = (p.distance / maxDist) * 1000;
