@@ -7,3 +7,19 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.history-swipe {
+  will-change: transform, opacity;
+}
+
+.history-swipe--settling {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-swipe--settling {
+    transition: none;
+  }
+}

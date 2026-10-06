@@ -187,6 +187,103 @@ describe('HistoryComponent', () => {
 
       expect(mockDatabaseService.deleteCollection).not.toHaveBeenCalled();
     });
+
+    describe('swiping between tabs', () => {
+      const pointer = (clientX: number, clientY = 0) =>
+        ({
+          pointerId: 1,
+          pointerType: 'touch',
+          button: 0,
+          clientX,
+          clientY,
+          target: null,
+          currentTarget: null,
+        }) as unknown as PointerEvent;
+
+      async function swipe(fromX: number, toX: number, toY = 0) {
+        component.onSwipeStart(pointer(fromX));
+        component.onSwipeMove(pointer((fromX + toX) / 2, toY / 2));
+        component.onSwipeMove(pointer(toX, toY));
+        component.onSwipeEnd(pointer(toX, toY));
+        await vi.runAllTimersAsync();
+      }
+
+      beforeEach(() => vi.useFakeTimers());
+      afterEach(() => vi.useRealTimers());
+
+      it('should find the neighbouring tab in the order of the tab bar', () => {
+        component.setTab(1);
+
+        expect(component.tabTowards(1)).toBe(2);
+        expect(component.tabTowards(-1)).toBe('all');
+      });
+
+      it('should turn to the next tab on a right-to-left swipe', async () => {
+        component.setTab('all');
+
+        await swipe(300, 150);
+
+        expect(component.activeTab()).toBe(1);
+        expect(localStorage.getItem('trackingfy_history_tab')).toBe('1');
+      });
+
+      it('should turn back to the previous tab on a left-to-right swipe', async () => {
+        component.setTab(2);
+
+        await swipe(100, 250);
+
+        expect(component.activeTab()).toBe(1);
+      });
+
+      it('should stay put past either end of the tab bar', async () => {
+        component.setTab('all');
+        await swipe(100, 250);
+        expect(component.activeTab()).toBe('all');
+
+        component.setTab('none');
+        await swipe(300, 150);
+        expect(component.activeTab()).toBe('none');
+      });
+
+      it('should not change tab on a drag too short to be a swipe', async () => {
+        component.setTab('all');
+
+        await swipe(300, 270);
+
+        expect(component.activeTab()).toBe('all');
+        expect(component.swipeOffset()).toBe(0);
+      });
+
+      it('should leave a mostly vertical drag to the scroll', async () => {
+        component.setTab('all');
+
+        await swipe(300, 220, 200);
+
+        expect(component.activeTab()).toBe('all');
+      });
+
+      it('should not open the route a swipe ends on', async () => {
+        const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+        component.setTab('all');
+
+        component.onSwipeStart(pointer(300));
+        component.onSwipeMove(pointer(150));
+        component.onSwipeEnd(pointer(150));
+        component.navigateToActivity(10);
+
+        expect(navigate).not.toHaveBeenCalled();
+        await vi.runAllTimersAsync();
+      });
+
+      it('should not swipe while routes are being selected', async () => {
+        component.setTab('all');
+        component.enterSelectionMode(10);
+
+        await swipe(300, 150);
+
+        expect(component.activeTab()).toBe('all');
+      });
+    });
   });
 
   describe('search and filters', () => {

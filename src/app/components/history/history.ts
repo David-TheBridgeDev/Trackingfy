@@ -49,6 +49,20 @@ const LONG_PRESS_TOLERANCE_PX = 12;
  */
 const CLICK_SUPPRESSION_MS = 700;
 
+/** A drag has to travel this far before it is a swipe rather than a tap. */
+const SWIPE_INTENT_PX = 12;
+/** And this far before letting go of it changes tab. */
+const SWIPE_COMMIT_PX = 60;
+/** How much more horizontal than vertical a drag must be to count as a swipe. */
+const SWIPE_DIRECTION_RATIO = 1.4;
+/** How far the list can follow the finger. */
+const SWIPE_MAX_PX = 110;
+/** How far it slides out, and how long that takes, before the next tab arrives. */
+const SWIPE_EXIT_PX = 70;
+const SWIPE_EXIT_MS = 140;
+/** What is left of a drag towards an end of the tab bar, where there is no next tab. */
+const SWIPE_RESISTANCE = 0.25;
+
 /** Accent- and case-insensitive, so "montaña" is found by typing "montana". */
 export function normalizeForSearch(text: string): string {
   return text
@@ -108,6 +122,25 @@ export class HistoryComponent implements OnInit {
   private pressOrigin = { x: 0, y: 0 };
   /** Until when a long press keeps the click it produces from opening the route. */
   private suppressClickUntil = 0;
+
+  /** How far the list has been dragged sideways, in pixels. */
+  swipeOffset = signal(0);
+
+  /** Whether that offset is being animated rather than following a finger. */
+  swipeSettling = signal(false);
+
+  swipeTransform = computed(() => `translateX(${this.swipeOffset()}px)`);
+
+  /** The list fades as it leaves, which is what makes the next tab feel like a page. */
+  swipeOpacity = computed(() =>
+    Math.max(0.35, 1 - Math.abs(this.swipeOffset()) / (SWIPE_EXIT_PX * 2)),
+  );
+
+  private swipeStart: { x: number; y: number; pointerId: number } | null = null;
+  /** Set once a drag has proved to be horizontal, so vertical scrolling is left alone. */
+  private swipeLocked = false;
+  /** While a change of tab is playing, further gestures would fight the animation. */
+  private isSliding = false;
 
   readonly tabCounts = computed(() => this.collectionsService.countRoutes(this.activities()));
 
@@ -353,6 +386,151 @@ export class HistoryComponent implements OnInit {
 
   isActiveTab(key: CollectionFilter): boolean {
     return this.activeTab() === key;
+  }
+
+  // --- Swiping between tabs ------------------------------------------------
+
+  /**
+   * Start following a drag across the list.
+   *
+   * The tabs are pages laid side by side, so a sideways swipe over the list turns to the
+   * neighbouring one, the way a gallery turns photos. Selection mode is left out: the
+   * selection is tied to what is on screen, and the tab bar is hidden while it lasts.
+   */
+  onSwipeStart(event: PointerEvent) {
+    if (this.isSelectionMode() || this.isSliding || this.tabs().length < 2) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, a, input, select, textarea')) return;
+
+    this.swipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    this.swipeLocked = false;
+    this.swipeSettling.set(false);
+  }
+
+  onSwipeMove(event: PointerEvent) {
+    const start = this.swipeStart;
+    if (!start || event.pointerId !== start.pointerId) return;
+
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+
+    if (!this.swipeLocked) {
+      if (Math.abs(dx) < SWIPE_INTENT_PX) return;
+
+      // A drag that is mostly vertical is someone scrolling the list; let go of it for
+      // good rather than stealing the rest of the movement.
+      if (Math.abs(dx) < Math.abs(dy) * SWIPE_DIRECTION_RATIO) {
+        this.swipeStart = null;
+        this.settle(0);
+        return;
+      }
+
+      this.swipeLocked = true;
+      this.cancelPress();
+
+      // The pointer is only held once the drag is known to be a swipe: holding it from
+      // the start would pull it off the card underneath and cancel every long press.
+      const surface = event.currentTarget as HTMLElement | null;
+      surface?.setPointerCapture?.(event.pointerId);
+    }
+
+    this.swipeOffset.set(this.resist(dx));
+  }
+
+  onSwipeEnd(event: PointerEvent) {
+    const start = this.swipeStart;
+    if (!start || event.pointerId !== start.pointerId) return;
+
+    const dx = event.clientX - start.x;
+    const locked = this.swipeLocked;
+
+    this.swipeStart = null;
+    this.swipeLocked = false;
+    this.releasePointer(event);
+
+    // A swipe that ends over a route must not open it as well.
+    if (locked) this.suppressClickUntil = Date.now() + CLICK_SUPPRESSION_MS;
+
+    const direction: 1 | -1 = dx < 0 ? 1 : -1;
+    if (locked && Math.abs(dx) >= SWIPE_COMMIT_PX && this.tabTowards(direction) !== null) {
+      void this.slide(direction);
+    } else {
+      this.settle(0);
+    }
+  }
+
+  onSwipeCancel(event?: PointerEvent) {
+    this.swipeStart = null;
+    this.swipeLocked = false;
+    if (event) this.releasePointer(event);
+    this.settle(0);
+  }
+
+  private releasePointer(event: PointerEvent) {
+    const surface = event.currentTarget as HTMLElement | null;
+    if (surface?.hasPointerCapture?.(event.pointerId)) {
+      surface.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  /** The tab a move in this direction lands on: forward (right to left) is 1, back is -1. */
+  tabTowards(direction: 1 | -1): CollectionFilter | null {
+    const tabs = this.tabs();
+    const index = tabs.findIndex((tab) => tab.key === this.activeTab());
+    return tabs[index + direction]?.key ?? null;
+  }
+
+  /** Follow the finger, unless there is no tab that way: then barely move at all. */
+  private resist(dx: number): number {
+    const capped = Math.max(-SWIPE_MAX_PX, Math.min(SWIPE_MAX_PX, dx));
+    return this.tabTowards(dx < 0 ? 1 : -1) === null ? capped * SWIPE_RESISTANCE : capped;
+  }
+
+  private settle(offset: number) {
+    this.swipeSettling.set(true);
+    this.swipeOffset.set(offset);
+  }
+
+  /**
+   * Turn to the neighbouring tab: the list leaves the way the finger went, and the next
+   * one comes in from the other side.
+   */
+  async slide(direction: 1 | -1) {
+    const key = this.tabTowards(direction);
+    if (key === null || this.isSliding) return;
+
+    this.isSliding = true;
+
+    try {
+      if (!prefersReducedMotion()) {
+        this.settle(-direction * SWIPE_EXIT_PX);
+        await delay(SWIPE_EXIT_MS);
+
+        // Put the list down on the far side without animating the jump, so the arrival
+        // reads as a new page rather than as the old one sliding back.
+        this.swipeSettling.set(false);
+        this.swipeOffset.set(direction * SWIPE_EXIT_PX);
+      }
+
+      this.setTab(key);
+
+      requestAnimationFrame(() => {
+        this.settle(0);
+        this.revealActiveTab();
+      });
+    } finally {
+      this.isSliding = false;
+    }
+  }
+
+  /** The tab bar scrolls sideways too, and the tab a swipe lands on may be off its edge. */
+  private revealActiveTab() {
+    const chip = document.querySelector<HTMLElement>(
+      `[data-history-tab="${String(this.activeTab())}"]`,
+    );
+    chip?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }
 
   // --- Filters -------------------------------------------------------------
@@ -768,6 +946,12 @@ export class HistoryComponent implements OnInit {
     const s = total % 60;
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
   }
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
 
 /** The tab the user left the history on, so the app opens where they were. */
