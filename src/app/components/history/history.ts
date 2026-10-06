@@ -57,11 +57,18 @@ const SWIPE_COMMIT_PX = 60;
 const SWIPE_DIRECTION_RATIO = 1.4;
 /** How far the list can follow the finger. */
 const SWIPE_MAX_PX = 110;
-/** How far it slides out, and how long that takes, before the next tab arrives. */
-const SWIPE_EXIT_PX = 70;
-const SWIPE_EXIT_MS = 140;
+/** How far to the side the next tab starts before sliding into place. */
+const SWIPE_ENTER_PX = 48;
 /** What is left of a drag towards an end of the tab bar, where there is no next tab. */
 const SWIPE_RESISTANCE = 0.25;
+/**
+ * How long a swipe keeps swallowing clicks.
+ *
+ * Only the click the swipe itself produces, which follows the finger lifting at once, has
+ * to be caught. Anything longer eats the tap that comes next, on the route the user
+ * actually wants to open.
+ */
+const SWIPE_CLICK_GUARD_MS = 120;
 
 /** Accent- and case-insensitive, so "montaña" is found by typing "montana". */
 export function normalizeForSearch(text: string): string {
@@ -133,14 +140,12 @@ export class HistoryComponent implements OnInit {
 
   /** The list fades as it leaves, which is what makes the next tab feel like a page. */
   swipeOpacity = computed(() =>
-    Math.max(0.35, 1 - Math.abs(this.swipeOffset()) / (SWIPE_EXIT_PX * 2)),
+    Math.max(0.35, 1 - Math.abs(this.swipeOffset()) / (SWIPE_MAX_PX * 2)),
   );
 
   private swipeStart: { x: number; y: number; pointerId: number } | null = null;
   /** Set once a drag has proved to be horizontal, so vertical scrolling is left alone. */
   private swipeLocked = false;
-  /** While a change of tab is playing, further gestures would fight the animation. */
-  private isSliding = false;
 
   readonly tabCounts = computed(() => this.collectionsService.countRoutes(this.activities()));
 
@@ -398,7 +403,7 @@ export class HistoryComponent implements OnInit {
    * selection is tied to what is on screen, and the tab bar is hidden while it lasts.
    */
   onSwipeStart(event: PointerEvent) {
-    if (this.isSelectionMode() || this.isSliding || this.tabs().length < 2) return;
+    if (this.isSelectionMode() || this.tabs().length < 2) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
 
     const target = event.target as HTMLElement | null;
@@ -451,11 +456,11 @@ export class HistoryComponent implements OnInit {
     this.releasePointer(event);
 
     // A swipe that ends over a route must not open it as well.
-    if (locked) this.suppressClickUntil = Date.now() + CLICK_SUPPRESSION_MS;
+    if (locked) this.suppressClickUntil = Date.now() + SWIPE_CLICK_GUARD_MS;
 
     const direction: 1 | -1 = dx < 0 ? 1 : -1;
     if (locked && Math.abs(dx) >= SWIPE_COMMIT_PX && this.tabTowards(direction) !== null) {
-      void this.slide(direction);
+      this.slide(direction);
     } else {
       this.settle(0);
     }
@@ -494,35 +499,32 @@ export class HistoryComponent implements OnInit {
   }
 
   /**
-   * Turn to the neighbouring tab: the list leaves the way the finger went, and the next
-   * one comes in from the other side.
+   * Turn to the neighbouring tab.
+   *
+   * The tab changes the moment the finger lifts, and only the new list slides in from
+   * the side the finger came from. Nothing waits on the animation, so a route can be
+   * tapped straight away.
    */
-  async slide(direction: 1 | -1) {
+  slide(direction: 1 | -1) {
     const key = this.tabTowards(direction);
-    if (key === null || this.isSliding) return;
+    if (key === null) return;
 
-    this.isSliding = true;
+    this.setTab(key);
 
-    try {
-      if (!prefersReducedMotion()) {
-        this.settle(-direction * SWIPE_EXIT_PX);
-        await delay(SWIPE_EXIT_MS);
-
-        // Put the list down on the far side without animating the jump, so the arrival
-        // reads as a new page rather than as the old one sliding back.
-        this.swipeSettling.set(false);
-        this.swipeOffset.set(direction * SWIPE_EXIT_PX);
-      }
-
-      this.setTab(key);
-
-      requestAnimationFrame(() => {
-        this.settle(0);
-        this.revealActiveTab();
-      });
-    } finally {
-      this.isSliding = false;
+    if (prefersReducedMotion()) {
+      this.swipeSettling.set(false);
+      this.swipeOffset.set(0);
+    } else {
+      // Put the list down on the far side without animating the jump, so the arrival
+      // reads as a new page rather than as the old one sliding back.
+      this.swipeSettling.set(false);
+      this.swipeOffset.set(direction * SWIPE_ENTER_PX);
     }
+
+    requestAnimationFrame(() => {
+      this.settle(0);
+      this.revealActiveTab();
+    });
   }
 
   /** The tab bar scrolls sideways too, and the tab a swipe lands on may be off its edge. */
@@ -947,8 +949,6 @@ export class HistoryComponent implements OnInit {
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
   }
 }
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;

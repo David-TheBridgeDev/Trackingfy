@@ -275,6 +275,22 @@ describe('HistoryComponent', () => {
         await vi.runAllTimersAsync();
       });
 
+      it('should open a route tapped right after a swipe', async () => {
+        const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+        component.setTab('all');
+
+        // A swipe on touch usually produces no click of its own, so the guard must not
+        // be left waiting to eat the next real tap.
+        component.onSwipeStart(pointer(300));
+        component.onSwipeMove(pointer(150));
+        component.onSwipeEnd(pointer(150));
+        vi.advanceTimersByTime(200);
+        component.navigateToActivity(10);
+
+        expect(component.activeTab()).toBe(1);
+        expect(navigate).toHaveBeenCalledWith(['/activity', 10]);
+      });
+
       it('should not swipe while routes are being selected', async () => {
         component.setTab('all');
         component.enterSelectionMode(10);
